@@ -1,0 +1,56 @@
+<html>
+<!-- simple web based editor for adding info to an image set-->
+<!-- part of the world museum digital asset management solution -->
+
+<!-- list the images contained in the asset management system -->
+<head>
+<title>WM Digital Asset Manager</title>
+</head>
+<body>
+<script src="urlparms.js" ></script>
+<script src="wmview.js" ></script>
+<script src="adamClient.js" ></script>
+
+<div id="wmarea">
+<div id="navbar" width="20%">
+<center>
+<a href="wmlist.html">All Images</a>
+</center>
+</div>
+<div id="wmlist">
+<table >
+<tbody id="imgtable">
+</tbody>
+</table>
+</div>
+</body>
+<script>
+// get Page parameters
+var imgid = getUrlParam('imgid','1');
+console.log(imgid);
+// create our handle for the museum
+adam = new Adam("wmusuem");
+// connect to the museum database
+adam.connect("https://cs.boisestate.edu");
+
+// now get the rows for the images
+//colnames = adam.getColNames("images");
+somerows = adam.getComments("comments",imgid);
+
+function statUpdateComment(comid,acom)
+{
+  adam.adamUpdateComment(comid,acom);
+}
+
+function statDeleteComment(comid)
+{
+  adam.DeleteComment(comid);
+}
+
+function statNewComment()
+{
+  console.log(imgid);
+  adam.NewComment(imgid);
+}
+</script>
+</html>

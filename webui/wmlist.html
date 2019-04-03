@@ -1,0 +1,38 @@
+<html>
+<!-- simple web based editor for adding info to an image set-->
+<!-- part of the world museum digital asset management solution -->
+
+<!-- list the images contained in the asset management system -->
+<head>
+<title>WM Digital Asset Manager</title>
+</head>
+<body>
+<script src="wmview.js" ></script>
+<script src="adamClient.js" ></script>
+
+<div id="wmarea">
+<div id="navbar" width="20%">
+Prev Next
+</div>
+<div id="wmlist">
+<table >
+<tbody id="imgtable">
+</tbody>
+</table>
+</div>
+</body>
+<script>
+// create our handle for the museum
+adam = new Adam("wmusuem");
+// connect to the museum database
+adam.connect("https://cs.boisestate.edu");
+
+// now get the rows for the images
+//colnames = adam.getColNames("images");
+somerows = adam.getRows("images");
+
+// now create the selectable list
+//aplace = document.getElementById("imgtable");
+//addViewTextList(aplace,colnames,somerows);
+</script>
+</html>

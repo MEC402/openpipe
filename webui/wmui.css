@@ -1,0 +1,28 @@
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 5px;
+}
+
+.text {
+  color: white;
+  font: 12px sans-serif;
+}
+
+.node text {
+  font: 32px sans-serif;
+  fill: black;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 8px;
+}
+
+body {
+    background-color: white;
+    color: white;
+}
+
+fancybox-image img { width:auto; max-height:52px;}
