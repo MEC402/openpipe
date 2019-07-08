@@ -19,9 +19,7 @@ Parameters
 |Name | Type | Description |
 |-----|------|------------|
 |q | string | keyword or phrase that searches against all metadata in CMS |
-|-----|------|------------|
 |local | integer | 0 only searches OpenPipe CMS, 1 searchs all possible endpoints, even remote endpoints. |
-|------|---------|--------|
 | cache | integer | 0 do not cache results.  1 Cache resulting images |
 
 
