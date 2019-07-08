@@ -1,0 +1,13 @@
+#!/bin/bash
+set +x
+(cd /cornea2/mediastore/crpanos2
+for v in *.ready
+do
+  if [ -f "/cornea/crpanos2/${v}" ]; then
+    skip ${v}
+  else
+    cp -r ${v%.ready} /cornea/crpanos2/
+    touch /cornea/crpanos2/${v}
+  fi
+done
+)

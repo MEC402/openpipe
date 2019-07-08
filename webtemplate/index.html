@@ -1,0 +1,71 @@
+<html>
+<head><title>Panorama Web Page Template</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+</head>
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<style>
+body,h1,h2,h3,h4,h5 {
+	font-family: Baskerville, "Palatino Linotype", Palatino, "Century Schoolbook L", "Times New Roman", serif;
+	line-height: 24px;
+}
+.w3-quarter img{margin-bottom: 0px; cursor: pointer}
+.w3-quarter img:hover{opacity: 0.6; transition: 0.3s}
+</style>
+<body bgcolor="#274465">
+
+  <br>
+   <!--<font color="white"><center><img class="img-responsive" src="logo.png" width="395" height="78" alt=""/></center>-->
+
+  </font></p>
+  <center>
+		<h1><font color="#D64309">Boise State University Panoramas</font></h1>
+   <p><font color="white">World Museum 360<strong>°</strong> 
+   Oculus Headset Application Coming Soon </font></p>
+  </center>
+
+
+<div class="w3-row" id="panotable">
+  <p>
+
+<!--table width=100%-->
+<script>
+
+$.getJSON( "panoramas.json", function( data ) {
+  var items = [];
+console.log(data.panos.length);
+
+var mp = Math.ceil(data.panos.length/4);
+
+for (j =0; j < 4; j++) {
+  var myitems =[];
+  for (i = 0; i < mp ; i++) {
+    //myitems.push("<div>");
+      //var mp = Math.floor(data.panos.length/4);
+//console.log(mp);
+      if (j*mp+i < data.panos.length)
+      {
+      myitems.push( "<a href=\"bsuviewer.html?id="+data.panos[j*mp+i].id+"\"><img width=100% src=\"" + data.panos[j*mp+i].thumb+"\"/></a>" );
+    }
+    }
+    //myitems.push("</div>");
+    items.push(myitems );
+  }
+//  debugger;
+ console.log("PANOs done");
+  for (i= 0; i <  4; i++) {
+  $( "<div/>", {
+    "class": "w3-quarter",
+    html: items[i].join( "" )
+  }).appendTo( "#panotable" );
+ }
+});
+console.log("PAST");
+</script>
+<!--/table-->
+</div>
+
+</body>
+</html>
