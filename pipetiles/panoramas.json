@@ -1,0 +1,105 @@
+{
+"title": "Immersion Idaho Mix",
+"panos": [
+
+{"id": "CA_Hollywood_Mall_90",
+ "name": "CA_Hollywood_Mall_90",
+ "left": "/data/scratch/tiledir/CA_Hollywood_Mall_90/left/%d/%d/%d/%d.jpg",
+ "right": "/data/scratch/tiledir/CA_Hollywood_Mall_90/right/%d/%d/%d/%d.jpg",
+ "thumb": "/data/scratch/tiledir/CA_Hollywood_Mall_90/left/1/f/0/0.jpg",
+ "icon": "icon-casa-serena-dining-room-128x128.png",
+ "yaw": 0.0,
+ "navlink": [
+ ]}
+,
+{"id": "CA_nyny_100",
+ "name": "CA_nyny_100",
+ "left": "/data/scratch/tiledir/CA_nyny_100/left/%d/%d/%d/%d.jpg",
+ "right": "/data/scratch/tiledir/CA_nyny_100/right/%d/%d/%d/%d.jpg",
+ "thumb": "/data/scratch/tiledir/CA_nyny_100/left/1/f/0/0.jpg",
+ "icon": "icon-casa-serena-dining-room-128x128.png",
+ "yaw": 0.0,
+ "navlink": [
+ ]}
+,
+{"id": "CA_starWalk_100",
+ "name": "CA_starWalk_100",
+ "left": "/data/scratch/tiledir/CA_starWalk_100/left/%d/%d/%d/%d.jpg",
+ "right": "/data/scratch/tiledir/CA_starWalk_100/right/%d/%d/%d/%d.jpg",
+ "thumb": "/data/scratch/tiledir/CA_starWalk_100/left/1/f/0/0.jpg",
+ "icon": "icon-casa-serena-dining-room-128x128.png",
+ "yaw": 0.0,
+ "navlink": [
+ ]}
+,
+{"id": "CA_vegas_donnieandmarie_100",
+ "name": "CA_vegas_donnieandmarie_100",
+ "left": "/data/scratch/tiledir/CA_vegas_donnieandmarie_100/left/%d/%d/%d/%d.jpg",
+ "right": "/data/scratch/tiledir/CA_vegas_donnieandmarie_100/right/%d/%d/%d/%d.jpg",
+ "thumb": "/data/scratch/tiledir/CA_vegas_donnieandmarie_100/left/1/f/0/0.jpg",
+ "icon": "icon-casa-serena-dining-room-128x128.png",
+ "yaw": 0.0,
+ "navlink": [
+ ]}
+,
+{"id": "observatory_farAway",
+ "name": "observatory_farAway",
+ "left": "/data/scratch/tiledir/observatory_farAway/left/%d/%d/%d/%d.jpg",
+ "right": "/data/scratch/tiledir/observatory_farAway/right/%d/%d/%d/%d.jpg",
+ "thumb": "/data/scratch/tiledir/observatory_farAway/left/1/f/0/0.jpg",
+ "icon": "icon-casa-serena-dining-room-128x128.png",
+ "yaw": 0.0,
+ "navlink": [
+ ]}
+,
+{"id": "ID_Capitol_Entrance_90",
+ "name": "ID_Capitol_Entrance_90",
+ "left": "/data/scratch/tiledir/ID_Capitol_Entrance_90/left/%d/%d/%d/%d.jpg",
+ "right": "/data/scratch/tiledir/ID_Capitol_Entrance_90/right/%d/%d/%d/%d.jpg",
+ "thumb": "/data/scratch/tiledir/ID_Capitol_Entrance_90/left/1/f/0/0.jpg",
+ "icon": "icon-casa-serena-dining-room-128x128.png",
+ "yaw": 0.0,
+ "navlink": [
+ ]}
+,
+{"id": "ID_gardner_100",
+ "name": "ID_gardner_100",
+ "left": "/data/scratch/tiledir/ID_gardner_100/left/%d/%d/%d/%d.jpg",
+ "right": "/data/scratch/tiledir/ID_gardner_100/right/%d/%d/%d/%d.jpg",
+ "thumb": "/data/scratch/tiledir/ID_gardner_100/left/1/f/0/0.jpg",
+ "icon": "icon-casa-serena-dining-room-128x128.png",
+ "yaw": 0.0,
+ "navlink": [
+ ]}
+,
+{"id": "SF_FishermansWharf_90",
+ "name": "SF_FishermansWharf_90",
+ "left": "/data/scratch/tiledir/SF_FishermansWharf_90/left/%d/%d/%d/%d.jpg",
+ "right": "/data/scratch/tiledir/SF_FishermansWharf_90/right/%d/%d/%d/%d.jpg",
+ "thumb": "/data/scratch/tiledir/SF_FishermansWharf_90/left/1/f/0/0.jpg",
+ "icon": "icon-casa-serena-dining-room-128x128.png",
+ "yaw": 0.0,
+ "navlink": [
+ ]}
+,
+{"id": "SF_GGBridge_On_90",
+ "name": "SF_GGBridge_On_90",
+ "left": "/data/scratch/tiledir/SF_GGBridge_On_90/left/%d/%d/%d/%d.jpg",
+ "right": "/data/scratch/tiledir/SF_GGBridge_On_90/right/%d/%d/%d/%d.jpg",
+ "thumb": "/data/scratch/tiledir/SF_GGBridge_On_90/left/1/f/0/0.jpg",
+ "icon": "icon-casa-serena-dining-room-128x128.png",
+ "yaw": 0.0,
+ "navlink": [
+ ]}
+,
+{"id": "YS_Rainbow_Ponds_100",
+ "name": "YS_Rainbow_Ponds_100",
+ "left": "/data/scratch/tiledir/YS_Rainbow_Ponds_100/left/%d/%d/%d/%d.jpg",
+ "right": "/data/scratch/tiledir/YS_Rainbow_Ponds_100/right/%d/%d/%d/%d.jpg",
+ "thumb": "/data/scratch/tiledir/YS_Rainbow_Ponds_100/left/1/f/0/0.jpg",
+ "icon": "icon-casa-serena-dining-room-128x128.png",
+ "yaw": 0.0,
+ "navlink": [
+ ]}
+]
+}
