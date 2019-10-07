@@ -1,0 +1,15 @@
+<div>
+  <input type="text" nbInput placeholder="Put the search term here" shape="round" [(ngModel)]="searchTerm" (keydown.enter)="searchAssets()" >
+  <button nbButton hero status="primary" shape="round" size="tiny" (click)="searchAssets()"><nb-icon icon="search-outline"></nb-icon></button>
+</div>
+
+
+<nb-card size="large">
+  <nb-card-header>
+    METS
+  </nb-card-header>
+  <nb-card-body  align="center">
+    <ngx-card-deck [assets]="metInfo" [source]="source" [searchTerm]="searchTerm"></ngx-card-deck>
+  </nb-card-body>
+</nb-card>
+

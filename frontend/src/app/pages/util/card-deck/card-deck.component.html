@@ -1,0 +1,5 @@
+<div class="row" >
+  <div  *ngFor="let asset of assets" class="thumbnail">
+    <ngx-card [ngStyle]="{'width':'300' + 'px'}" [asset]="asset" [source]="source" [searchTerm]="searchTerm"></ngx-card>
+  </div>
+</div>
