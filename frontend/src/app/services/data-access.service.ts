@@ -7,23 +7,38 @@ import {Observable} from 'rxjs';
   providedIn: 'root',
 })
 export class DataAccessService {
-  constructor(private http: HttpClient) { }
+  webServerURL;
+  constructor(private http: HttpClient) {
+    this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/';
+    // this.webServerURL = 'http://localhost/cgi-bin/';
+  }
 
   public getMETsData(searchTerm: string , start: number , step: number) {
-    // const url = 'http://mec402.boisestate.edu/cgi-bin/assetSources//mets.py';
-    const url = 'http://mec402.boisestate.edu/cgi-bin/assetSources/mets.py';
+    const url = this.webServerURL + 'assetSources/mets.py';
+    const params = new HttpParams().set('q', searchTerm).set('start', String(start)).set('step', String(step));
+    return this.http.get(url, {params: params});
+  }
+
+  public getRijksData(searchTerm: string , start: number , step: number) {
+    const url = this.webServerURL + 'assetSources/rijks.py';
+    const params = new HttpParams().set('q', searchTerm).set('start', String(start)).set('step', String(step));
+    return this.http.get(url, {params: params});
+  }
+
+  public getClevelandData(searchTerm: string , start: number , step: number) {
+    const url = this.webServerURL + 'assetSources/cleveland.py';
     const params = new HttpParams().set('q', searchTerm).set('start', String(start)).set('step', String(step));
     return this.http.get(url, {params: params});
   }
 
   public getCollections(): Observable<CollectionResults> {
-    const url = 'http://mec402.boisestate.edu/cgi-bin/dataAccess/getCollections.py';
+    const url = this.webServerURL + 'dataAccess/getCollections.py';
     const params = new HttpParams().set('collectionId', 'all');
     return this.http.get<CollectionResults>(url, {params: params});
   }
 
   public createCollection(name: string): Observable<InsertionResponse> {
-    const url = 'http://mec402.boisestate.edu/cgi-bin/dataAccess/createCollection.py';
+    const url = this.webServerURL + 'dataAccess/createCollection.py';
     const params = new HttpParams().set('name', name);
     return this.http.get<InsertionResponse>(url, {params: params});
   }
@@ -44,7 +59,7 @@ export class DataAccessService {
   }
 
   public saveAsset(asset, source, metaDataId, scope): Observable<InsertionResponse> {
-    const addAssetURL = 'http://mec402.boisestate.edu/cgi-bin/dataAccess/addAsset.py';
+    const addAssetURL = this.webServerURL + 'dataAccess/addAsset.py';
     const assetParams = new HttpParams().set('shortName', asset.title)
       .set('uri', asset.uri)
       .set('idAtSource', asset.id)
@@ -55,7 +70,7 @@ export class DataAccessService {
   }
 
   public addMetaTags(metaDataId, asset): Observable<InsertionResponse> {
-    const metaTagsURL = 'http://mec402.boisestate.edu/cgi-bin/dataAccess/createMetaTags.py';
+    const metaTagsURL = this.webServerURL + 'dataAccess/createMetaTags.py';
     const postBody = {'metaDataId': metaDataId,
                       'title': asset.title,
                       'smallImage': asset.smallImage,
@@ -68,7 +83,7 @@ export class DataAccessService {
   }
 
   public addAssetToCollection(assetId, collection, searchTerm): Observable<InsertionResponse> {
-    const addAssetToCollectionURL = 'http://mec402.boisestate.edu/cgi-bin/dataAccess/addAssetIntoCollection.py';
+    const addAssetToCollectionURL = this.webServerURL + 'dataAccess/addAssetIntoCollection.py';
     const assetCollectionParams = new HttpParams().set('assetId', assetId)
       .set('collectionId', collection.id)
       .set('searchTerm', searchTerm);
@@ -76,15 +91,45 @@ export class DataAccessService {
   }
 
   public createMetaData(): Observable<InsertionResponse> {
-    const assetMetaDataURL = 'http://mec402.boisestate.edu/cgi-bin/dataAccess/createMetaData.py';
+    const assetMetaDataURL = this.webServerURL + 'dataAccess/createMetaData.py';
     return this.http.get<InsertionResponse>(assetMetaDataURL);
   }
 
   public getPublicAssetsInCollection(collectionId): Observable<Assets> {
-    const getAssetsInCollectionURL = 'http://mec402.boisestate.edu/cgi-bin/dataAccess/getPublicAssetsInCollection.py';
+    const getAssetsInCollectionURL = this.webServerURL + 'dataAccess/getPublicAssetsInCollection.py';
     const assetsInCollectionParams = new HttpParams().set('collectionId', collectionId);
     return this.http.get<Assets>(getAssetsInCollectionURL, {params: assetsInCollectionParams});
   }
+
+  public getCanonicalMetaTags(): Observable<Collection[]> {
+    const getCanonicalMetaTagsURL = this.webServerURL + 'dataAccess/getCanonicalMetaTags.py';
+    return this.http.get<Collection[]>(getCanonicalMetaTagsURL);
+  }
+
+  public addCanonicalMetaTag(name) {
+    const addCanonicalMetaTagURL = this.webServerURL + 'dataAccess/addCanonicalMetaTag.py';
+    const addCanonicalMetaTagParams = new HttpParams().set('name', name);
+    this.http.get(addCanonicalMetaTagURL, {params: addCanonicalMetaTagParams}).subscribe(res => {
+      console.log(res);
+    });
+  }
+
+  public updateCanonicalMetaTag(id, newName) {
+    const updateCanonicalMetaTagURL = this.webServerURL + 'dataAccess/updateCanonicalMetaTag.py';
+    const updateCanonicalMetaTagParams = new HttpParams().set('id', id).set('name', newName);
+    return this.http.get(updateCanonicalMetaTagURL, {params: updateCanonicalMetaTagParams}).subscribe(res => {
+      console.log(res);
+    });
+  }
+
+  public deleteCanonicalMetaTag(id) {
+    const deleteCanonicalMetaTagURL = this.webServerURL + 'dataAccess/deleteCanonicalMetaTag.py';
+    const deleteCanonicalMetaTagParams = new HttpParams().set('id', id);
+    return this.http.get(deleteCanonicalMetaTagURL, {params: deleteCanonicalMetaTagParams}).subscribe(res => {
+      console.log(res);
+    });
+  }
+
 }
 
 class CollectionResults {

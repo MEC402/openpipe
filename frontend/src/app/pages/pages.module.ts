@@ -5,7 +5,7 @@ import {
   NbCheckboxModule, NbDialogRef,
   NbIconModule,
   NbInputModule, NbListModule,
-  NbMenuModule, NbPopoverModule, NbRadioModule, NbStepperModule, NbToggleModule
+  NbMenuModule, NbPopoverModule, NbRadioModule, NbStepperModule, NbTabsetModule, NbToggleModule
 } from '@nebular/theme';
 
 import { ThemeModule } from '../@theme/theme.module';
@@ -26,6 +26,7 @@ import {FormsModule} from "@angular/forms";
 import {Ng2SmartTableModule} from "ng2-smart-table";
 import { MetadataSelectorComponent } from './util/metadata-selector/metadata-selector.component';
 import { PreviewCardComponent } from './util/preview-card/preview-card.component';
+import { CanonicalMetaTagsComponent } from './settings/canonical-meta-tags/canonical-meta-tags.component';
 
 @NgModule({
   providers: [
@@ -53,6 +54,7 @@ import { PreviewCardComponent } from './util/preview-card/preview-card.component
     NbStepperModule,
     NbToggleModule,
     NbRadioModule,
+    NbTabsetModule,
 
   ],
   declarations: [
@@ -64,6 +66,7 @@ import { PreviewCardComponent } from './util/preview-card/preview-card.component
     CardDeckComponent,
     MetadataSelectorComponent,
     PreviewCardComponent,
+    CanonicalMetaTagsComponent,
   ],
 })
 export class PagesModule {
