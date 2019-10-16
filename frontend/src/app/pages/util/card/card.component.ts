@@ -59,6 +59,7 @@ export class CardComponent implements OnInit {
 
   openCollectionDialog(collectionDialog: TemplateRef<any>) {
     this.dataAccess.getCollections().subscribe(res => {
+      console.log(res);
       this.collections = res.data;
       this.collectionDialogRef = this.dialogService.open(collectionDialog);
     });

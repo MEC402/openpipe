@@ -9,10 +9,11 @@ import {DataAccessService} from '../../services/data-access.service';
 export class HomeComponent implements OnInit {
 
   searchTerm: string;
-  metInfo: any;
-  source;
+  source= [];
+  met= true;
+  rijk= true;
+  cleveland= true;
   constructor(private dataAccess: DataAccessService) {
-    this.source= {'id': '123'};
   }
 
   ngOnInit() {
@@ -20,8 +21,33 @@ export class HomeComponent implements OnInit {
   }
 
   searchAssets() {
-    this.dataAccess.getMETsData(this.searchTerm, 0 , 20).subscribe(res => {
-      this.metInfo = res;
-    });
+    this.source = [];
+    if (this.met) {
+      this.dataAccess.getMETsData(this.searchTerm, 0 , 20).subscribe(res => {
+        const data = {'name': 'MET Museum', 'data': res};
+        this.source.push(data);
+        console.log(this.source);
+      });
+    }
+
+    if (this.rijk) {
+      this.dataAccess.getRijksData(this.searchTerm, 0 , 20).subscribe(res => {
+        const data = {'name': 'Rijk Museum', 'data': res};
+        this.source.push(data);
+        console.log(this.source);
+      });
+    }
+
+    if (this.cleveland) {
+      this.dataAccess.getClevelandData(this.searchTerm, 0 , 20).subscribe(res => {
+        const data = {'name': 'Cleveland Museum', 'data': res};
+        this.source.push(data);
+        console.log(this.source);
+      });
+    }
+
+
+
+
   }
 }
