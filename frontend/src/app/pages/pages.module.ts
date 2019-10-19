@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import {
+  NbAccordionModule,
   NbButtonModule,
   NbCardModule,
   NbCheckboxModule, NbDialogRef,
   NbIconModule,
   NbInputModule, NbListModule,
-  NbMenuModule, NbPopoverModule, NbRadioModule, NbStepperModule, NbTabsetModule, NbToggleModule
+  NbMenuModule, NbPopoverModule, NbRadioModule, NbStepperModule, NbTabsetModule, NbToggleModule, NbUserModule
 } from '@nebular/theme';
 
 import { ThemeModule } from '../@theme/theme.module';
@@ -27,6 +28,10 @@ import {Ng2SmartTableModule} from "ng2-smart-table";
 import { MetadataSelectorComponent } from './util/metadata-selector/metadata-selector.component';
 import { PreviewCardComponent } from './util/preview-card/preview-card.component';
 import { CanonicalMetaTagsComponent } from './settings/canonical-meta-tags/canonical-meta-tags.component';
+import { MetaTagEditorComponent } from './settings/meta-tag-editor/meta-tag-editor.component';
+import { UploaderComponent } from './uploader/uploader.component';
+import {FileUploadModule} from "ng2-file-upload";
+import { AssetsComponent } from './assets/assets.component';
 
 @NgModule({
   providers: [
@@ -55,6 +60,9 @@ import { CanonicalMetaTagsComponent } from './settings/canonical-meta-tags/canon
     NbToggleModule,
     NbRadioModule,
     NbTabsetModule,
+    NbAccordionModule,
+    NbUserModule,
+    FileUploadModule,
 
   ],
   declarations: [
@@ -67,6 +75,9 @@ import { CanonicalMetaTagsComponent } from './settings/canonical-meta-tags/canon
     MetadataSelectorComponent,
     PreviewCardComponent,
     CanonicalMetaTagsComponent,
+    MetaTagEditorComponent,
+    UploaderComponent,
+    AssetsComponent,
   ],
 })
 export class PagesModule {

@@ -21,7 +21,7 @@
     <nb-card-header>MetaData</nb-card-header>
     <nb-card-body>
       <label *ngFor="let d of data">
-        <nb-checkbox (checkedChange)="toggle($event,d)">{{d[0]}}:{{d[1]}}</nb-checkbox>
+        <nb-checkbox checked="true" (checkedChange)="toggle($event,d)">{{d[0]}}:{{d[1]}}</nb-checkbox>
       </label>
     </nb-card-body>
     <nb-card-footer>
