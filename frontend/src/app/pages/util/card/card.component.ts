@@ -18,6 +18,7 @@ export class CardComponent implements OnInit {
   scope;
   @ViewChild('contentTemplate', { static: false }) contentTemplate: TemplateRef<any>;
   @ViewChild(NbPopoverDirective, { static: false }) popover: NbPopoverDirective;
+  check = true;
 
   constructor(private dialogService: NbDialogService,
               protected dialogRef: NbDialogRef<any>,

@@ -2,19 +2,29 @@ import { NbMenuItem } from '@nebular/theme';
 
 export const MENU_ITEMS: NbMenuItem[] = [
   {
-    title: 'Home',
-    icon: 'home-outline',
+    title: 'Search',
+    icon: 'search-outline',
     link: '/pages/home',
-    home: true,
   },
   {
-    title: 'Collections',
+    title: 'Folders',
     icon: 'keypad-outline',
     link: '/pages/collections',
   },
   {
-    title: 'Settings',
-    icon: 'settings-2-outline',
+    title: 'Assets',
+    icon: 'color-palette-outline',
+    link: '/pages/assets',
+    home: true,
+  },
+  {
+    title: 'Meta-Data',
+    icon: 'bookmark-outline',
     link: '/pages/settings',
+  },
+  {
+    title: 'Uploader',
+    icon: 'upload-outline',
+    link: '/pages/uploader',
   },
 ];

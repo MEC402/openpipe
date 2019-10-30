@@ -1,0 +1,12 @@
+<nb-card size="giant">
+  <nb-card-header>
+    Asset
+  </nb-card-header>
+  <nb-card-body>
+    <nb-list *ngIf="assets">
+      <nb-list-item *ngFor="let asset of assets.data">
+          <nb-user shape="rectangle" [name]="asset.name" [picture]="asset.smallImage"  size="giant" (click)="onClick(asset)"></nb-user>
+      </nb-list-item>
+    </nb-list>
+  </nb-card-body>
+</nb-card>

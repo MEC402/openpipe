@@ -10,7 +10,7 @@ export class DataAccessService {
   webServerURL;
   constructor(private http: HttpClient) {
     this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/';
-    // this.webServerURL = 'http://localhost/cgi-bin/';
+    //this.webServerURL = 'http://localhost/cgi-bin/';
   }
 
   public getMETsData(searchTerm: string , start: number , step: number) {
@@ -130,6 +130,23 @@ export class DataAccessService {
     });
   }
 
+  public getAssetMetaTags(id): Observable<Results> {
+    const getAssetMetaTagsURL = this.webServerURL + 'dataAccess/getAssetMetaTags.py';
+    const getAssetMetaTagsParams = new HttpParams().set('assetId', id);
+    return this.http.get<Results>(getAssetMetaTagsURL, {params: getAssetMetaTagsParams});
+  }
+
+  public getAllAssets() {
+    const getAllAssetURL = this.webServerURL + 'dataAccess/getAllAssets.py';
+    return this.http.get(getAllAssetURL);
+  }
+
+}
+
+
+class Results {
+  total;
+  data: any[];
 }
 
 class CollectionResults {

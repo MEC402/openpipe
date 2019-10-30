@@ -5,10 +5,11 @@ import {NbDialogRef, NbDialogService} from '@nebular/theme';
 @Component({
   selector: 'ngx-collections',
   templateUrl: './collections.component.html',
-  styleUrls: ['./collections.component.scss']
+  styleUrls: ['./collections.component.scss'],
 })
 export class CollectionsComponent {
   collections: any;
+  assets: any;
 
   constructor(private dataAccess: DataAccessService,
               private dialogService: NbDialogService,
@@ -23,4 +24,5 @@ export class CollectionsComponent {
       this.dialogRef = this.dialogService.open(dialog, { context: res });
     });
   }
+
 }
