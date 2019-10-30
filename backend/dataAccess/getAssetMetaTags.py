@@ -1,9 +1,9 @@
 #!/bin/python3
 
 import json
+import cgi
 import mysql.connector
 from mysql.connector import Error
-import cgi
 
 
 def cgiFieldStorageToDict(fieldStorage):
@@ -14,7 +14,8 @@ def cgiFieldStorageToDict(fieldStorage):
         params[key] = fieldStorage[key].value
     return params
 
-def getPublicAsssetsInCollection(collectionId):
+
+def getAssetMetaTags(id):
     result = {}
     try:
         connection = mysql.connector.connect(
@@ -24,21 +25,18 @@ def getPublicAsssetsInCollection(collectionId):
             database="artmaster"
         )
 
-        sql_select_Query = "SELECT assetId,metaDataId FROM collectionMember JOIN asset ON collectionMember.assetId = asset.id WHERE scope=0 and collectionId = %s"
+        sql_select_Query = "select metaTag.id, asset.id as assetId, tagName, value from asset join metaTag on asset.metaDataId=metaTag.metaDataId where asset.id=%s"
         cursor = connection.cursor()
-        cursor.execute(sql_select_Query, (collectionId,))
+        cursor.execute(sql_select_Query, (id,))
         records = cursor.fetchall()
         result["total"] = cursor.rowcount
         rows = []
         for row in records:
-            rowInfo = {"id":row[0]}
-            metaDataId=row[1]
-            sql_select_Query = "select tagName,value from metaTag where metaDataId=%s"
-            cursor = connection.cursor()
-            cursor.execute(sql_select_Query, (metaDataId,))
-            metaTagsRecords = cursor.fetchall()
-            for metaTagRow in metaTagsRecords:
-                rowInfo[metaTagRow[0]]=metaTagRow[1]
+            rowInfo = {}
+            rowInfo["id"] = row[0]
+            rowInfo["assetId"] = row[1]
+            rowInfo["tagName"] = row[2]
+            rowInfo["value"] = row[3]
             rows.append(rowInfo)
         result["data"] = rows
     except Error as e:
@@ -49,11 +47,13 @@ def getPublicAsssetsInCollection(collectionId):
             cursor.close()
     return result
 
+
+
 print("Content-Type: text/json\n")
 dict = cgiFieldStorageToDict(cgi.FieldStorage())
 
-if 'collectionId' not in dict.keys():
-    print(json.dumps({"total": "-1", "data": [{}]}))
+if 'assetId' not in dict.keys():
+    print(json.dumps({"total": "", "data": [{"id": "", "name": "", "timeStamp": ""}]}))
 else:
-    id = dict['collectionId']
-    print(json.dumps(getPublicAsssetsInCollection(id), default=str))
+    id = dict['assetId']
+    print(json.dumps(getAssetMetaTags(id), default=str))
