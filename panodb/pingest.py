@@ -1,19 +1,24 @@
+#!/bin/python3
 #
 # pingest.py
 #
-# pingest.py indirectory ingestdir
+# pingest.py indirectory masterdir
 #
 # ingest all of the image .RW2 files into the given ingestdirector
 # and add the images into the image TABLE
 
-import sqlite3;
-import os;
-import sys;
-import glob;
-import pipeconfig
+import os
+import sys
+import glob
+import getopt
+import mysql.connector
+from datetime import datetime
 
 def printUsage():
-    print("pingest ImageDirectory IngestDir [left | right]")
+    print("pingest [--nomove] ImageDirectory MasterDir ")
+
+move=True
+images=True
 
 #parse command line options
 print (sys.argv)
@@ -21,60 +26,110 @@ if (len(sys.argv) < 3):
  printUsage();
  exit(-1)
 
-imgdir = sys.argv[1];
-ingdir = sys.argv[2];
-eye ="none"
+try: 
+  optlist, args = getopt.getopt(sys.argv[1:], 'ni',["nomove","noimages"])
+except getopt.GetoptError as err:
+  sys.exit(-1)
 
-if (len(sys.argv) == 4):
-    eye = sys.argv[3];
-    if (eye != "left") & (eye != "right"):
-        printUsage()
-        exit(-1)
+for o,a in optlist:
+    print (o)
+    if o in ("-n", "--nomove"):
+     move = False
+    elif o in ("-i", "--noimages"):
+     images = False
 
 
-#load database configuration information
+imgdir = args[0];
+masterdir = args[1];
+
+print(move)
+
+BASEDIR="/WorldMuseum/masters"
+BASEURL="http://mec402.boisestate.edu/wmuseum/masters/"
+
+def isImage(aname):
+   print(aname)
+   ext = (".rw2",".cr2",".png",".jpg",".tif",".tiff")
+   if aname.lower().endswith(ext):
+      return True
+   return False
+
+#A more robust method for ingest would be to update table with each file copy.
+#however we will use a lazy method because it will run faster.
+
+if (move):
+#first copy the entire folder to the masterdir
+ cmdline = "cp -r %s %s" % (imgdir,masterdir)
+ os.chdir(BASEDIR)
+ os.system(cmdline)
+ print (cmdline)
+else:
+ os.chdir(BASEDIR)
+ print("skip copy")
 
 
-#A better method for ingest would be to update table with each file copy.
-#however we will use a lasy method because it will run faster.
+print ("completed copying all of the files")
 
-#first copy the entire fi#imagedir = ingdir + "/" + "*.RW2"
-#cp file tree from indirectory to ingestdir
-cmdline = "cp -r %s %s" % (imgdir,ingdir)
-os.chdir(pipeconfig.GBASE+"/" + pipeconfig.GPIPE + "/storage")
-os.system(cmdline)
-print (cmdline)
-
-#second get a file list from the ingestdirectory
+#second get a file list from the masterdir
 #imagedir = ingdir + "/" + "*.RW2"
-imagedir = ingdir + "/*/*.RW2"
-print(imagedir);
-walklist = os.walk(ingdir)
+
+print(masterdir)
+walklist = os.walk(masterdir)
 print (walklist)
 imglist = [];
 for root,dirs,files in walklist:
     for name in files:
-        if name.endswith(".RW2"):
+        if isImage(name):
            imglist.append((root,name))
 
-print (imglist)
+#print (imglist)
+
+#connect to the database
+try:
+   connection = mysql.connector.connect( host="artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com", user="artmaster", passwd="ArtMaster51", database="artmaster")
+
+   cursor = connection.cursor()
+
+except mysql.connector.Error as error:
+        exit(-1)
 
 #add the list of image files into the image file table.
-dbase = pipeconfig.GBASE + "/" + pipeconfig.GPIPE+"/"+pipeconfig.GDBASE
-pdb = sqlite3.connect(dbase)
-pdbcursor = pdb.cursor();
-#pdb.execute('''CREATE TABLE ingests (date text, basefolder text, folder text)''')
-#pdbcursor.execute("DELETE FROM images;")
-
-for root,name in imglist:
-    rootq = "\'"+root+"\'"
-    namen = "\'" +name + "\'"
-    eyen = "\'" +eye + "\'"
-    sqlstring = "INSERT INTO images VALUES (%s,%s,%s,%d,%d,%s);" % ("\'date\'",rootq,namen,-1,-1,eyen)
-    pdbcursor.execute(sqlstring)
-    print( sqlstring)
-pdb.commit();
-pdb.close();
+if (images):
+ sql_insert_query = """ INSERT INTO images (shortName, filename, uri,  master) VALUES (%s, %s, %s, %s)"""
+ for root,name in imglist:
+    shortname = os.path.splitext(os.path.basename(name))[0]
+    auri = BASEURL+root+"/"+name
+    insert_tuple_1 = (shortname,name, auri,masterdir)
+    cursor.execute(sql_insert_query)
+    print(insert_tuple_1)
+ connection.commit()
+else:
+  print("skip images update")
 
 
+#add the newly added images into the asset table as well
+#first get the ids for the newly added images in the master dir
+print("addassets")
+sql_query = """ SELECT id from images where master='%s';""" % (masterdir)
+cursor.execute(sql_query)
+records = cursor.fetchall()
+#print(records)
+
+#then we traverse and create the asset record
+sql_insert_query = """ INSERT INTO asset (shortName, uri, IdAtSource, sourceId, scope, timestamp) VALUES (%s, %s, %s, %s, %s, %s)"""
+for i, imgid in enumerate(records):
+    print(imgid, i) 
+    shortName = os.path.splitext(os.path.basename(imglist[i][1]))[0]
+    uri = BASEURL+imglist[i][0] + "/" + imglist[i][1] 
+    idAtSource = imgid[0]
+    sourceId = 666
+    scope = 0
+    insert_tuple_1 = (shortName, uri, idAtSource, sourceId, scope, datetime.now())
+#    print (insert_tuple_1)
+#    print ("\n")
+    cursor.execute(sql_insert_query, insert_tuple_1)
+
+connection.commit()
 #finished
+cursor.close()
+connection.close()
