@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
 import {NbDialogRef, NbDialogService, NbPopoverDirective} from '@nebular/theme';
 import {DataAccessService} from '../../../services/data-access.service';
 
@@ -8,8 +8,11 @@ import {DataAccessService} from '../../../services/data-access.service';
   styleUrls: ['./preview-card.component.scss'],
 })
 export class PreviewCardComponent implements OnInit {
-
+  assetElem: any;
+  assets: any;
+  @Output() valueChange = new EventEmitter();
   @Input() asset;
+
   constructor(private dialogService: NbDialogService,
               protected dialogRef: NbDialogRef<any>,
               private dataAccess: DataAccessService) { }
@@ -18,11 +21,10 @@ export class PreviewCardComponent implements OnInit {
   }
 
 
-  openDialog(dialog: TemplateRef<any>) {
-    const data = [];
-    Object.keys(this.asset.sourceData).forEach(s => {
-      data.push([s, this.asset.sourceData[s]]);
+  showMeta(assetElem) {
+    this.dataAccess.getAssetMetaTags(assetElem.id).subscribe(res => {
+      //this.assets = res.data;
+      this.valueChange.emit(res);
     });
-    this.dialogRef = this.dialogService.open(dialog, { context: data });
   }
 }

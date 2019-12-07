@@ -10,7 +10,7 @@
   </nb-card-body>
 
   <nb-card-footer class="row">
-    <button nbButton (click)="openCollectionDialog(collectionDialog)" size="tiny">+ Collection</button>
+    <button nbButton (click)="openCollectionDialog(collectionDialog)" size="tiny">+ Folders</button>
     <button nbButton (click)="openDialog(dialog)" size="tiny">MetaData</button>
   </nb-card-footer>
 
@@ -37,10 +37,10 @@
       <nb-stepper orientation="horizontal" disableStepNavigation>
         <nb-step [label]="labelOne">
           <ng-template #labelOne>Collection</ng-template>
-          <h4>Choose a Collection</h4>
+          <h4>Choose a Folder</h4>
           <nb-list>
             <nb-list-item>
-              <button nbButton status="warning" [nbPopover]="form">New Collection</button>
+              <button nbButton status="warning" [nbPopover]="form">New Folder</button>
             </nb-list-item>
             <nb-list-item *ngFor="let d of collections">
               {{ d.name }}
@@ -82,7 +82,7 @@
 
 <ng-template #form>
   <nb-card>
-      <input type="text" nbInput placeholder="Collection Name" [(ngModel)]="newCollectionName">
+      <input type="text" nbInput placeholder="Folder Name" [(ngModel)]="newCollectionName">
       <button nbButton (click)="onCreateCollection()">save</button>
   </nb-card>
 </ng-template>

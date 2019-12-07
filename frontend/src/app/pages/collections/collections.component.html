@@ -1,21 +1,47 @@
-<div class="row">
-  <button nbButton status="success" (click)="openDialog(dialog,c.id)" *ngFor="let c of collections">
-    {{c.name}}
-  </button>
+<div class="lists row">
+  <div class="col-md-3 ">
+    <nb-card>
+      <nb-card-body>
+        <nb-list>
+          <nb-list-item *ngFor="let elem of collections ">
+            <button nbButton shape="rectangle" status="primary" (click)="onClick(elem)" >{{elem.name}}</button>
+          </nb-list-item>
+        </nb-list>
+      </nb-card-body>
+    </nb-card>
+  </div>
+
+  <div class="col-md-6 ">
+    <nb-card size="giant">
+      <nb-card-header>
+        {{currentFolder}}
+      </nb-card-header>
+      <nb-card-body>
+        <div class="row" >
+          <div  *ngFor="let asset of assets" class="thumbnail">
+            <ngx-preview-card [ngStyle]="{'width':'300' + 'px'}" [asset]="asset" (valueChange)="metaShow($event)"></ngx-preview-card>
+          </div>
+        </div>
+      </nb-card-body>
+    </nb-card>
+  </div>
+
+  <div class="col-md-3 ">
+    <nb-card size="giant">
+
+      <nb-card-header>
+        {{"MetaData"}}
+      </nb-card-header>
+      <nb-card-body>
+
+        <nb-list>
+          <nb-list-item *ngFor="let elem of metaTags ">
+            <label>{{elem.tagName[0]}}:{{elem.value[0]}}</label>
+          </nb-list-item>
+        </nb-list>
+      </nb-card-body>
+    </nb-card>
+  </div>
+
 </div>
 
-
-<ng-template #dialog let-data let-ref="dialogRef">
-  <nb-card size="large">
-    <nb-card-header>
-      <button nbButton (click)="ref.close()">Close</button>
-    </nb-card-header>
-    <nb-card-body>
-      <div class="row" >
-        <div  *ngFor="let asset of data.data" class="thumbnail">
-          <ngx-preview-card [ngStyle]="{'width':'300' + 'px'}" [asset]="asset"></ngx-preview-card>
-        </div>
-      </div>
-    </nb-card-body>
-  </nb-card>
-</ng-template>

@@ -10,19 +10,27 @@ import {NbDialogRef, NbDialogService} from '@nebular/theme';
 export class CollectionsComponent {
   collections: any;
   assets: any;
+  currentFolder: any;
+  metaTags: any;
 
-  constructor(private dataAccess: DataAccessService,
-              private dialogService: NbDialogService,
-              protected dialogRef: NbDialogRef<any>) {
+  constructor(private dataAccess: DataAccessService) {
     dataAccess.getCollections().subscribe(res => {
       this.collections = res.data;
     });
   }
 
-  openDialog(dialog: TemplateRef<any>, collectionId) {
-    this.dataAccess.getPublicAssetsInCollection(collectionId).subscribe(res => {
-      this.dialogRef = this.dialogService.open(dialog, { context: res });
+
+
+  onClick(element) {
+    this.currentFolder = element.name;
+    this.dataAccess.getPublicAssetsInCollection(element.id).subscribe(res => {
+      this.assets = res.data;
     });
   }
 
+  metaShow(event) {
+    console.log(event);
+    this.metaTags = event.data;
+  }
 }
+
