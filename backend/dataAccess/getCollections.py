@@ -37,9 +37,9 @@ def getAllCollections(limit):
         rows=[]
         for row in records:
             rowInfo={}
-            rowInfo["id"]=row[0]
-            rowInfo["name"]=row[1]
-            rowInfo["timeStamp"]=row[2]
+            rowInfo["id"]=[row[0]]
+            rowInfo["name"]=[row[1]]
+            rowInfo["timeStamp"]=[row[2]]
             rows.append(rowInfo)
         result["data"]=rows
     except Error as e:
@@ -69,9 +69,9 @@ def getCollectionByID(id):
         rows=[]
         for row in records:
             rowInfo={}
-            rowInfo["id"]=row[0]
-            rowInfo["name"]=row[1]
-            rowInfo["timeStamp"]=row[2]
+            rowInfo["id"]=[row[0]]
+            rowInfo["name"]=[row[1]]
+            rowInfo["timeStamp"]=[row[2]]
             rows.append(rowInfo)
         result["data"]=rows
     except Error as e:
@@ -100,9 +100,9 @@ def getRangeOfCollections(start,end):
         rows=[]
         for row in records:
             rowInfo={}
-            rowInfo["id"]=row[0]
-            rowInfo["name"]=row[1]
-            rowInfo["timeStamp"]=row[2]
+            rowInfo["id"]=[row[0]]
+            rowInfo["name"]=[row[1]]
+            rowInfo["timeStamp"]=[row[2]]
             rows.append(rowInfo)
         result["data"]=rows
     except Error as e:
@@ -122,11 +122,11 @@ if 'start' in dict.keys() and 'end' in dict.keys():
     print(json.dumps(getRangeOfCollections(dict["start"],dict["end"]), default=str))
 else:
     if 'collectionId' not in dict.keys():
-        print(json.dumps({"total": "", "data": [{"id": "", "name": "", "timeStamp": ""}]}))
+        print(json.dumps({"total": [""], "data": [{"id": [""], "name": [""], "timeStamp": [""]}]}))
     else:
         id = dict['collectionId']
         if id == -1:
-            print(json.dumps({"total": "", "data": [{"id": "", "name": "", "timeStamp": ""}]}))
+            print(json.dumps({"total": [""], "data": [{"id": [""], "name": [""], "timeStamp": [""]}]}))
         elif id == "all":
             if 'limit' in dict.keys():
               print(json.dumps(getAllCollections(dict["limit"])))

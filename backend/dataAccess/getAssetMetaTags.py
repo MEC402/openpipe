@@ -6,6 +6,8 @@ import mysql.connector
 from mysql.connector import Error
 
 
+
+
 def cgiFieldStorageToDict(fieldStorage):
     """ Get a plain dictionary rather than the '.value' system used by the
    cgi module's native fieldStorage class. """
@@ -33,10 +35,10 @@ def getAssetMetaTags(id):
         rows = []
         for row in records:
             rowInfo = {}
-            rowInfo["id"] = row[0]
-            rowInfo["assetId"] = row[1]
-            rowInfo["tagName"] = row[2]
-            rowInfo["value"] = row[3]
+            rowInfo["id"] = [row[0]]
+            rowInfo["assetId"] = [row[1]]
+            rowInfo["tagName"] = [row[2]]
+            rowInfo["value"] = [row[3]]
             rows.append(rowInfo)
         result["data"] = rows
     except Error as e:
@@ -53,7 +55,8 @@ print("Content-Type: text/json\n")
 dict = cgiFieldStorageToDict(cgi.FieldStorage())
 
 if 'assetId' not in dict.keys():
-    print(json.dumps({"total": "", "data": [{"id": "", "name": "", "timeStamp": ""}]}))
+    print(json.dumps({"total": "", "data": [{"id": [""], "name": [""], "timeStamp": [""]}]}))
 else:
     id = dict['assetId']
     print(json.dumps(getAssetMetaTags(id), default=str))
+

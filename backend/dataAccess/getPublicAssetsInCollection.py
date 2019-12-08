@@ -31,14 +31,14 @@ def getPublicAsssetsInCollection(collectionId):
         result["total"] = cursor.rowcount
         rows = []
         for row in records:
-            rowInfo = {"id":row[0]}
+            rowInfo = {"id":[row[0]]}
             metaDataId=row[1]
             sql_select_Query = "select tagName,value from metaTag where metaDataId=%s"
             cursor = connection.cursor()
             cursor.execute(sql_select_Query, (metaDataId,))
             metaTagsRecords = cursor.fetchall()
             for metaTagRow in metaTagsRecords:
-                rowInfo[metaTagRow[0]]=metaTagRow[1]
+                rowInfo[metaTagRow[0]]=[metaTagRow[1]]
             rows.append(rowInfo)
         result["data"] = rows
     except Error as e:
