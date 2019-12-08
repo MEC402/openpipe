@@ -68,7 +68,7 @@ else:
     if int(start) + int(step) > retrievedAssets['total']:
         step = retrievedAssets['total'] - int(start) - 1
   
-    assets = retrievedAssets['objectIDs'][int(start):int(start) + int(step)]
+    assets= retrievedAssets['objectIDs'][int(start):int(start) + int(step)]
     pool = ThreadPool(len(assets))
     for assetId in assets:
         #results.append(getAssetMetaData(assetId))
