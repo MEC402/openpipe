@@ -80,9 +80,14 @@ export class MetaTagEditorComponent implements OnInit {
   }
 
   onClick(asset: any) {
-    this.currentAsset = asset.name;
-    this.dataAccess.getAssetMetaTags(asset.id).subscribe(res=>{
-      this.source.load(res.data);
+    this.currentAsset = asset.name[0];
+    this.dataAccess.getAssetMetaTags(asset.id[0]).subscribe(res => {
+
+      let topics = [];
+      res.data.forEach(metaTag => {
+          topics.push({'id': metaTag['id'][0], 'assetId':metaTag['assetId'][0] ,'tagName': metaTag['tagName'][0], 'value': metaTag['value'][0]});
+      });
+      this.source.load(topics);
     });
 
   }

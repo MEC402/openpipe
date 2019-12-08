@@ -32,6 +32,10 @@ export class CanonicalMetaTagsComponent {
         title: 'Tag Name',
         type: 'string',
       },
+      value: {
+        title: 'Tag Default Value',
+        type: 'string',
+      }
     },
   };
 
@@ -39,7 +43,14 @@ export class CanonicalMetaTagsComponent {
 
   constructor(private dataAccess: DataAccessService) {
     dataAccess.getCanonicalMetaTags().subscribe(res => {
-      this.source.load(res);
+      let canonicalData = [];
+      Object.keys(res).forEach(key => {
+        let elem={};
+        elem['name'] = key;
+        elem['value'] = res[key][0];
+        canonicalData.push(elem);
+      });
+      this.source.load(canonicalData);
     });
   }
 
