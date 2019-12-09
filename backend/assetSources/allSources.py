@@ -17,7 +17,7 @@ def cgiFieldStorageToDict(fieldStorage):
     return params
 
 
-def getSchema():
+def getSchema(type):
     engine = db.create_engine(
         'mysql+mysqlconnector://artmaster:ArtMaster51@artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com/artmaster')
     connection = engine.connect()
@@ -27,18 +27,24 @@ def getSchema():
     result = connection.execute(query).fetchall()
     res = {}
     for row in result:
-        res[row[1]] = [row[2]]
+        if type == 0:
+            res[row[1]] = [""]
+        else:
+            res[row[1]] = [row[2]]
     return res
 
 
 print("Content-Type: text/json\n")
-schema = getSchema()
+
 
 dict = cgiFieldStorageToDict(cgi.FieldStorage())
 
 # dict = {'q': 'cats',
 #         'p': 1,
 #         'ps': 20}
+
+if 'type' not in dict.keys():
+    dict["type"] = 1
 
 if 'p' not in dict.keys():
     dict["p"] = 1
@@ -59,7 +65,7 @@ else:
     threads = []
     museums = []
     results = []
-
+    schema = getSchema(int(dict["type"]))
     met = MetMuseum(schema.copy())
     museums.append(met)
     rijks = RijksMuseum(schema.copy())
