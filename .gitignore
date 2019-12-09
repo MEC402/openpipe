@@ -1,42 +1,42 @@
 # compiled output
-/frontend/dist
-/frontend/tmp
-/frontend/out-tsc
+/*/dist
+/*/tmp
+/*/out-tsc
 
 # dependencies
-/frontend/node_modules
+/*/node_modules
 
 # IDEs and editors
 
-/./.idea
-/frontend/.project
-/frontend/.classpath
-/frontend/.c9/
-/frontend/*.launch
-/frontend/.settings/
-/frontend/*.sublime-workspace
+/*/.idea
+/*/.project
+/*/.classpath
+/*/.c9/
+/*/*.launch
+/*/.settings/
+/*/*.sublime-workspace
 
 # IDE - VSCode
-/frontend/.vscode/*
-/frontend/!.vscode/settings.json
-/frontend/!.vscode/tasks.json
-/frontend/!.vscode/launch.json
-/frontend/!.vscode/extensions.json
+/*/.vscode/*
+/*/!.vscode/settings.json
+/*/!.vscode/tasks.json
+/*/!.vscode/launch.json
+/*/!.vscode/extensions.json
 
 # misc
-/frontend/.sass-cache
-/frontend/connect.lock
-/frontend/coverage
-/frontend/libpeerconnection.log
-/frontendnpm-debug.log
-/frontendtestem.log
-/frontend/typings
-/frontend/docs
+/*/.sass-cache
+/*/connect.lock
+/*/coverage
+/*/libpeerconnection.log
+/*npm-debug.log
+/*testem.log
+/*/typings
+/*/docs
 
 # e2e
-/frontend/e2e/*.js
-/frontend/e2e/*.map
+/*/e2e/*.js
+/*/e2e/*.map
 
 # System Files
-/frontend/.DS_Store
-/frontend/Thumbs.db
+/*/.DS_Store
+/*/Thumbs.db
