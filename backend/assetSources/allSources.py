@@ -3,10 +3,10 @@
 import json
 import cgi
 from multiprocessing.pool import ThreadPool
-import sqlalchemy as db
 from MetMuseum import MetMuseum
 from RijksMuseum import RijksMuseum
 from ClevelandMuseum import ClevelandMuseum
+from CanonicalSchema import CanonicalSchema
 
 
 def cgiFieldStorageToDict(fieldStorage):
@@ -16,32 +16,15 @@ def cgiFieldStorageToDict(fieldStorage):
         params[key] = fieldStorage[key].value
     return params
 
-
-def getSchema(type):
-    engine = db.create_engine(
-        'mysql+mysqlconnector://artmaster:ArtMaster51@artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com/artmaster')
-    connection = engine.connect()
-    metadata = db.MetaData()
-    canonicalMetaTag = db.Table('canonicalMetaTag', metadata, autoload=True, autoload_with=engine)
-    query = db.select([canonicalMetaTag])
-    result = connection.execute(query).fetchall()
-    res = {}
-    for row in result:
-        if type == 0:
-            res[row[1]] = [""]
-        else:
-            res[row[1]] = [row[2]]
-    return res
-
-
 print("Content-Type: text/json\n")
-
 
 dict = cgiFieldStorageToDict(cgi.FieldStorage())
 
-# dict = {'q': 'cats',
+# remberandt
+
+# dict = {'q': 'van gogh',
 #         'p': 1,
-#         'ps': 20}
+#         'ps': 10}
 
 if 'type' not in dict.keys():
     dict["type"] = 1
@@ -65,16 +48,14 @@ else:
     threads = []
     museums = []
     results = []
-    schema = getSchema(int(dict["type"]))
+    cs=CanonicalSchema()
+    schema = cs.getSchema(int(dict["type"]))
     met = MetMuseum(schema.copy())
     museums.append(met)
     rijks = RijksMuseum(schema.copy())
     museums.append(rijks)
     cleveland = ClevelandMuseum(schema.copy())
     museums.append(cleveland)
-    # results.extend(met.getData(dict["q"], dict["p"], dict["ps"]))
-    # results.extend(rijks.getData(dict["q"], dict["p"], dict["ps"]))
-    # results.extend(cleveland.getData(dict["q"], dict["p"], dict["ps"]))
 
     pool = ThreadPool(len(museums))
     for museum in museums:
@@ -82,10 +63,17 @@ else:
     pool.close()
     pool.join()
 
-    for t in threads:
-        results.extend(t.get())
+    response = {"total": 0,
+                "museumCount":{},
+                "data": []}
 
-    response = {"total": len(results),
-                "data": results}
+    for t in threads:
+        result=t.get()
+        response["museumCount"][result["sourceName"]]=result["total"]
+        response["data"].extend(result["data"])
+
+    response["total"] = len(response["data"])
+
+
 
     print(json.dumps(response))

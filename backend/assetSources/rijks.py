@@ -17,34 +17,6 @@ def cgiFieldStorageToDict(fieldStorage):
     return params
 
 
-def searchForAssets(term):
-    serviceName = "collection"
-    params = {'key': "qvMYRE87",'format': "json",'q': term}
-    response = requests.get(url=url + serviceName, params=params)
-    data = response.json()
-    return data
-
-
-def getMetaTagMapping(assetOriginalID):
-    serviceName = "collection/"+str(assetOriginalID)+"/"
-    params = {'key': "qvMYRE87",'format': "json"}
-    response = requests.get(url=url + serviceName, params=params)
-    data = response.json()
-    return data['artObject']
-
-
-def getAssetMetaData(data):
-    metaData = {}
-    
-    metaData['id'] = data['objectNumber']
-    metaData['largeImage'] = data['webImage']["url"]
-    metaData['smallImage'] = data['webImage']["url"]
-    metaData['title'] = data['title']
-    metaData['sourceData']=getMetaTagMapping(data['objectNumber'])
-
-    return metaData
-
-
 print("Content-Type: text/json\n")
 dict = cgiFieldStorageToDict(cgi.FieldStorage())
 

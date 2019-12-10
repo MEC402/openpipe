@@ -20,24 +20,27 @@ class ClevelandMuseum:
         data = data["data"]
         response = {}
         response = self.schema.copy()
-        response["source"] = ["Cleveland"]
-        response["id"] = [data["id"]]
+        response["openpipe_canonical_source"] = ["Cleveland"]
+        response["openpipe_canonical_id"] = [data["id"]]
         if data['images'] is not None:
-            response["largeImage"] = [data["images"]["print"]["url"]]
-            response["largeImageDimensions"] = [str(data["images"]["print"]["width"]) + "," + str(data["images"]["print"]["height"])]
-            response["smallImage"] = [data["images"]["web"]["url"]]
-            response["smallImageDimensions"] = [str(data["images"]["web"]["width"]) + "," + str(data["images"]["web"]["height"])]
-        response["title"] = [data["title"]]
-        response["artist"] = []
+            response["openpipe_canonical_largeImage"] = [data["images"]["print"]["url"]]
+            response["openpipe_canonical_largeImageDimensions"] = [
+                str(data["images"]["print"]["width"]) + "," + str(data["images"]["print"]["height"])]
+            response["openpipe_canonical_smallImage"] = [data["images"]["web"]["url"]]
+            response["openpipe_canonical_smallImageDimensions"] = [
+                str(data["images"]["web"]["width"]) + "," + str(data["images"]["web"]["height"])]
+        response["openpipe_canonical_title"] = [data["title"]]
+        response["openpipe_canonical_artist"] = []
         for c in data["creators"]:
-            response["artist"].append(c["description"])
-        response["culture"] = data["culture"]
+            response["openpipe_canonical_artist"].append(c["description"])
+        response["openpipe_canonical_culture"] = data["culture"]
         # response["classification"] = [data["classification"]]
         # self.schema.genre.push(data["city"])
         # self.schema.medium.push(data["city"])
         # response["nation"] = [data["country"]]
         # response["city"] = [data["city"]]
         # response["tags"] = data["tags"]
+        response.update(data)
         return response
 
     def getAssetMetaData(self, asset):
@@ -68,4 +71,6 @@ class ClevelandMuseum:
         pool.close()
         pool.join()
         results = [r.get() for r in results]
-        return results
+        return {"data": results,
+                "total": total,
+                "sourceName": "Cleveland"}
