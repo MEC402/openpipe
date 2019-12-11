@@ -8,6 +8,7 @@ from multiprocessing.pool import ThreadPool
 from MetMuseum import MetMuseum
 from RijksMuseum import RijksMuseum
 from ClevelandMuseum import ClevelandMuseum
+from LocalSearch import LocalSearch
 from CanonicalSchema import CanonicalSchema
 
 
@@ -23,10 +24,10 @@ def cgiFieldStorageToDict(fieldStorage):
 print("Content-Type: text/json\n")
 dict = cgiFieldStorageToDict(cgi.FieldStorage())
 
-# dict = {'q': 'van gogh',
+# dict = {'q': 'cats',
 #         'p': 1,
 #         'ps': 10,
-#         'name':"cleveland"}
+#         'name':"local"}
 
 if 'p' not in dict.keys():
     dict['p'] = 1
@@ -52,5 +53,8 @@ else:
     elif dict["name"].lower() == "cleveland":
         cleveland = ClevelandMuseum(cs.getSchema(int(dict["type"])))
         results = cleveland.getData(dict["q"], int(dict["p"]), int(dict["ps"]))
+    elif dict["name"].lower() == "local":
+        local = LocalSearch()
+        results = local.getData(dict["q"], int(dict["p"]), int(dict["ps"]))
 
     print(json.dumps(results))

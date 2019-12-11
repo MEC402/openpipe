@@ -6,9 +6,20 @@ from mysql.connector import Error
 import cgi
 
 
+def cgiFieldStorageToDict(fieldStorage):
+    """ Get a plain dictionary rather than the '.value' system used by the
+   cgi module's native fieldStorage class. """
+    params = {}
+    for key in fieldStorage.keys():
+        params[key] = fieldStorage[key].value
+    return params
 
-def getAllAssets():
+def getAllAssets(page,pageSize):
     result = {}
+
+    start = (page - 1) * pageSize
+    step = pageSize
+
     try:
         connection = mysql.connector.connect(
             host="artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
@@ -17,9 +28,9 @@ def getAllAssets():
             database="artmaster"
         )
 
-        sql_select_Query = "SELECT id,metaDataId,shortName FROM asset limit 500;"
+        sql_select_Query = "SELECT id,metaDataId,shortName FROM asset limit %s,%s;"
         cursor = connection.cursor()
-        cursor.execute(sql_select_Query)
+        cursor.execute(sql_select_Query,(start,step))
         records = cursor.fetchall()
         result["total"] = cursor.rowcount
         rows = []
@@ -44,4 +55,15 @@ def getAllAssets():
     return result
 
 print("Content-Type: text/json\n")
-print(json.dumps(getAllAssets(), default=str))
+
+dict = cgiFieldStorageToDict(cgi.FieldStorage())
+
+if 'p' not in dict.keys():
+    dict['p'] = 1
+
+if 'ps' not in dict.keys():
+    dict['ps'] = 10
+
+# dict={'p':200,'ps':10}
+
+print(json.dumps(getAllAssets(int(dict["p"]), int(dict["ps"])), default=str))

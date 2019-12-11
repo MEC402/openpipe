@@ -30,9 +30,10 @@ class ClevelandMuseum:
             response["openpipe_canonical_smallImageDimensions"] = [
                 str(data["images"]["web"]["width"]) + "," + str(data["images"]["web"]["height"])]
         response["openpipe_canonical_title"] = [data["title"]]
-        response["openpipe_canonical_artist"] = []
-        for c in data["creators"]:
-            response["openpipe_canonical_artist"].append(c["description"])
+        if len(data["creators"]) > 0:
+            response["openpipe_canonical_artist"] = []
+            for c in data["creators"]:
+                response["openpipe_canonical_artist"].append(c["description"])
         response["openpipe_canonical_culture"] = data["culture"]
         # response["classification"] = [data["classification"]]
         # self.schema.genre.push(data["city"])

@@ -32,7 +32,8 @@ class MetMuseum:
         # self.schema.medium.push(data["city"])
         response["openpipe_canonical_nation"] = [data["country"]]
         response["openpipe_canonical_city"] = [data["city"]]
-        response["openpipe_canonical_tags"] = data["tags"]
+        if len(data["tags"]) > 0:
+            response["openpipe_canonical_tags"] = data["tags"]
         response.update(data)
         return response
 
