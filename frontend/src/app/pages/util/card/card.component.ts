@@ -29,17 +29,27 @@ export class CardComponent implements OnInit {
   }
 
   getAssetsSourceMetaTags() {
-    let data = [];
-    Object.keys(this.asset.sourceData).forEach(s => {
-      data.push([s, this.asset.sourceData[s]]);
+    const data = [];
+    Object.keys(this.asset).forEach(s => {
+      data.push([s, this.asset[s]]);
     });
     return data;
   }
 
   openDialog(dialog: TemplateRef<any>) {
     const data = [];
-    Object.keys(this.asset.sourceData).forEach(s => {
-      data.push([s, this.asset.sourceData[s]]);
+    Object.keys(this.asset).forEach(s => {
+      if (!s.includes('openpipe')) {
+        data.push([s, JSON.stringify(this.asset[s]).replace(/['"]+/g, '')]);
+        this.chosenMetaData[s] = JSON.stringify(this.asset[s]).replace(/['"]+/g, '');
+      } else {
+        data.push([s, JSON.stringify(this.asset[s][0]).replace(/['"]+/g, '')]);
+        this.chosenMetaData[s] = JSON.stringify(this.asset[s][0]).replace(/['"]+/g, '');
+      }
+    });
+    this.dataAccess.getCollections().subscribe(res => {
+      console.log(res);
+      this.collections = res.data;
     });
     this.dialogRef = this.dialogService.open(dialog, { context: data });
   }
@@ -50,13 +60,8 @@ export class CardComponent implements OnInit {
       this.chosenMetaData[d[0]] = d[1];
     else
       delete this.chosenMetaData[d[0]];
-  }
-
-  saveMetaData(dialog: TemplateRef<any>) {
     console.log(this.chosenMetaData);
-    this.dialogRef.close();
   }
-
 
   openCollectionDialog(collectionDialog: TemplateRef<any>) {
     this.dataAccess.getCollections().subscribe(res => {
@@ -66,13 +71,10 @@ export class CardComponent implements OnInit {
     });
   }
 
-  saveCollection(collectionDialog: TemplateRef<any>) {
-    this.collectionDialogRef.close();
-  }
 
   onCreateCollection() {
     this.dataAccess.createCollection(this.newCollectionName).subscribe(res => {
-      if (res.result == "Success") {
+      if (res.result == 'Success') {
         this.dataAccess.getCollections().subscribe(res => {
           this.collections = res.data;
         });
@@ -82,7 +84,9 @@ export class CardComponent implements OnInit {
   }
 
   saveAsset() {
-    this.dataAccess.saveAssetIntoCollection(this.asset, this.chosenCollection, this.searchTerm, this.source, this.scope);
+
+    this.dataAccess.saveAssetIntoCollection(this.asset, this.chosenMetaData ,this.chosenCollection, this.searchTerm, this.source, this.scope);
+    this.dialogRef.close();
   }
 
   setChosenCollection(d: any) {

@@ -3,10 +3,19 @@ import {
   NbAccordionModule,
   NbButtonModule,
   NbCardModule,
-  NbCheckboxModule, NbDialogRef,
+  NbCheckboxModule,
+  NbDialogRef,
   NbIconModule,
-  NbInputModule, NbListModule,
-  NbMenuModule, NbPopoverModule, NbRadioModule, NbStepperModule, NbTabsetModule, NbToggleModule, NbUserModule
+  NbInputModule,
+  NbListModule,
+  NbMenuModule,
+  NbPopoverModule,
+  NbRadioModule,
+  NbSelectModule,
+  NbStepperModule,
+  NbTabsetModule,
+  NbToggleModule,
+  NbUserModule
 } from '@nebular/theme';
 
 import { ThemeModule } from '../@theme/theme.module';
@@ -63,6 +72,7 @@ import { AssetsComponent } from './assets/assets.component';
     NbAccordionModule,
     NbUserModule,
     FileUploadModule,
+    NbSelectModule,
 
   ],
   declarations: [

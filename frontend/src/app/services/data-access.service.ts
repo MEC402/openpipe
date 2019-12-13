@@ -13,6 +13,16 @@ export class DataAccessService {
     //this.webServerURL = 'http://localhost/cgi-bin/';
   }
 
+  public getMuseumData(searchTerm: string, museumName  , page: number , pageSize: number) {
+    const url = this.webServerURL + 'assetSources/museums.py';
+    const params = new HttpParams()
+                  .set('q', searchTerm)
+                  .set('name', museumName)
+                  .set('p', String(page))
+                  .set('ps', String(pageSize));
+    return this.http.get(url, {params: params});
+  }
+
   public getMETsData(searchTerm: string , start: number , step: number) {
     const url = this.webServerURL + 'assetSources/mets.py';
     const params = new HttpParams().set('q', searchTerm).set('start', String(start)).set('step', String(step));
@@ -43,12 +53,12 @@ export class DataAccessService {
     return this.http.get<InsertionResponse>(url, {params: params});
   }
 
-  public saveAssetIntoCollection(asset, collection, searchTerm, source, scope): Observable<InsertionResponse> {
+  public saveAssetIntoCollection(asset, metaTags, collection, searchTerm, source, scope): Observable<InsertionResponse> {
     this.createMetaData().subscribe(res => {
       const metaDataId = res.result;
       this.saveAsset(asset, source, metaDataId, scope).subscribe(res => {
         const assetId = res.result;
-        this.addMetaTags(metaDataId, asset).subscribe(res => {
+        this.addMetaTags(metaDataId, metaTags).subscribe(res => {
           this.addAssetToCollection(assetId, collection, searchTerm).subscribe(res => {
             console.log(res);
           });
@@ -69,12 +79,11 @@ export class DataAccessService {
     return this.http.get<InsertionResponse>(addAssetURL, {params: assetParams});
   }
 
-  public addMetaTags(metaDataId, asset): Observable<InsertionResponse> {
+  public addMetaTags(metaDataId, metaTags): Observable<InsertionResponse> {
     const metaTagsURL = this.webServerURL + 'dataAccess/createMetaTags.py';
-    const postBody = {'metaDataId': metaDataId,
-                      'title': asset.title,
-                      'smallImage': asset.smallImage,
-                      'largeImage': asset.largeImage};
+    metaTags['metaDataId'] = metaDataId;
+    const postBody = metaTags;
+    console.log(postBody);
     const headers = new HttpHeaders({
       'Content-Type': 'text/plain',
       'Access-Control-Allow-Origin': '*',

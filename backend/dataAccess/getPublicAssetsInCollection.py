@@ -14,7 +14,7 @@ def cgiFieldStorageToDict(fieldStorage):
         params[key] = fieldStorage[key].value
     return params
 
-def getPublicAsssetsInCollection(collectionId):
+def getPublicAsssetsInCollection(collectionId,page,pageSize):
     result = {}
     try:
         connection = mysql.connector.connect(
@@ -24,9 +24,12 @@ def getPublicAsssetsInCollection(collectionId):
             database="artmaster"
         )
 
-        sql_select_Query = "SELECT assetId,metaDataId FROM collectionMember JOIN asset ON collectionMember.assetId = asset.id WHERE scope=0 and collectionId = %s"
+        start = (page - 1) * pageSize
+        step = pageSize
+
+        sql_select_Query = "SELECT assetId,metaDataId FROM collectionMember JOIN asset ON collectionMember.assetId = asset.id WHERE scope=0 and collectionId = %s limit %s,%s "
         cursor = connection.cursor()
-        cursor.execute(sql_select_Query, (collectionId,))
+        cursor.execute(sql_select_Query, (collectionId,start,step))
         records = cursor.fetchall()
         result["total"] = cursor.rowcount
         rows = []
@@ -52,8 +55,14 @@ def getPublicAsssetsInCollection(collectionId):
 print("Content-Type: text/json\n")
 dict = cgiFieldStorageToDict(cgi.FieldStorage())
 
+if 'p' not in dict.keys():
+    dict['p'] = 1
+
+if 'ps' not in dict.keys():
+    dict['ps'] = 10
+
 if 'collectionId' not in dict.keys():
     print(json.dumps({"total": "-1", "data": [{}]}))
 else:
     id = dict['collectionId']
-    print(json.dumps(getPublicAsssetsInCollection(id), default=str))
+    print(json.dumps(getPublicAsssetsInCollection(id,int(dict["p"]), int(dict["ps"])), default=str))

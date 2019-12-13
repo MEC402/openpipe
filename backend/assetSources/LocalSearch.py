@@ -76,11 +76,13 @@ class LocalSearch:
         if int(start) + int(step) > retrievedAssets['total']:
             step = retrievedAssets['total'] - int(start) - 1
         assets = retrievedAssets['assetIDs'][int(start):int(start) + int(step)]
-
-        pool = ThreadPool(len(assets))
-        for assetId in assets:
-            results.append(pool.apply_async(self.getAssetMetaData, args=[assetId]))
-        pool.close()
-        pool.join()
-        results = [r.get() for r in results]
-        return {"data": results, "total": retrievedAssets['total'], "sourceName": "Local"}
+        if len(retrievedAssets['assetIDs']>0):
+            pool = ThreadPool(len(assets))
+            for assetId in assets:
+                results.append(pool.apply_async(self.getAssetMetaData, args=[assetId]))
+            pool.close()
+            pool.join()
+            results = [r.get() for r in results]
+            return {"data": results, "total": retrievedAssets['total'], "sourceName": "Local"}
+        else:
+            return {"data": [], "total": 0, "sourceName": "Local"}

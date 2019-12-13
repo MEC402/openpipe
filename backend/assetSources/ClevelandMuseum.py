@@ -34,7 +34,8 @@ class ClevelandMuseum:
             response["openpipe_canonical_artist"] = []
             for c in data["creators"]:
                 response["openpipe_canonical_artist"].append(c["description"])
-        response["openpipe_canonical_culture"] = data["culture"]
+        if len(data["culture"]) > 0:
+            response["openpipe_canonical_culture"] = data["culture"]
         # response["classification"] = [data["classification"]]
         # self.schema.genre.push(data["city"])
         # self.schema.medium.push(data["city"])

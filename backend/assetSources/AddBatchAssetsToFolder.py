@@ -124,7 +124,7 @@ def getSchema(type):
 def searchMuseum(term):
     print("hi")
     ms = MetMuseum(getSchema(1))
-    for l in range(1,10):
+    for l in range(1,5):
         print(l)
         result = ms.getData(term, l, 100)
         print(result)
@@ -133,8 +133,8 @@ def searchMuseum(term):
             print(ind)
             mid = insertIntoMetaData()
             aid = insertIntoAsset(i["openpipe_canonical_title"][0], "", i["openpipe_canonical_id"][0], 1, mid, 0)
-            insertIntoCollectionMember(aid, 17, term)
+            insertIntoCollectionMember(aid, 20, term)
             print(insertIntoMetaTags(i, mid))
             ind = ind + 1
 # rembrandt
-searchMuseum("early middle ages")
+searchMuseum("paris")

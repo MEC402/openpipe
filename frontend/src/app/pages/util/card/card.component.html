@@ -1,84 +1,46 @@
 <nb-card size="small">
 
   <nb-card-header>
-    {{this.asset.title}}
+    {{this.asset.openpipe_canonical_title}}
   </nb-card-header>
   <nb-card-body align="center">
-    <a [href]="asset.largeImage" target="_blank">
-      <img [src]="asset.smallImage">
+    <a [href]="asset.openpipe_canonical_largeImage" target="_blank">
+      <img [src]="asset.openpipe_canonical_smallImage">
     </a>
   </nb-card-body>
 
   <nb-card-footer class="row">
-    <button nbButton (click)="openCollectionDialog(collectionDialog)" size="tiny">+ Folders</button>
-    <button nbButton (click)="openDialog(dialog)" size="tiny">MetaData</button>
+    <button nbButton (click)="openDialog(dialog)" size="tiny">Add to a Folder</button>
   </nb-card-footer>
 
 </nb-card>
 
 <ng-template #dialog let-data let-ref="dialogRef">
-  <nb-card>
-    <nb-card-header>MetaData</nb-card-header>
+  <nb-card size="giant">
+    <nb-card-header>
+      <button nbButton (click)="saveAsset()">Save</button>
+      <button nbButton (click)="ref.close()">Close</button>
+    </nb-card-header>
     <nb-card-body>
+      <h4>Choose a Folder:</h4>
+      <nb-select placeholder="Select Showcase" [(selected)]="chosenCollection">
+        <nb-option *ngFor="let c of collections" [value]="c.name[0]">{{c.name[0]}}</nb-option>
+      </nb-select>
+      <button nbButton status="warning" [nbPopover]="form">New Folder</button>
+      <h4>Private or Public Asset:</h4>
+      <nb-radio-group [(ngModel)]="scope">
+        <nb-radio value="0" checked=true>Public</nb-radio>
+        <nb-radio value="1">Private</nb-radio>
+      </nb-radio-group>
+      <h4>Meta Data</h4>
       <label *ngFor="let d of data">
         <nb-checkbox checked="true" (checkedChange)="toggle($event,d)">{{d[0]}}:{{d[1]}}</nb-checkbox>
       </label>
     </nb-card-body>
-    <nb-card-footer>
-      <button nbButton (click)="saveMetaData(dialog)">Save</button>
-      <button nbButton (click)="ref.close()">Close</button>
-    </nb-card-footer>
   </nb-card>
 </ng-template>
 
-<ng-template #collectionDialog let-data let-ref="dialogRef">
-  <nb-card size="large">
-    <nb-card-body>
-      <nb-stepper orientation="horizontal" disableStepNavigation>
-        <nb-step [label]="labelOne">
-          <ng-template #labelOne>Collection</ng-template>
-          <h4>Choose a Folder</h4>
-          <nb-list>
-            <nb-list-item>
-              <button nbButton status="warning" [nbPopover]="form">New Folder</button>
-            </nb-list-item>
-            <nb-list-item *ngFor="let d of collections">
-              {{ d.name }}
-              <button  nbButton nbStepperNext ghost status="danger" (click)="setChosenCollection(d)"><nb-icon icon="arrow-ios-forward-outline"></nb-icon></button>
-            </nb-list-item>
-          </nb-list>
-        </nb-step>
-        <nb-step label="Access">
-          <button class="prev-button" nbButton nbStepperPrevious>prev</button>
-          <button class="next-button" nbButton nbStepperNext>next</button>
-          <h4>Private or Public Asset</h4>
-          <nb-radio-group [(ngModel)]="scope">
-            <nb-radio value="0" checked=true>Public</nb-radio>
-            <nb-radio value="1">Private</nb-radio>
-          </nb-radio-group>
-        </nb-step>
-        <nb-step [label]="labelTwo">
-          <ng-template #labelTwo>MetaData</ng-template>
-          <button class="prev-button" nbButton nbStepperPrevious>prev</button>
-          <button class="next-button" nbButton nbStepperNext (click)="saveAsset()">next</button>
-          <h4>Choose The MetaData</h4>
-          <nb-card size="large">
-            <nb-card-body>
-              <nb-checkbox labelPosition="end" *ngFor="let d of getAssetsSourceMetaTags(); let i = index;" [id]="i" (click)="toggle($event,d)">{{d[0]}}:{{d[1]}}</nb-checkbox>
-            </nb-card-body>
-          </nb-card>
-        </nb-step>
-        <nb-step [label]="labelFour">
-          <ng-template #labelFour>Save</ng-template>
-          <h4>Result</h4>
-          <p>
-            Asset Stored Successfully!
-          </p>
-        </nb-step>
-      </nb-stepper>
-    </nb-card-body>
-  </nb-card>
-</ng-template>
+
 
 <ng-template #form>
   <nb-card>
