@@ -2,6 +2,9 @@
 
 import requests
 from multiprocessing.pool import ThreadPool
+from getImageInfo import getImageInfo
+import urllib.request as urllib2
+import urllib.parse as urllibpars
 
 
 class MetMuseum:
@@ -23,7 +26,15 @@ class MetMuseum:
         response["openpipe_canonical_source"] = ["MET"]
         response["openpipe_canonical_id"] = [data["objectID"]]
         response["openpipe_canonical_largeImage"] = [data["primaryImage"]]
+        # print(response["openpipe_canonical_largeImage"])
+        # dimentions=getImageInfo(urllib2.urlopen(urllib2.Request(urllibpars.quote(response["openpipe_canonical_largeImage"][0].encode('utf-8'),safe=''), headers={"Range": "5000"})).read(150))
+        dimentions=getImageInfo(urllib2.urlopen(urllib2.Request(response["openpipe_canonical_largeImage"][0], headers={"Range": "5000"})).read())
+        response["openpipe_canonical_largeImageDimensions"] = [str(dimentions[1])+","+str(dimentions[2])]
         response["openpipe_canonical_smallImage"] = [data["primaryImageSmall"]]
+        # print(response["openpipe_canonical_smallImage"])
+        # dimentions = getImageInfo(urllib2.urlopen(urllib2.Request(urllibpars.quote(response["openpipe_canonical_smallImage"][0].encode('utf-8'),safe=''), headers={"Range": "5000"})).read(150))
+        dimentions = getImageInfo(urllib2.urlopen(urllib2.Request(response["openpipe_canonical_smallImage"][0], headers={"Range": "5000"})).read())
+        response["openpipe_canonical_smallImageDimensions"] = [str(dimentions[1])+","+str(dimentions[2])]
         response["openpipe_canonical_title"] = [data["title"]]
         response["openpipe_canonical_artist"] = [data["artistDisplayName"]]
         response["openpipe_canonical_culture"] = [data["culture"]]

@@ -24,10 +24,10 @@ def cgiFieldStorageToDict(fieldStorage):
 print("Content-Type: text/json\n")
 dict = cgiFieldStorageToDict(cgi.FieldStorage())
 
-# dict = {'q': 'cats',
-#         'p': 1,
-#         'ps': 10,
-#         'name':"local"}
+dict = {'q': 'cats',
+        'p': 1,
+        'ps': 3,
+        'name':"met"}
 
 if 'p' not in dict.keys():
     dict['p'] = 1
