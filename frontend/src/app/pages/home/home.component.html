@@ -12,6 +12,16 @@
 <nb-card size="large" *ngFor="let s of source">
   <nb-card-header>
     {{s.name}}
+    <div>
+      <label>Page:</label>
+      <button nbButton ghost status="primary"  size="tiny" (click)="prevPage(s)" [disabled]="s.page<=1">
+        <nb-icon icon="arrow-ios-back-outline" status="basic"></nb-icon>
+      </button>
+      <label>{{s.page}} of {{ceil(s.total/s.pageSize)}}</label>
+      <button nbButton ghost status="primary"  size="tiny" (click)="nextPage(s)" [disabled]="s.page>=(s.total/s.pageSize)">
+        <nb-icon icon="arrow-ios-forward-outline" status="basic"></nb-icon>
+      </button>
+    </div>
   </nb-card-header>
   <nb-card-body  align="center">
     <ngx-card-deck [assets]="s.data" [source]="s.name" [searchTerm]="searchTerm"></ngx-card-deck>
