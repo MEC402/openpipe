@@ -4,6 +4,7 @@ from PIL import Image
 
 class ImageInformation:
     def getPixelDimentions(self, url):
+        url=url.replace(" ", "%20")
         file=urllib2.urlopen(urllib2.Request(url, headers={"Range": "5000"})).read()
         im = Image.open(BytesIO(file))
         width, height = im.size
