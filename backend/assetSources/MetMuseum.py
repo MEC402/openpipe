@@ -1,10 +1,9 @@
 #!/bin/python3
 
-import requests
 from multiprocessing.pool import ThreadPool
-from getImageInfo import ImageInformation
-import urllib.request as urllib2
-import urllib.parse as urllibpars
+
+import requests
+from ImageUtil import ImageUtil
 
 
 class MetMuseum:
@@ -26,7 +25,7 @@ class MetMuseum:
         response["openpipe_canonical_source"] = ["MET"]
         response["openpipe_canonical_id"] = [data["objectID"]]
         response["openpipe_canonical_largeImage"] = [data["primaryImage"]]
-        imageInfo=ImageInformation()
+        imageInfo=ImageUtil()
         dimentions=imageInfo.getPixelDimentions(response["openpipe_canonical_largeImage"][0])
         response["openpipe_canonical_largeImageDimensions"] = [str(dimentions[0])+","+str(dimentions[1])]
         response["openpipe_canonical_smallImage"] = [data["primaryImageSmall"]]
