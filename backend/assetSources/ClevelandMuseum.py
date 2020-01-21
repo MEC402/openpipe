@@ -29,6 +29,10 @@ class ClevelandMuseum:
             response["openpipe_canonical_smallImage"] = [data["images"]["web"]["url"]]
             response["openpipe_canonical_smallImageDimensions"] = [
                 str(data["images"]["web"]["width"]) + "," + str(data["images"]["web"]["height"])]
+            response["openpipe_canonical_fullImage"] = [
+                "http://mec402.boisestate.edu/cgi-bin/assetSources/getClevelandConvertedTif.py?id=" + str(data["id"])]
+            # tileInfo = self.getTileImages(data["objectNumber"], 0)
+            # response["openpipe_canonical_fullImageDimensions"] = []
         response["openpipe_canonical_title"] = [data["title"]]
         if len(data["creators"]) > 0:
             response["openpipe_canonical_artist"] = []
@@ -51,6 +55,12 @@ class ClevelandMuseum:
         data = response.json()
         metaData = self.getMetaTagMapping(data)
         return metaData
+
+    def getMetaDataByAssetID(self,objctID):
+        serviceName = str(objctID)
+        response = requests.get(url=self.url + serviceName)
+        data = response.json()
+        return data["data"]
 
     def getData(self, q, page, pageSize):
         results = []
