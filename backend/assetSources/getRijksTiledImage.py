@@ -2,13 +2,11 @@
 
 import cgi
 import json
-import sys
 import os
+import sys
 
-import requests
 from ImageUtil import ImageUtil
 from RijksMuseum import RijksMuseum
-import base64
 
 path = "../cache/"
 
@@ -31,22 +29,13 @@ if 'id' not in dict.keys():
     print(json.dumps([{}]))
 
 else:
-    url = "https://www.rijksmuseum.nl/api/nl/collection/"
     rijks = RijksMuseum({})
     imgUtil = ImageUtil()
-    serviceName = dict["id"] + "/tiles"
-    params = {'key': "qvMYRE87"}
-    response = requests.get(url=url + serviceName, params=params)
-    data = response.json()
+
     imgWidth = 0
     imgHeight = 0
     tileData = []
-    for d in data["levels"]:
-        if d['name'] == "z0":
-            tileData = d['tiles']
-            imgWidth = d['width']
-            imgHeight = d['height']
-            break
+    tileData, imgWidth, imgHeight = rijks.getTileImages(dict["id"], 0)
     image = imgUtil.concatTiles(tileData, imgWidth, imgHeight)
     fileName = "Rijks_" + dict["id"] + '.jpg'
     image.save(path + fileName)
@@ -56,5 +45,3 @@ else:
     sys.stdout.write("\n")
     sys.stdout.flush()
     sys.stdout.buffer.write(open(path + fileName, "rb").read())
-
-

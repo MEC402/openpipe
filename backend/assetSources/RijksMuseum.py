@@ -36,11 +36,17 @@ class RijksMuseum:
             response["openpipe_canonical_smallImage"] = [data["webImage"]["url"]]
             response["openpipe_canonical_smallImageDimensions"] = [
                 str(data["webImage"]["width"]) + "," + str(data["webImage"]["height"])]
+            response["openpipe_canonical_fullImage"] = [
+                "http://mec402.boisestate.edu/cgi-bin/assetSources/getRijksTiledImage.py?id=" + data["objectNumber"]]
+            tileInfo = self.getTileImages(data["objectNumber"], 0)
+            response["openpipe_canonical_fullImageDimensions"] = [str(tileInfo[1])+","+str(tileInfo[2])]
+
         response["openpipe_canonical_title"] = [data["title"]]
         if (len(data["principalMakers"]) > 0):
             response["openpipe_canonical_artist"] = []
             for artist in data["principalMakers"]:
                 response["openpipe_canonical_artist"].append(artist["name"])
+
         # schema["culture"].append(data["culture"])
         # schema["classification"].append(data["classification"])
         # # schema.genre.push(data["city"])
@@ -48,6 +54,7 @@ class RijksMuseum:
         # schema["nation"].append(data["country"])
         # schema["city"].append(data["city"])
         # schema["tags"] = data["tags"]
+
         response.update(data)
         return response
 
@@ -61,3 +68,16 @@ class RijksMuseum:
         pool.join()
         results = [r.get() for r in results]
         return {"data": results, "total": retrievedAssets["count"], "sourceName": "Rijks"}
+
+    def getTileImages(self, objectId, z):
+        serviceName = "collection/" + objectId + "/tiles"
+        params = {'key': "qvMYRE87"}
+        response = requests.get(url=self.url + serviceName, params=params)
+        data = response.json()
+        for d in data["levels"]:
+            if d['name'] == "z" + str(z):
+                tileData = d['tiles']
+                imgWidth = d['width']
+                imgHeight = d['height']
+                break
+        return tileData, imgWidth, imgHeight
