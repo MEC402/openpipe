@@ -1,0 +1,26 @@
+{
+  "total": 0,
+  "endpoints": [
+    {
+      "name": "",
+      "httpType": "",
+      "contentType": "",
+      "function": "",
+      "deploymentFolderPath": "",
+      "parameters": [
+        {
+          "name": "",
+          "type": "",
+          "description": "",
+        }
+      ],
+      "body": "",
+    },
+    {
+
+    },
+    {
+
+    }
+  ]
+}
