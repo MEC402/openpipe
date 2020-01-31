@@ -5,8 +5,9 @@
       "name": "",
       "httpType": "",
       "contentType": "",
+      "mediaType": "",
       "function": "",
-      "deploymentFolderPath": "",
+      "serverPath": "",
       "parameters": [
         {
           "name": "",
@@ -14,7 +15,8 @@
           "description": "",
         }
       ],
-      "body": "",
+      "bodySchema": "",
+      "description": ""
     },
     {
 
