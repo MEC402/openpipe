@@ -43,6 +43,7 @@ import {FileUploadModule} from 'ng2-file-upload';
 import { AssetsComponent } from './assets/assets.component';
 import { ReportsComponent } from './reports/reports.component';
 import {ServiceStatusComponent} from "./reports/service-status/service-status.component";
+import { MissingImagesComponent } from './reports/missing-images/missing-images.component';
 
 
 @NgModule({
@@ -93,6 +94,7 @@ import {ServiceStatusComponent} from "./reports/service-status/service-status.co
     AssetsComponent,
     ReportsComponent,
     ServiceStatusComponent,
+    MissingImagesComponent,
   ],
 })
 export class PagesModule {

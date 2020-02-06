@@ -3,20 +3,7 @@
     <ngx-service-status [items]="items"></ngx-service-status>
   </nb-tab>
   <nb-tab tabTitle="Missing Images">
-    <nb-card size="small">
-      <nb-card-body>
-        <nb-list >
-          <nb-list-item  class="item" *ngFor="let item of items">
-            <span>{{item.name}}</span>
-            <span class="delta" [class.up]="item.status.alive && item.name!='Name'" [class.down]="!item.status.alive && item.name!='Name'">
-          <nb-icon *ngIf="item.name!='Name'" [icon]="item.status.alive ? 'checkmark-circle-2' : 'minus-circle' " pack="eva"></nb-icon>
-              {{ item.status.value }}
-    </span>
-            <!--        <span>{{item.lastChecked}}</span>-->
-          </nb-list-item>
-        </nb-list>
-      </nb-card-body>
-    </nb-card>
+    <ngx-missing-images></ngx-missing-images>
   </nb-tab>
   <nb-tab tabTitle="Missing MetaData">
     Tab content 2
