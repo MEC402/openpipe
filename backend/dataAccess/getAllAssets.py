@@ -67,3 +67,5 @@ if 'ps' not in dict.keys():
 # dict={'p':200,'ps':10}
 
 print(json.dumps(getAllAssets(int(dict["p"]), int(dict["ps"])), default=str))
+
+

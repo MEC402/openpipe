@@ -88,7 +88,7 @@ export class HomeComponent implements OnInit {
   prevPage(source) {
     console.log(source);
 
-    this.dataAccess.getMuseumData(this.searchTerm, source.sourceName.lower() , source.page - 1, source.pageSize)
+    this.dataAccess.getMuseumData(this.searchTerm, source.sourceName , source.page - 1, source.pageSize)
       .subscribe(res => {
         console.log(res);
         source.data = res['data'];
