@@ -15,7 +15,9 @@
 /*/*.launch
 /*/.settings/
 /*/*.sublime-workspace
-*.pyc
+
+__pycache__/
+
 
 # IDE - VSCode
 /*/.vscode/*
@@ -41,3 +43,4 @@
 # System Files
 /*/.DS_Store
 /*/Thumbs.db
+

@@ -27,4 +27,9 @@ export const MENU_ITEMS: NbMenuItem[] = [
     icon: 'upload-outline',
     link: '/pages/uploader',
   },
+  {
+    title: 'Reports',
+    icon: 'clipboard-outline',
+    link: '/pages/reports',
+  },
 ];

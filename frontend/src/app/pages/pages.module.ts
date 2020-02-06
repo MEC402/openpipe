@@ -15,7 +15,7 @@ import {
   NbStepperModule,
   NbTabsetModule,
   NbToggleModule,
-  NbUserModule
+  NbUserModule,
 } from '@nebular/theme';
 
 import { ThemeModule } from '../@theme/theme.module';
@@ -32,15 +32,18 @@ import { CardDeckComponent } from './util/card-deck/card-deck.component';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatCardModule} from '@angular/material/card';
 import {MatButtonModule} from '@angular/material/button';
-import {FormsModule} from "@angular/forms";
-import {Ng2SmartTableModule} from "ng2-smart-table";
+import {FormsModule} from '@angular/forms';
+import {Ng2SmartTableModule} from 'ng2-smart-table';
 import { MetadataSelectorComponent } from './util/metadata-selector/metadata-selector.component';
 import { PreviewCardComponent } from './util/preview-card/preview-card.component';
 import { CanonicalMetaTagsComponent } from './settings/canonical-meta-tags/canonical-meta-tags.component';
 import { MetaTagEditorComponent } from './settings/meta-tag-editor/meta-tag-editor.component';
 import { UploaderComponent } from './uploader/uploader.component';
-import {FileUploadModule} from "ng2-file-upload";
+import {FileUploadModule} from 'ng2-file-upload';
 import { AssetsComponent } from './assets/assets.component';
+import { ReportsComponent } from './reports/reports.component';
+import {ServiceStatusComponent} from "./reports/service-status/service-status.component";
+
 
 @NgModule({
   providers: [
@@ -88,6 +91,8 @@ import { AssetsComponent } from './assets/assets.component';
     MetaTagEditorComponent,
     UploaderComponent,
     AssetsComponent,
+    ReportsComponent,
+    ServiceStatusComponent,
   ],
 })
 export class PagesModule {

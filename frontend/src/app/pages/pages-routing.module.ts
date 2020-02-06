@@ -6,8 +6,9 @@ import { NotFoundComponent } from './miscellaneous/not-found/not-found.component
 import {HomeComponent} from './home/home.component';
 import {CollectionsComponent} from './collections/collections.component';
 import {SettingsComponent} from './settings/settings.component';
-import {UploaderComponent} from "./uploader/uploader.component";
-import {AssetsComponent} from "./assets/assets.component";
+import {UploaderComponent} from './uploader/uploader.component';
+import {AssetsComponent} from './assets/assets.component';
+import {ReportsComponent} from './reports/reports.component';
 
 const routes: Routes = [{
   path: '',
@@ -32,6 +33,10 @@ const routes: Routes = [{
     {
       path: 'uploader',
       component: UploaderComponent,
+    },
+    {
+      path: 'reports',
+      component: ReportsComponent,
     },
     {
       path: 'miscellaneous',
