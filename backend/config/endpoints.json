@@ -1,5 +1,4 @@
 {
-  "total": 0,
   "endpoints": [
     {
       "name": "",
@@ -19,10 +18,21 @@
       "description": ""
     },
     {
-
-    },
-    {
-
+      "name": "reportAssetsWithMissingImages",
+      "httpType": "GET",
+      "contentType": "text",
+      "mediaType": "json",
+      "function": "reportAssetsWithMissingImages.py",
+      "serverPath": "/cgi-bin/reports/",
+      "parameters": [
+        {
+          "name": "",
+          "type": "",
+          "description": "",
+        }
+      ],
+      "bodySchema": "",
+      "description": ""
     }
   ]
 }

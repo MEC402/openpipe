@@ -21,7 +21,6 @@ class TO:
         for mappedclass in Base.classes:
             self.__classes[mappedclass.__name__] = mappedclass
 
-
     def getClasses(self):
         if len(self.__classes.keys())<=0:
             self.builClassesFromDB()
