@@ -16,16 +16,15 @@ export class ReportsComponent implements OnInit {
     {'name': 'AWS cloudWatch', 'status': {'alive': false, 'value': ' unavailable'}, 'lastChecked': '10 minuts ago'}];
 
   missingImages= [
-    {'name': 'Name', 'status': {'alive': 'aaa', 'value': 'status'}, 'lastChecked': 'last Checked'},
-    {'name': 'AWS RDS', 'status': {'alive': true, 'value': 'available'}, 'lastChecked': '40 minuts ago'},
-    {'name': 'Endpoints', 'status': {'alive': true, 'value': ' available'}, 'lastChecked': '20 minuts ago'},
-    {'name': 'AWS cloudWatch', 'status': {'alive': false, 'value': ' unavailable'}, 'lastChecked': '10 minuts ago'}];
+    {'assetName': 'assetName', 'assetID': '', 'sourceName': 'sourceName', 'sourceID': '', 'metaTagID': '', 'metaTagName': 'metaTagName'},
+    {'assetName': '', 'assetID': '', 'sourceName': '', 'sourceID': '', 'metaTagID': '', 'metaTagName': ''}
+    ];
+
+
 
   missingMetaTags= [
-    {'name': 'Name', 'status': {'alive': 'aaa', 'value': 'status'}, 'lastChecked': 'last Checked'},
-    {'name': 'AWS RDS', 'status': {'alive': true, 'value': 'available'}, 'lastChecked': '40 minuts ago'},
-    {'name': 'Endpoints', 'status': {'alive': true, 'value': ' available'}, 'lastChecked': '20 minuts ago'},
-    {'name': 'AWS cloudWatch', 'status': {'alive': false, 'value': ' unavailable'}, 'lastChecked': '10 minuts ago'}];
+    {'assetName': '', 'assetID': '', 'sourceName': '', 'sourceID': '', 'metaTagID': '', 'metaTagName': ''},
+    ];
 
   ngOnInit() {
   }
