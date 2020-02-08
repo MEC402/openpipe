@@ -48,5 +48,10 @@ class BL:
                     orm.insert(
                         AssetDefect(assetId=asset["id"], metaDataId=asset["metaDataId"], metaTagName=mc, defectId=2))
 
+    def getAssetReport(self):
+        orm = ORM()
+        queryStatement ="""SELECT assetId,metaDataId,metaTagId,metaTagName,metaTagValue,defectType FROM assetDefect join defect on assetDefect.defectId=defect.id order by assetId asc;"""
+        results = orm.executeSelect(queryStatement)
+        return results
 
 vf = BL().getAssetsWithBadMetaTags()
