@@ -150,6 +150,11 @@ export class DataAccessService {
     return this.http.get(getAllAssetURL);
   }
 
+  public getAssetsMissingImageReport() {
+    const getAssetsMissingImageReportURL = this.webServerURL + 'dataAccess/getAssetsReport.py';
+    return this.http.get(getAssetsMissingImageReportURL);
+  }
+
 }
 
 

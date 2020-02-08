@@ -24,14 +24,24 @@ export class MissingImagesComponent implements OnInit {
       confirmSave : true,
     },
     columns: {
-      name: {
-        title: 'Asset',
+      shortName: {
+        title: 'Asset Name',
+        type: 'string',
+        editable: false,
+      },
+      tagName: {
+        title: 'Tag Name',
         type: 'string',
         editable: false,
       },
       value: {
-        title: 'Tag Default Value',
+        title: 'Asset Name',
         type: 'string',
+      },
+      sourceName: {
+        title: 'Source Museum',
+        type: 'string',
+        editable: false,
       },
     },
   };
@@ -39,15 +49,9 @@ export class MissingImagesComponent implements OnInit {
   source: LocalDataSource = new LocalDataSource();
 
   constructor(private dataAccess: DataAccessService) {
-    dataAccess.getCanonicalMetaTags().subscribe(res => {
-      const canonicalData = [];
-      Object.keys(res).forEach(key => {
-        const elem = {};
-        elem['name'] = key;
-        elem['value'] = res[key][0];
-        canonicalData.push(elem);
-      });
-      this.source.load(canonicalData);
+    dataAccess.getAssetsMissingImageReport().subscribe(res => {
+      console.log(res)
+      this.source.load(res.data);
     });
   }
 
