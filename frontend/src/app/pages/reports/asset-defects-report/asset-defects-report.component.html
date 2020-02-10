@@ -1,0 +1,13 @@
+
+<nb-card>
+  <nb-card-header>
+    Canonical Meta-Tags
+  </nb-card-header>
+
+  <nb-card-body>
+    <ng2-smart-table [settings]="settings" [source]="source" (deleteConfirm)="onDeleteConfirm($event)"
+                     (editConfirm)="onEditConfirm($event)" (createConfirm)="onCreateConfirm($event)">
+    </ng2-smart-table>
+  </nb-card-body>
+</nb-card>
+

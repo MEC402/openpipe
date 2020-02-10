@@ -44,6 +44,7 @@ import { AssetsComponent } from './assets/assets.component';
 import { ReportsComponent } from './reports/reports.component';
 import {ServiceStatusComponent} from "./reports/service-status/service-status.component";
 import { MissingImagesComponent } from './reports/missing-images/missing-images.component';
+import { AssetDefectsReportComponent } from './reports/asset-defects-report/asset-defects-report.component';
 
 
 @NgModule({
@@ -95,6 +96,7 @@ import { MissingImagesComponent } from './reports/missing-images/missing-images.
     ReportsComponent,
     ServiceStatusComponent,
     MissingImagesComponent,
+    AssetDefectsReportComponent,
   ],
 })
 export class PagesModule {

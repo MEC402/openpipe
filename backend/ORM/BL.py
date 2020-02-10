@@ -1,5 +1,6 @@
 from ORM import ORM
 from TO import TO
+import requests
 
 
 class BL:
@@ -50,8 +51,25 @@ class BL:
 
     def getAssetReport(self):
         orm = ORM()
-        queryStatement ="""SELECT assetId,metaDataId,metaTagId,metaTagName,metaTagValue,defectType FROM assetDefect join defect on assetDefect.defectId=defect.id order by assetId asc;"""
+        queryStatement ="""SELECT assetId,assetDefect.metaDataId,metaTagId,metaTagName,metaTagValue,defectType, asset.shortName as assetName, source.sourceName FROM assetDefect join defect on assetDefect.defectId=defect.id join asset on assetDefect.assetId=asset.id join source on asset.sourceId=source.id order by assetId asc;"""
         results = orm.executeSelect(queryStatement)
         return results
 
-vf = BL().getAssetsWithBadMetaTags()
+    def getAssetsWithFaultyImageLink(self):
+        orm = ORM()
+        AssetDefect = self.tables["assetDefect"]
+        queryStatement = "select metaTag.id as metaTagID, metaTag.metaDataId,tagName,value, asset.id as assetID, shortName, IdAtSource, asset.sourceId, sourceName " \
+                         "from metaTag join asset on metaTag.metaDataId=asset.metaDataId join source on asset.sourceId=source.id " \
+                         "where (tagName='openpipe_canonical_largeImage') " \
+                         "or (tagName='openpipe_canonical_smallImage')"
+        results = orm.executeSelect(queryStatement)
+        for r in results["data"]:
+            request = requests.head(r["value"])
+            if request.status_code == 200:
+                print('Web site exists')
+            else:
+                orm.insert(AssetDefect(assetId=r["id"], metaDataId=r["metaDataId"],
+                                       metaTagId=r["metaTagID"], metaTagName=r["tagName"],
+                                       metaTagValue=r["value"], defectId=4))
+
+BL().getAssetsWithFaultyImageLink()

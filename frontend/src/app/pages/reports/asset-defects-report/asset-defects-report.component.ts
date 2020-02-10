@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import {LocalDataSource} from 'ng2-smart-table';
+import {LocalDataSource} from "ng2-smart-table";
 import {DataAccessService} from '../../../services/data-access.service';
 
 @Component({
-  selector: 'ngx-missing-images',
-  templateUrl: './missing-images.component.html',
-  styleUrls: ['./missing-images.component.scss'],
+  selector: 'ngx-asset-defects-report',
+  templateUrl: './asset-defects-report.component.html',
+  styleUrls: ['./asset-defects-report.component.scss']
 })
-export class MissingImagesComponent implements OnInit {
+export class AssetDefectsReportComponent implements OnInit {
+
 
   ngOnInit() {
   }
@@ -24,18 +25,23 @@ export class MissingImagesComponent implements OnInit {
       confirmSave : true,
     },
     columns: {
-      shortName: {
+      assetName: {
         title: 'Asset Name',
         type: 'string',
         editable: false,
       },
-      tagName: {
-        title: 'Tag Name',
+      defectType: {
+        title: 'Defect Type',
         type: 'string',
         editable: false,
       },
-      value: {
-        title: 'Asset Name',
+      metaTagName: {
+        title: 'MetaTag Name',
+        type: 'string',
+        editable: false,
+      },
+      metaTagValue: {
+        title: 'MetaTag Value',
         type: 'string',
       },
       sourceName: {
@@ -46,10 +52,12 @@ export class MissingImagesComponent implements OnInit {
     },
   };
 
+
+
   source: LocalDataSource = new LocalDataSource();
 
   constructor(private dataAccess: DataAccessService) {
-    dataAccess.getAssetsMissingImageReport().subscribe(res => {
+    dataAccess.getAssetsReport().subscribe(res => {
       console.log(res)
       this.source.load(res.data);
     });
