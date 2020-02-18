@@ -14,7 +14,8 @@ def cgiFieldStorageToDict(fieldStorage):
         params[key] = fieldStorage[key].value
     return params
 
-def getAllAssets(page,pageSize):
+
+def getAllAssets(page, pageSize, changeStart, changeEnd):
     result = {}
 
     start = (page - 1) * pageSize
@@ -28,22 +29,22 @@ def getAllAssets(page,pageSize):
             database="artmaster"
         )
 
-        sql_select_Query = "SELECT id,metaDataId,shortName FROM asset limit %s,%s;"
+        sql_select_Query = "SELECT id,metaDataId,shortName FROM asset where timestamp between \'" + changeStart + "\' and \'" + changeEnd +"\' limit %s,%s;"
         cursor = connection.cursor()
-        cursor.execute(sql_select_Query,(start,step))
+        cursor.execute(sql_select_Query, (start, step))
         records = cursor.fetchall()
         result["total"] = cursor.rowcount
         rows = []
         for row in records:
-            rowInfo = {"id":[row[0]],"metaDataId":[row[1]], "name":[row[2]]}
-            metaDataId=row[1]
+            rowInfo = {"id": [row[0]], "metaDataId": [row[1]], "name": [row[2]]}
+            metaDataId = row[1]
             sql_select_Query = "select tagName,value from metaTag where metaDataId=%s"
-            if (metaDataId):
+            if metaDataId:
                 cursor = connection.cursor()
                 cursor.execute(sql_select_Query, (metaDataId,))
                 metaTagsRecords = cursor.fetchall()
                 for metaTagRow in metaTagsRecords:
-                    rowInfo[metaTagRow[0]]=[metaTagRow[1]]
+                    rowInfo[metaTagRow[0]] = [metaTagRow[1]]
             rows.append(rowInfo)
         result["data"] = rows
     except Error as e:
@@ -53,6 +54,7 @@ def getAllAssets(page,pageSize):
             connection.close()
             cursor.close()
     return result
+
 
 print("Content-Type: text/json\n")
 
@@ -64,8 +66,12 @@ if 'p' not in dict.keys():
 if 'ps' not in dict.keys():
     dict['ps'] = 10
 
-# dict={'p':200,'ps':10}
+if 'changeStart' not in dict.keys():
+    dict['changeStart'] = 10
 
-print(json.dumps(getAllAssets(int(dict["p"]), int(dict["ps"])), default=str))
+if 'changeEnd' not in dict.keys():
+    dict['changeEnd'] = 10
 
+# dict={'p':1,'ps':3,'changeStart':'2019-12-11','changeEnd':'2019-12-11'}
 
+print(json.dumps(getAllAssets(int(dict["p"]), int(dict["ps"]), dict['changeStart'], dict['changeEnd']), default=str))
