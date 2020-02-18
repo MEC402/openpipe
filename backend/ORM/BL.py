@@ -68,7 +68,7 @@ class BL:
             if request.status_code == 200:
                 print('Web site exists')
             else:
-                orm.insert(AssetDefect(assetId=r["id"], metaDataId=r["metaDataId"],
+                orm.insert(AssetDefect(assetId=r["assetID"], metaDataId=r["metaDataId"],
                                        metaTagId=r["metaTagID"], metaTagName=r["tagName"],
                                        metaTagValue=r["value"], defectId=4))
 

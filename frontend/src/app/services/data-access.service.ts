@@ -150,14 +150,14 @@ export class DataAccessService {
     return this.http.get(getAllAssetURL);
   }
 
-  public getAssetsReport() {
+  public getAssetsReport(): Observable<Results> {
     const getAssetsReport = this.webServerURL + 'dataAccess/getAssetsReport.py';
-    return this.http.get(getAssetsReport);
+    return this.http.get<Results>(getAssetsReport);
   }
 
-  public getAssetsMissingImageReport() {
+  public getAssetsMissingImageReport(): Observable<Results>{
     const getAssetsMissingImageReportURL = this.webServerURL + 'dataAccess/getAssetsWithoutImages.py';
-    return this.http.get(getAssetsMissingImageReportURL);
+    return this.http.get<Results>(getAssetsMissingImageReportURL);
   }
 
 }
