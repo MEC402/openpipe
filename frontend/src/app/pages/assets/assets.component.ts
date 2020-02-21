@@ -11,6 +11,7 @@ export class AssetsComponent implements OnInit {
 
   constructor(private dataAccess: DataAccessService) {
     this.dataAccess.getAllAssets().subscribe(res => {
+      console.log(res);
       this.assets = res;
     });
   }
