@@ -5,11 +5,17 @@ from sqlalchemy.orm import sessionmaker
 
 
 class ORM:
+    address = {'dev': "artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
+               'production': "artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com"}
+    databaseName = "artmaster"
+    databaseHostAddress = address['dev']
+    databaseUserName = "artmaster"
+    databasePassword = "ArtMaster51"
     # TODO: Make this singleton
     # TODO: Password Manger
     def getSession(self):
         engine = db.create_engine(
-            'mysql+mysqlconnector://artmaster:ArtMaster51@artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com/artmaster')
+            'mysql+mysqlconnector://' + self.databaseUserName + ':' + self.databasePassword + '@' + self.databaseHostAddress + '/' + self.databaseName)
         Session = sessionmaker(bind=engine)
         return Session()
 
@@ -21,10 +27,9 @@ class ORM:
     def insert(self, obj):
         session = self.getSession()
         result = session.add(obj)
-        result=session.commit()
-        print(result)
+        result = session.commit()
         session.flush()
-        return result
+        return obj.id
 
     def update(self, object):
         return
@@ -35,10 +40,10 @@ class ORM:
     def executeSelect(self, query):
         try:
             connection = mysql.connector.connect(
-                host="artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
-                user="artmaster",
-                passwd="ArtMaster51",
-                database="artmaster"
+                host=self.databaseHostAddress,
+                user=self.databaseUserName,
+                passwd=self.databasePassword,
+                database=self.databaseName
             )
             cursor = connection.cursor()
             cursor.execute(query, )
@@ -49,7 +54,7 @@ class ORM:
             for r in records:
                 row = {}
                 for i in range(len(fieldNames)):
-                    row[fieldNames[i]] = r[i]
+                    row[fieldNames[i]] = [r[i]]
                 jsonRes['data'].append(row)
 
         except Error as e:
