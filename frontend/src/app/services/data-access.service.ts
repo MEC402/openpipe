@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import * as url from 'url';
 import {Observable} from 'rxjs';
+import {FileItem} from 'ng2-file-upload';
+
+  //tslint:disable
 
 @Injectable({
   providedIn: 'root',
@@ -51,6 +54,16 @@ export class DataAccessService {
     const url = this.webServerURL + 'dataAccess/createCollection.py';
     const params = new HttpParams().set('name', name);
     return this.http.get<InsertionResponse>(url, {params: params});
+  }
+
+  public uploadImages(fileItems : File[]) : Observable<InsertionResponse> {
+   const url = this.webServerURL + 'dataAccess/addUserAssets.py';
+   const postBody = fileItems;
+   const headers = new HttpHeaders({
+      'Content-Type': 'text/plain',
+      'Access-Control-Allow-Origin': '*',
+    });
+    return this.http.post<InsertionResponse>(url, postBody, {headers});
   }
 
   public saveAssetIntoCollection(asset, metaTags, collection, searchTerm, source, scope): Observable<InsertionResponse> {
