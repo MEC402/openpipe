@@ -25,6 +25,7 @@ export class CollectionsComponent {
     this.currentFolder = element.name;
     this.dataAccess.getPublicAssetsInCollection(element.id).subscribe(res => {
       this.assets = res.data;
+      console.log(this.assets)
     });
   }
 

@@ -41,14 +41,15 @@ class ClevelandMuseum:
         if len(data["culture"]) > 0:
             response["openpipe_canonical_culture"] = data["culture"]
 
-        era="CE"
-        year1 = abs(int(data["creation_date_earliest"]))
-        year2 = abs(int(data["creation_date_latest"]))
-        if "B.C." in data["creation_date"]:
-            era="BC"
-        response["openpipe_canonical_firstDate"] = [era+" "+str(year1)+" "+"JAN"+" "+"01"+" "+"00:00:00"]
-        response["openpipe_canonical_lastDate"] = [era+" "+str(year2)+" "+"JAN"+" "+"01"+" "+"00:00:00"]
-        response["openpipe_canonical_date"]=[response["openpipe_canonical_firstDate"][0],response["openpipe_canonical_lastDate"][0]]
+        if data["creation_date_earliest"] is not None and data["creation_date_latest"] is not None and data["creation_date"] is not None:
+            era="CE"
+            year1 = abs(int(data["creation_date_earliest"]))
+            year2 = abs(int(data["creation_date_latest"]))
+            if "B.C." in data["creation_date"]:
+                era="BC"
+            response["openpipe_canonical_firstDate"] = [era+" "+str(year1)+" "+"JAN"+" "+"01"+" "+"00:00:00"]
+            response["openpipe_canonical_lastDate"] = [era+" "+str(year2)+" "+"JAN"+" "+"01"+" "+"00:00:00"]
+            response["openpipe_canonical_date"]=[response["openpipe_canonical_firstDate"][0],response["openpipe_canonical_lastDate"][0]]
 
         # response["classification"] = [data["classification"]]
         # self.schema.genre.push(data["city"])

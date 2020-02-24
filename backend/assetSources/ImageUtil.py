@@ -3,6 +3,7 @@ from io import BytesIO
 from multiprocessing.pool import ThreadPool
 
 from PIL import Image
+from requests import get
 
 
 class ImageUtil:
@@ -11,8 +12,9 @@ class ImageUtil:
 
     def getPixelDimentions(self, url):
         url = url.replace(" ", "%20")
-        file = urllib2.urlopen(urllib2.Request(url, headers={"Range": "5000"})).read()
-        im = Image.open(BytesIO(file))
+        # file = urllib2.urlopen(urllib2.Request(url, headers={"Range": "5000"})).read()
+        file = get(url)
+        im = Image.open(BytesIO(file.content))
         width, height = im.size
         return width, height
 
