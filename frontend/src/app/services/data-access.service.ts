@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import * as url from 'url';
 import {Observable} from 'rxjs';
+import {log} from "util";
 
 @Injectable({
   providedIn: 'root',
@@ -59,7 +60,10 @@ export class DataAccessService {
       this.saveAsset(asset, source, metaDataId, scope).subscribe(res => {
         const assetId = res.result;
         this.addMetaTags(metaDataId, metaTags).subscribe(res => {
+          console.log("after adding metaTags");
+          console.log(res);
           this.addAssetToCollection(assetId, collection, searchTerm).subscribe(res => {
+            console.log("test");
             console.log(res);
           });
         });
@@ -88,13 +92,15 @@ export class DataAccessService {
       'Content-Type': 'text/plain',
       'Access-Control-Allow-Origin': '*',
     });
-    return this.http.post<InsertionResponse>(metaTagsURL, postBody, {headers});
+    return this.http.post<InsertionResponse>(metaTagsURL, postBody);
   }
 
   public addAssetToCollection(assetId, collection, searchTerm): Observable<InsertionResponse> {
     const addAssetToCollectionURL = this.webServerURL + 'dataAccess/addAssetIntoCollection.py';
+    console.log(collection.id)
+    console.log(collection.id[0])
     const assetCollectionParams = new HttpParams().set('assetId', assetId)
-      .set('collectionId', collection.id)
+      .set('collectionId', collection.id[0])
       .set('searchTerm', searchTerm);
     return this.http.get<InsertionResponse>(addAssetToCollectionURL, {params: assetCollectionParams});
   }

@@ -16,7 +16,7 @@ def cgiFieldStorageToDict(fieldStorage):
 print("Content-Type: text/json\n")
 dict = cgiFieldStorageToDict(cgi.FieldStorage())
 
-dict={"name":"test23"}
+#dict={"name":"test23"}
 
 if 'name' not in dict.keys():
     print(json.dumps({"result": "Fail"}, default=str))

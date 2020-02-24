@@ -3,19 +3,17 @@ import sqlalchemy as db
 from mysql.connector import Error
 from sqlalchemy.orm import sessionmaker
 
+from ORM.DBInfo import DBInfo
+
 
 class ORM:
-    address = {'dev': "artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
-               'production': "artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com"}
-    databaseName = "artmaster"
-    databaseHostAddress = address['dev']
-    databaseUserName = "artmaster"
-    databasePassword = "ArtMaster51"
+
+    connection=DBInfo().getConnectionInfo()
     # TODO: Make this singleton
     # TODO: Password Manger
     def getSession(self):
         engine = db.create_engine(
-            'mysql+mysqlconnector://' + self.databaseUserName + ':' + self.databasePassword + '@' + self.databaseHostAddress + '/' + self.databaseName)
+            'mysql+mysqlconnector://' + self.connection["username"] + ':' + self.connection["password"] + '@' + self.connection["address"] + '/' + self.connection["schema"])
         Session = sessionmaker(bind=engine)
         return Session()
 
@@ -40,10 +38,10 @@ class ORM:
     def executeSelect(self, query):
         try:
             connection = mysql.connector.connect(
-                host=self.databaseHostAddress,
-                user=self.databaseUserName,
-                passwd=self.databasePassword,
-                database=self.databaseName
+                host=self.connection["address"],
+                user=self.connection["username"],
+                passwd=self.connection["password"],
+                database=self.connection["schema"]
             )
             cursor = connection.cursor()
             cursor.execute(query, )

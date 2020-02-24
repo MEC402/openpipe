@@ -1,17 +1,18 @@
 from sqlalchemy import create_engine, MetaData
-from sqlalchemy.engine import reflection
-from sqlalchemy.orm import create_session
 from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import create_session
 
-import inspect
+from ORM.DBInfo import DBInfo
 
 
 class TO:
     __classes = {}
 
     def builClassesFromDB(self):
+        connection = DBInfo().getConnectionInfo()
         engine = create_engine(
-            'mysql+mysqlconnector://artmaster:ArtMaster51@artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com/artmaster')
+            'mysql+mysqlconnector://' + connection["username"] + ':' + connection["password"] + '@' + connection[
+                "address"] + '/' + connection["schema"])
         metadata = MetaData()
 
         Base = automap_base()
@@ -28,8 +29,10 @@ class TO:
 
 
 # to = TO()
-# print(to.getClasses())
-# print(to.getClasses())
+# a=to.getClasses()
+# print(a)
+# print(a["asset"].__dict__)
+# # print(to.getClasses())
 
 # https://www.freecodecamp.org/news/dynamic-class-definition-in-python-3e6f7d20a381/
 

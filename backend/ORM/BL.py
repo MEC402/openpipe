@@ -74,12 +74,11 @@ class BL:
                                        metaTagValue=r["value"], defectId=4))
 
     def getAllAssets(self, page, pageSize, changeStart, changeEnd):
-        result = {}
         start = (page - 1) * pageSize
         step = pageSize
 
         orm = ORM()
-        queryStatement = "SELECT id,metaDataId,shortName FROM asset where timestamp between \'" + changeStart + "\' and \'" + changeEnd + "\' limit " + str(start) + "," + str(step)
+        queryStatement = "SELECT id,metaDataId,shortName FROM asset where insertTime between \'" + changeStart + "\' and \'" + changeEnd + "\' limit " + str(start) + "," + str(step)
         results = orm.executeSelect(queryStatement)
         rows=[]
         for row in results['data']:
@@ -126,8 +125,8 @@ class BL:
         for key in data.keys():
             if key != 'metaDataId':
                 value = data[key]
-                results.append(orm.insert(MetaTag(metaDataId=metaDataId, tagName=key, value=value)))
-        return results
+                results.append(orm.insert(MetaTag(metaDataId=str(metaDataId), tagName=str(key), value=str(value))))
+        return 1
 
 
     def getAssetMetaTags(self,id):
@@ -161,3 +160,25 @@ class BL:
         queryStatement = "select * from collection LIMIT "+start+","+end
         results = orm.executeSelect(queryStatement)
         return result
+
+    def getPublicAsssetsInCollection(self, collectionId, page, pageSize):
+        orm = ORM()
+        start = (page - 1) * pageSize
+        step = pageSize
+        queryStatement =  "SELECT assetId,metaDataId FROM collectionMember JOIN asset ON collectionMember.assetId = asset.id WHERE scope=0 and collectionId ="+str(collectionId)+" limit "+str(start)+","+str(step)
+        results = orm.executeSelect(queryStatement)
+        rows=[]
+        for row in results['data']:
+            rowInfo = {"id": row['assetId'], "metaDataId": row['metaDataId']}
+            metaDataId = row['metaDataId'][0]
+            queryStatement = "select tagName,value from metaTag where metaDataId="
+            if metaDataId:
+                queryStatement = queryStatement+str(metaDataId)
+                tags=orm.executeSelect(queryStatement)['data']
+                for metaTagRow in tags:
+                    rowInfo[metaTagRow['tagName'][0]] = [metaTagRow['value'][0]]
+                rows.append(rowInfo)
+            # rows.append(rowInfo)
+        results["data"] = rows
+        return results
+
