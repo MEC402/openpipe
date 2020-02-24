@@ -8,7 +8,9 @@ import {DataAccessService} from '../../services/data-access.service';
 })
 export class AssetsComponent implements OnInit {
   assets: any;
-
+  page=1;
+  total;
+  pageSize=10;
   constructor(private dataAccess: DataAccessService) {
     this.dataAccess.getAllAssets().subscribe(res => {
       console.log(res);
@@ -24,5 +26,28 @@ export class AssetsComponent implements OnInit {
       window.open(asset.largeImage, '_blank');
     }
 
+  }
+
+  nextPage() {
+    // this.dataAccess.getMuseumData(this.searchTerm, source.sourceName , source.page + 1, source.pageSize)
+    //   .subscribe(res => {
+    //     console.log(res);
+    //     source.data = res['data'];
+    //     source.page = source.page + 1;
+    //   });
+  }
+
+  prevPage() {
+    // console.log(source);
+    // this.dataAccess.getMuseumData(this.searchTerm, source.sourceName , source.page - 1, source.pageSize)
+    //   .subscribe(res => {
+    //     console.log(res);
+    //     source.data = res['data'];
+    //     source.page = source.page - 1;
+    //   });
+  }
+
+  ceil(number: number) {
+    // return Math.ceil(number);
   }
 }
