@@ -3,10 +3,10 @@ import {
   NbAccordionModule,
   NbButtonModule,
   NbCardModule,
-  NbCheckboxModule,
+  NbCheckboxModule, NbContextMenuModule,
   NbDialogRef,
   NbIconModule,
-  NbInputModule,
+  NbInputModule, NbLayoutModule,
   NbListModule,
   NbMenuModule,
   NbPopoverModule,
@@ -78,6 +78,8 @@ import { AssetDefectsReportComponent } from './reports/asset-defects-report/asse
     NbUserModule,
     FileUploadModule,
     NbSelectModule,
+    NbLayoutModule,
+    NbContextMenuModule,
 
   ],
   declarations: [
