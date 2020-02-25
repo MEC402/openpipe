@@ -1,3 +1,5 @@
+from multiprocessing.pool import ThreadPool
+
 from MetMuseum import MetMuseum
 from RijksMuseum import RijksMuseum
 from ClevelandMuseum import ClevelandMuseum
@@ -9,7 +11,7 @@ from datetime import datetime
 def insertIntoMetaTags(data,mid):
     try:
         connection = mysql.connector.connect(
-            host="artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
+            host="artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
             user="artmaster",
             passwd="ArtMaster51",
             database="artmaster"
@@ -38,7 +40,7 @@ def insertIntoMetaTags(data,mid):
 def insertIntoMetaData():
     try:
         connection = mysql.connector.connect(
-            host="artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
+            host="artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
             user="artmaster",
             passwd="ArtMaster51",
             database="artmaster"
@@ -60,7 +62,7 @@ def insertIntoMetaData():
 def insertIntoCollectionMember(assetId,collectionId,searchTerm):
     try:
         connection = mysql.connector.connect(
-            host="artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
+            host="artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
             user="artmaster",
             passwd="ArtMaster51",
             database="artmaster"
@@ -83,15 +85,15 @@ def insertIntoCollectionMember(assetId,collectionId,searchTerm):
 def insertIntoAsset(shortName, uri, idAtSource, sourceId, metaDataId,scope):
     try:
         connection = mysql.connector.connect(
-            host="artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
+            host="artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
             user="artmaster",
             passwd="ArtMaster51",
             database="artmaster"
         )
 
         cursor = connection.cursor(prepared=True)
-        sql_insert_query = """ INSERT INTO asset (shortName, uri, IdAtSource, sourceId, metaDataId, scope, timestamp) VALUES (%s, %s, %s, %s, %s, %s,%s)"""
-        insert_tuple_1 = (shortName, uri, idAtSource, sourceId, metaDataId,scope, datetime.now())
+        sql_insert_query = """ INSERT INTO asset (shortName, uri, IdAtSource, sourceId, metaDataId, scope) VALUES (%s, %s, %s, %s, %s, %s)"""
+        insert_tuple_1 = (shortName, uri, idAtSource, sourceId, metaDataId,scope)
         cursor.execute(sql_insert_query, insert_tuple_1)
         connection.commit()
         return cursor.lastrowid
@@ -105,7 +107,7 @@ def insertIntoAsset(shortName, uri, idAtSource, sourceId, metaDataId,scope):
 
 def getSchema(type):
     engine = db.create_engine(
-        'mysql+mysqlconnector://artmaster:ArtMaster51@artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com/artmaster')
+        'mysql+mysqlconnector://artmaster:ArtMaster51@artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com/artmaster')
     connection = engine.connect()
     metadata = db.MetaData()
     canonicalMetaTag = db.Table('canonicalMetaTag', metadata, autoload=True, autoload_with=engine)
@@ -121,20 +123,36 @@ def getSchema(type):
 
 
 
-def searchMuseum(term):
+def searchMuseum(term,collectionid):
     print("hi")
-    ms = MetMuseum(getSchema(1))
-    for l in range(1,5):
-        print(l)
-        result = ms.getData(term, l, 100)
-        print(result)
-        ind = 0
-        for i in result["data"]:
-            print(ind)
-            mid = insertIntoMetaData()
-            aid = insertIntoAsset(i["openpipe_canonical_title"][0], "", i["openpipe_canonical_id"][0], 1, mid, 0)
-            insertIntoCollectionMember(aid, 20, term)
-            print(insertIntoMetaTags(i, mid))
-            ind = ind + 1
+    ms = ClevelandMuseum(getSchema(1))
+    sourceID=3
+    r=20
+    pool = ThreadPool(r)
+    for l in range(1,r):
+        getInfo(l,term,collectionid,sourceID,ms)
+    # for l in range(1,r):
+    #     pool.apply_async(getInfo, args=[l,term,collectionid,sourceID,ms])
+    # pool.close()
+    # pool.join()
+
+
+def addAsset(i,term,collectionid,sourceID):
+    print(i["openpipe_canonical_title"][0])
+    mid = insertIntoMetaData()
+    aid = insertIntoAsset(i["openpipe_canonical_title"][0], "", i["openpipe_canonical_id"][0], sourceID, mid, 0)
+    insertIntoCollectionMember(aid, collectionid, term)
+    print(i["openpipe_canonical_title"][0]+":   "+insertIntoMetaTags(i, mid))
+
+def getInfo(pageNumber,term,collectionid,sourceID,ms):
+    print("pageNumber= "+ str(pageNumber))
+    result = ms.getData(term, pageNumber, 100)
+    print(result)
+    pool = ThreadPool(len(result["data"]))
+    for i in result["data"]:
+        pool.apply_async(addAsset, args=[i, term, collectionid,sourceID])
+    pool.close()
+    pool.join()
+
 # rembrandt
-searchMuseum("paris")
+searchMuseum("paris ",20)

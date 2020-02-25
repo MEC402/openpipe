@@ -41,6 +41,15 @@ class MetMuseum:
         response["openpipe_canonical_city"] = [data["city"]]
         if len(data["tags"]) > 0:
             response["openpipe_canonical_tags"] = data["tags"]
+        era="CE"
+        year1 = abs(int(data["objectBeginDate"]))
+        year2 = abs(int(data["objectEndDate"]))
+        if "B.C." in data["objectDate"]:
+            era="BC"
+        response["openpipe_canonical_firstDate"] = [era+" "+str(year1)+" "+"JAN"+" "+"01"+" "+"00:00:00"]
+        response["openpipe_canonical_lastDate"] = [era+" "+str(year2)+" "+"JAN"+" "+"01"+" "+"00:00:00"]
+        response["openpipe_canonical_date"]=[response["openpipe_canonical_firstDate"][0],response["openpipe_canonical_lastDate"][0]]
+
         response.update(data)
         return response
 

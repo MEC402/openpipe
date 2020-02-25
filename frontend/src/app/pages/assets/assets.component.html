@@ -1,6 +1,16 @@
 <nb-card size="giant">
   <nb-card-header>
     Asset
+    <div>
+      <label>Page:</label>
+      <button nbButton ghost status="primary"  size="tiny" (click)="prevPage()" [disabled]="page<=1">
+        <nb-icon icon="arrow-ios-back-outline" status="basic"></nb-icon>
+      </button>
+      <label>{{page}} of {{ceil(total/pageSize)}}</label>
+      <button nbButton ghost status="primary"  size="tiny" (click)="nextPage()" [disabled]="page>=(total/pageSize)">
+        <nb-icon icon="arrow-ios-forward-outline" status="basic"></nb-icon>
+      </button>
+    </div>
   </nb-card-header>
   <nb-card-body>
     <nb-list *ngIf="assets">

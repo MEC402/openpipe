@@ -23,8 +23,8 @@
     </nb-card-header>
     <nb-card-body>
       <h4>Choose a Folder:</h4>
-      <nb-select placeholder="Select Showcase" [(selected)]="chosenCollection">
-        <nb-option *ngFor="let c of collections" [value]="c.name[0]">{{c.name[0]}}</nb-option>
+      <nb-select placeholder="Select Folder" [(selected)]="chosenCollection">
+        <nb-option *ngFor="let c of collections" [value]="c">{{c.name[0]}}</nb-option>
       </nb-select>
       <button nbButton status="warning" [nbPopover]="form">New Folder</button>
       <h4>Private or Public Asset:</h4>

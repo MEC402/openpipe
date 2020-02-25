@@ -1,47 +1,71 @@
-<div class="lists row">
-  <div class="col-md-3 ">
-    <nb-card>
-      <nb-card-body>
-        <nb-list>
-          <nb-list-item *ngFor="let elem of collections ">
-            <button nbButton size="tiny" shape="rectangle" status="primary" (click)="onClick(elem)" >{{elem.name}}</button>
-          </nb-list-item>
-        </nb-list>
-      </nb-card-body>
-    </nb-card>
-  </div>
+<nb-stepper orientation="horizontal" disableStepNavigation>
+  <nb-step hidden="true">
+<!--    <button class="next-button" (click)="onClick(c)" nbButton nbStepperNext *ngFor="let c of collections">{{c.name}}</button>-->
+        <button class="menu-target" *ngFor="let c of collections"
+                nbButton
+                [nbContextMenu]="items"
+                nbContextMenuTrigger="noop"
+                (contextmenu)="open()"
+                (click)="onClick(c)"
+                nbStepperNext >
+          {{c.name}}
+        </button>
+  </nb-step>
+  <nb-step hidden="true">
+    <button class="prev-button" (click)="backToFolders()" nbButton nbStepperPrevious>prev</button>
+    <div class="row" >
+      <div  *ngFor="let asset of assets" class="thumbnail">
+        <ngx-preview-card [ngStyle]="{'width':'300' + 'px'}" [asset]="asset" (valueChange)="metaShow($event)"></ngx-preview-card>
+      </div>
+    </div>
+  </nb-step>
+</nb-stepper>
 
-  <div class="col-md-6 ">
-    <nb-card size="giant">
-      <nb-card-header>
-        {{currentFolder}}
-      </nb-card-header>
-      <nb-card-body>
-        <div class="row" >
-          <div  *ngFor="let asset of assets" class="thumbnail">
-            <ngx-preview-card [ngStyle]="{'width':'300' + 'px'}" [asset]="asset" (valueChange)="metaShow($event)"></ngx-preview-card>
-          </div>
-        </div>
-      </nb-card-body>
-    </nb-card>
-  </div>
 
-  <div class="col-md-3 ">
-    <nb-card size="giant">
+<!--<div class="lists row">-->
+<!--  <div class="col-md-3 ">-->
+<!--    <nb-card>-->
+<!--      <nb-card-body>-->
+<!--        <nb-list>-->
+<!--          <nb-list-item *ngFor="let elem of collections ">-->
+<!--            <button nbButton size="tiny" shape="rectangle" status="primary" (click)="onClick(elem)" >{{elem.name}}</button>-->
+<!--          </nb-list-item>-->
+<!--        </nb-list>-->
+<!--      </nb-card-body>-->
+<!--    </nb-card>-->
+<!--  </div>-->
 
-      <nb-card-header>
-        {{"MetaData"}}
-      </nb-card-header>
-      <nb-card-body>
+<!--  <div class="col-md-6 ">-->
+<!--    <nb-card size="giant">-->
+<!--      <nb-card-header>-->
+<!--        {{currentFolder}}-->
+<!--      </nb-card-header>-->
+<!--      <nb-card-body>-->
+<!--        <div class="row" >-->
+<!--          <div  *ngFor="let asset of assets" class="thumbnail">-->
+<!--            <ngx-preview-card [ngStyle]="{'width':'300' + 'px'}" [asset]="asset" (valueChange)="metaShow($event)"></ngx-preview-card>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </nb-card-body>-->
+<!--    </nb-card>-->
+<!--  </div>-->
 
-        <nb-list>
-          <nb-list-item *ngFor="let elem of metaTags ">
-            <label>{{elem.tagName[0]}}:{{elem.value[0]}}</label>
-          </nb-list-item>
-        </nb-list>
-      </nb-card-body>
-    </nb-card>
-  </div>
+<!--  <div class="col-md-3 ">-->
+<!--    <nb-card size="giant">-->
 
-</div>
+<!--      <nb-card-header>-->
+<!--        {{"MetaData"}}-->
+<!--      </nb-card-header>-->
+<!--      <nb-card-body>-->
+
+<!--        <nb-list>-->
+<!--          <nb-list-item *ngFor="let elem of metaTags ">-->
+<!--            <label>{{elem.tagName[0]}}:{{elem.value[0]}}</label>-->
+<!--          </nb-list-item>-->
+<!--        </nb-list>-->
+<!--      </nb-card-body>-->
+<!--    </nb-card>-->
+<!--  </div>-->
+
+<!--</div>-->
 

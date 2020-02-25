@@ -47,6 +47,16 @@ class RijksMuseum:
             for artist in data["principalMakers"]:
                 response["openpipe_canonical_artist"].append(artist["name"])
 
+        era = "CE"
+        year1 = abs(int(data["dating"]["yearEarly"]))
+        year2 = abs(int(data["dating"]["yearLate"]))
+        if "B.C." in data["dating"]["presentingDate"]:
+            era = "BC"
+        response["openpipe_canonical_firstDate"] = [era + " " + str(year1) + " " + "JAN" + " " + "01" + " " + "00:00:00"]
+        response["openpipe_canonical_lastDate"] = [era + " " + str(year2) + " " + "JAN" + " " + "01" + " " + "00:00:00"]
+        response["openpipe_canonical_date"] = [response["openpipe_canonical_firstDate"][0],
+                                               response["openpipe_canonical_lastDate"][0]]
+
         # schema["culture"].append(data["culture"])
         # schema["classification"].append(data["classification"])
         # # schema.genre.push(data["city"])

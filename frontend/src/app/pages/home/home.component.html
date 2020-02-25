@@ -9,9 +9,9 @@
   </div>
 </div>
 
-<nb-card size="large" *ngFor="let s of source">
-  <nb-card-header>
-    {{s.name}}
+
+<nb-tabset >
+  <nb-tab [tabTitle]="s.name" *ngFor="let s of source; let i = index" responsive [active]="i==0">
     <div>
       <label>Page:</label>
       <button nbButton ghost status="primary"  size="tiny" (click)="prevPage(s)" [disabled]="s.page<=1">
@@ -22,9 +22,8 @@
         <nb-icon icon="arrow-ios-forward-outline" status="basic"></nb-icon>
       </button>
     </div>
-  </nb-card-header>
-  <nb-card-body  align="center">
     <ngx-card-deck [assets]="s.data" [source]="s.name" [searchTerm]="searchTerm"></ngx-card-deck>
-  </nb-card-body>
-</nb-card>
+  </nb-tab>
+</nb-tabset>
+
 
