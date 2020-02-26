@@ -3,7 +3,7 @@ import {
   NbAccordionModule,
   NbButtonModule,
   NbCardModule,
-  NbCheckboxModule, NbContextMenuModule,
+  NbCheckboxModule, NbContextMenuModule, NbDatepickerModule,
   NbDialogRef,
   NbIconModule,
   NbInputModule, NbLayoutModule,
@@ -45,6 +45,7 @@ import { ReportsComponent } from './reports/reports.component';
 import {ServiceStatusComponent} from "./reports/service-status/service-status.component";
 import { MissingImagesComponent } from './reports/missing-images/missing-images.component';
 import { AssetDefectsReportComponent } from './reports/asset-defects-report/asset-defects-report.component';
+import { AssetChangesComponent } from './reports/asset-changes/asset-changes.component';
 
 
 @NgModule({
@@ -80,6 +81,7 @@ import { AssetDefectsReportComponent } from './reports/asset-defects-report/asse
     NbSelectModule,
     NbLayoutModule,
     NbContextMenuModule,
+    NbDatepickerModule,
 
   ],
   declarations: [
@@ -99,6 +101,7 @@ import { AssetDefectsReportComponent } from './reports/asset-defects-report/asse
     ServiceStatusComponent,
     MissingImagesComponent,
     AssetDefectsReportComponent,
+    AssetChangesComponent,
   ],
 })
 export class PagesModule {

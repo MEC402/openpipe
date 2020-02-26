@@ -1,6 +1,6 @@
-import {Component, HostListener, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, HostListener, Inject, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {DataAccessService} from '../../services/data-access.service';
-import {NbContextMenuDirective, NbDialogRef, NbDialogService} from '@nebular/theme';
+import {NB_WINDOW, NbContextMenuDirective, NbDialogRef, NbDialogService, NbMenuService} from '@nebular/theme';
 
 @Component({
   selector: 'ngx-collections',
@@ -15,9 +15,21 @@ export class CollectionsComponent {
   currentFolder: any;
   metaTags: any;
 
-  constructor(private dataAccess: DataAccessService) {
+  constructor(private dataAccess: DataAccessService, private nbMenuService: NbMenuService) {
     dataAccess.getCollections().subscribe(res => {
       this.collections = res.data;
+    });
+    nbMenuService.onItemClick().subscribe(d => {
+      console.log(d);
+      if (d.item.title == 'Edit') {
+
+      } else if (d.item.title == 'Delete') {
+        if (window.confirm('Are you sure you want to delete?')) {
+          const index = this.collections.findIndex(c => c.name === d.tag);
+          this.collections.splice(index, 1);
+        } else {
+        }
+      }
     });
   }
 

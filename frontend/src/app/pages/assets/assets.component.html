@@ -1,3 +1,5 @@
+<input type="text" nbInput placeholder="Put the search term here" shape="round" [(ngModel)]="searchTerm" (keydown.enter)="searchAssets()" >
+<button nbButton hero status="primary" shape="round" size="tiny" (click)="searchAssets()"><nb-icon icon="search-outline"></nb-icon></button>
 <nb-card size="giant">
   <nb-card-header>
     Asset
@@ -13,10 +15,6 @@
     </div>
   </nb-card-header>
   <nb-card-body>
-    <nb-list *ngIf="assets">
-      <nb-list-item *ngFor="let asset of assets.data">
-          <nb-user shape="rectangle" [name]="asset.openpipe_canonical_title[0]" [picture]="asset.openpipe_canonical_smallImage"  size="giant" (click)="onClick(asset)"></nb-user>
-      </nb-list-item>
-    </nb-list>
+    <ngx-meta-tag-editor></ngx-meta-tag-editor>
   </nb-card-body>
 </nb-card>

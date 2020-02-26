@@ -1,0 +1,11 @@
+<nb-card>
+  <nb-card-header>
+    <input nbInput placeholder="Pick Date" [nbDatepicker]="formpicker">
+    <nb-datepicker #formpicker></nb-datepicker>
+  </nb-card-header>
+  <nb-card-body>
+    <ng2-smart-table [settings]="settings" [source]="source"
+                     (editConfirm)="onEditConfirm($event)" >
+    </ng2-smart-table>
+  </nb-card-body>
+</nb-card>

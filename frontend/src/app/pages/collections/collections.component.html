@@ -1,17 +1,22 @@
 <nb-stepper orientation="horizontal" disableStepNavigation>
-  <nb-step hidden="true">
-<!--    <button class="next-button" (click)="onClick(c)" nbButton nbStepperNext *ngFor="let c of collections">{{c.name}}</button>-->
+  <nb-step >
+    <nb-layout>
+      <nb-layout-column>
         <button class="menu-target" *ngFor="let c of collections"
-                nbButton
-                [nbContextMenu]="items"
-                nbContextMenuTrigger="noop"
-                (contextmenu)="open()"
-                (click)="onClick(c)"
-                nbStepperNext >
-          {{c.name}}
+                    [nbContextMenu]="items"
+                    nbContextMenuTrigger="noop"
+                    nbContextMenuAdjustment="clockwise"
+                    [nbContextMenuTag]="c"
+                    (contextmenu)="open()"
+                    (click)="onClick(c)"
+                    nbButton
+                    nbStepperNext >
+              {{c.name}}
         </button>
+      </nb-layout-column>
+    </nb-layout>
   </nb-step>
-  <nb-step hidden="true">
+  <nb-step >
     <button class="prev-button" (click)="backToFolders()" nbButton nbStepperPrevious>prev</button>
     <div class="row" >
       <div  *ngFor="let asset of assets" class="thumbnail">

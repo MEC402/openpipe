@@ -7,18 +7,20 @@ import {DataAccessService} from '../../services/data-access.service';
   styleUrls: ['./assets.component.scss'],
 })
 export class AssetsComponent implements OnInit {
+  searchTerm: string;
   assets: any;
   page=1;
   total;
   pageSize=10;
   constructor(private dataAccess: DataAccessService) {
+
+  }
+
+  ngOnInit() {
     this.dataAccess.getAllAssets().subscribe(res => {
       console.log(res);
       this.assets = res;
     });
-  }
-
-  ngOnInit() {
   }
 
   onClick(asset: any) {
@@ -26,6 +28,14 @@ export class AssetsComponent implements OnInit {
       window.open(asset.largeImage, '_blank');
     }
 
+  }
+
+  searchAssets() {
+      this.dataAccess.getMuseumData(this.searchTerm, 'local' , 1, 20).subscribe(res => {
+        this.assets=[];
+        console.log('hi is search');
+        this.assets=res;
+      });
   }
 
   nextPage() {
