@@ -41,6 +41,7 @@ export class MetaTagEditorComponent implements OnInit {
 
   source: LocalDataSource = new LocalDataSource();
   currentAsset: any;
+  selectedIndex: number;
   constructor(private dataAccess: DataAccessService) {
     this.dataAccess.getAllAssets().subscribe(res => {
       this.assets = res;
@@ -79,8 +80,9 @@ export class MetaTagEditorComponent implements OnInit {
     event.confirm.resolve();
   }
 
-  onClick(asset: any) {
+  onClick(asset: any, index:number) {
     this.currentAsset = asset.name[0];
+    this.selectedIndex=index;
     this.dataAccess.getAssetMetaTags(asset.id[0]).subscribe(res => {
 
       let topics = [];

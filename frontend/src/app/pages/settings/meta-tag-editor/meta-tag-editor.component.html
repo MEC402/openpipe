@@ -3,8 +3,8 @@
     <nb-card size="large">
       <nb-card-body>
         <nb-list *ngIf="assets">
-          <nb-list-item *ngFor="let asset of assets.data">
-            <nb-user shape="rectangle" [name]="asset.openpipe_canonical_title[0]" [picture]="asset.openpipe_canonical_smallImage" (click)="onClick(asset)" ></nb-user>
+          <nb-list-item *ngFor="let asset of assets.data; let i = index;" [ngClass]="{'highlight': selectedIndex === i}" (click)="onClick(asset,i)">
+            <nb-user shape="rectangle" [name]="asset.openpipe_canonical_title[0]" [picture]="asset.openpipe_canonical_smallImage"  ></nb-user>
           </nb-list-item>
         </nb-list>
       </nb-card-body>
