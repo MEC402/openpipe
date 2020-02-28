@@ -4,6 +4,12 @@ import requests
 from multiprocessing.pool import ThreadPool
 
 
+
+import aiohttp
+import asyncio
+
+
+
 class RijksMuseum:
     url = "https://www.rijksmuseum.nl/api/en/"
 
@@ -17,12 +23,12 @@ class RijksMuseum:
         data = response.json()
         return data
 
-    def getRijkMetaTagMapping(self, assetOriginalID):
+    async def getRijkMetaTagMapping(self, assetOriginalID):
         serviceName = "collection/" + str(assetOriginalID) + "/"
         params = {'key': "qvMYRE87", 'format': "json"}
-        response = requests.get(url=self.url + serviceName, params=params)
-        data = response.json()
-        return self.getRijkAssetMetaData(data["artObject"])
+        async with aiohttp.ClientSession() as session:
+            async with session.get(self.url + serviceName, params=params,) as response:
+                return await response.json()
 
     def getRijkAssetMetaData(self, data):
         response = {}
@@ -38,8 +44,8 @@ class RijksMuseum:
                 str(data["webImage"]["width"]) + "," + str(data["webImage"]["height"])]
             response["openpipe_canonical_fullImage"] = [
                 "http://mec402.boisestate.edu/cgi-bin/assetSources/getRijksTiledImage.py?id=" + data["objectNumber"]]
-            tileInfo = self.getTileImages(data["objectNumber"], 0)
-            response["openpipe_canonical_fullImageDimensions"] = [str(tileInfo[1])+","+str(tileInfo[2])]
+            # tileInfo = self.getTileImages(data["objectNumber"], 0)
+            # response["openpipe_canonical_fullImageDimensions"] = [str(tileInfo[1])+","+str(tileInfo[2])]
 
         response["openpipe_canonical_title"] = [data["title"]]
         if (len(data["principalMakers"]) > 0):
@@ -71,13 +77,20 @@ class RijksMuseum:
     def getData(self, q, page, pageSize):
         results = []
         retrievedAssets = self.searchRijkForAssets(q, page, pageSize)
-        pool = ThreadPool(len(retrievedAssets))
-        for assetId in retrievedAssets["artObjects"]:
-            results.append(pool.apply_async(self.getRijkMetaTagMapping, args=[assetId["objectNumber"]]))
+
+        loop = asyncio.get_event_loop()
+        coroutines = [self.getRijkMetaTagMapping(assetId['objectNumber']) for assetId in retrievedAssets["artObjects"]]
+        results = loop.run_until_complete(asyncio.gather(*coroutines))
+        loop.close()
+
+        finalRes=[]
+        pool = ThreadPool(len(results))
+        for i in results:
+            finalRes.append(pool.apply_async(self.getRijkAssetMetaData, args=[i['artObject']]))
         pool.close()
         pool.join()
-        results = [r.get() for r in results]
-        return {"data": results, "total": retrievedAssets["count"], "sourceName": "Rijks"}
+        rrr = [r.get() for r in finalRes]
+        return {"total": retrievedAssets["count"], "sourceName": "Rijks","data": rrr}
 
     def getTileImages(self, objectId, z):
         serviceName = "collection/" + objectId + "/tiles"
@@ -91,3 +104,4 @@ class RijksMuseum:
                 imgHeight = d['height']
                 break
         return tileData, imgWidth, imgHeight
+

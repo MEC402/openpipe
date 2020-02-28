@@ -1,10 +1,17 @@
+
+1.9413111999999995
+1.8731451999999997
+1.2551566999999988
+
 #!/bin/python3
 
 from multiprocessing.pool import ThreadPool
 
 import requests
 from ImageUtil import ImageUtil
-
+import aiohttp
+import asyncio
+import time
 
 class MetMuseum:
     url = "https://collectionapi.metmuseum.org/public/collection/v1/"
@@ -53,14 +60,14 @@ class MetMuseum:
         response.update(data)
         return response
 
-    def getAssetMetaData(self, assetOriginalID):
+    async def getAssetMetaData(self, assetOriginalID):
         serviceName = "objects/" + str(assetOriginalID)
-        response = requests.get(url=self.url + serviceName)
-        data = response.json()
-        metaData = self.getMetaTagMapping(data)
-        return metaData
+        async with aiohttp.ClientSession() as session:
+            async with session.get(self.url + serviceName) as response:
+                return await response.json()
 
     def getData(self, q, page, pageSize):
+        s = time.perf_counter()
         results = []
         retrievedAssets = self.searchMetForAssets(q)
 
@@ -72,11 +79,20 @@ class MetMuseum:
         if int(start) + int(step) > retrievedAssets['total']:
             step = retrievedAssets['total'] - int(start) - 1
         assets = retrievedAssets['objectIDs'][int(start):int(start) + int(step)]
-
-        pool = ThreadPool(len(assets))
-        for assetId in assets:
-            results.append(pool.apply_async(self.getAssetMetaData, args=[assetId]))
+        print(time.perf_counter() - s)
+        s = time.perf_counter()
+        loop = asyncio.get_event_loop()
+        coroutines = [self.getAssetMetaData(assetId) for assetId in assets]
+        results = loop.run_until_complete(asyncio.gather(*coroutines))
+        print(time.perf_counter() - s)
+        s = time.perf_counter()
+        pool = ThreadPool(len(results))
+        tempResults=[]
+        for assetId in results:
+            tempResults.append(pool.apply_async(self.getMetaTagMapping, args=[assetId]))
         pool.close()
         pool.join()
-        results = [r.get() for r in results]
-        return {"data": results, "total": retrievedAssets['total'], "sourceName": "MET"}
+        finalResults = [r.get() for r in tempResults]
+        print(time.perf_counter() - s)
+
+        return {"total": retrievedAssets['total'], "sourceName": "MET","data": finalResults}
