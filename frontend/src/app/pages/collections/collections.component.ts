@@ -37,8 +37,10 @@ export class CollectionsComponent {
     { title: 'Edit' },
     { title: 'Delete' },
   ];
+  isSingleView: any;
 
   open() {
+    this.contextMenu.position="top";
     this.contextMenu.show();
     return false;
   }

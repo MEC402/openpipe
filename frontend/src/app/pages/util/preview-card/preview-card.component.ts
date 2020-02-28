@@ -13,9 +13,7 @@ export class PreviewCardComponent implements OnInit {
   @Output() valueChange = new EventEmitter();
   @Input() asset;
 
-  constructor(private dialogService: NbDialogService,
-              protected dialogRef: NbDialogRef<any>,
-              private dataAccess: DataAccessService) { }
+  constructor(private dataAccess: DataAccessService) { }
 
   ngOnInit() {
   }
@@ -23,7 +21,6 @@ export class PreviewCardComponent implements OnInit {
 
   showMeta(assetElem) {
     this.dataAccess.getAssetMetaTags(assetElem.id).subscribe(res => {
-      //this.assets = res.data;
       this.valueChange.emit(res);
     });
   }

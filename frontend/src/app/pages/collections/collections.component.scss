@@ -1,16 +1,81 @@
-button {
-  margin: 1%;
+@import '../../@theme/styles/themes';
+@import '~@nebular/theme/styles/global/breakpoints';
+@import '~bootstrap/scss/mixins/breakpoints';
+
+@include nb-install-component() {
+
+  .single-view-button {
+    .nb-square {
+      font-size: 1rem;
+    }
+
+    @include nb-ltr {
+      margin-left: auto;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    @include nb-rtl {
+      margin-right: auto;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+
+  .grid-view-button {
+    ::ng-deep svg {
+      vertical-align: top;
+    }
+
+    @include nb-ltr {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    @include nb-rtl {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    .nb-square {
+      font-size: 1rem;
+    }
+  }
+
+  ngx-preview-card {
+    margin: 1%;
+
+  }
+
+  .thumbnail {
+    display: flex;
+
+  }
+  .row {
+    margin-left: 1%;
+  }
+
 }
 
-ngx-preview-card {
-  padding: 1%;
-
-}
-.thumbnail {
-  display: flex;
-
-}
-.row {
-  margin-left: 1%;
-}
-
+//
+//
+//
+//button {
+//  margin: 1%;
+//}
+//
+//ngx-preview-card {
+//  padding: 1%;
+//
+//}
+//.thumbnail {
+//  display: flex;
+//
+//}
+//.row {
+//  margin-left: 1%;
+//}
+//ngx-card {
+//  padding: 1%;
+//}
+//
+//nb-card {
+//  padding: 1%;
+//}
