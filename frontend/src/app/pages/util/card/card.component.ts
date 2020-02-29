@@ -20,6 +20,24 @@ export class CardComponent implements OnInit {
   @ViewChild(NbPopoverDirective, { static: false }) popover: NbPopoverDirective;
   check = true;
 
+  settings = {
+    selectMode: 'multi',
+    columns: {
+      id: {
+        title: 'ID',
+      },
+      name: {
+        title: 'Full Name',
+      },
+      username: {
+        title: 'User Name',
+      },
+      email: {
+        title: 'Email',
+      },
+    },
+  };
+
   constructor(private dialogService: NbDialogService,
               protected dialogRef: NbDialogRef<any>,
               protected collectionDialogRef: NbDialogRef<any>,
@@ -91,5 +109,9 @@ export class CardComponent implements OnInit {
 
   setChosenCollection(d: any) {
     this.chosenCollection = d;
+  }
+
+  onRowSelect(event: any) {
+    console.log(event);
   }
 }

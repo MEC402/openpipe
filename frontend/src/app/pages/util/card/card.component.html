@@ -33,9 +33,7 @@
         <nb-radio value="1">Private</nb-radio>
       </nb-radio-group>
       <h4>Meta Data</h4>
-      <label *ngFor="let d of data">
-        <nb-checkbox checked="true" (checkedChange)="toggle($event,d)">{{d[0]}}:{{d[1]}}</nb-checkbox>
-      </label>
+      <ng2-smart-table [settings]="settings" [source]="data" (userRowSelect)="onRowSelect($event)"></ng2-smart-table>
     </nb-card-body>
   </nb-card>
 </ng-template>
