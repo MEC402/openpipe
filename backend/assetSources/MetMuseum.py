@@ -1,8 +1,3 @@
-
-1.9413111999999995
-1.8731451999999997
-1.2551566999999988
-
 #!/bin/python3
 
 from multiprocessing.pool import ThreadPool
@@ -23,6 +18,7 @@ class MetMuseum:
         serviceName = "search"
         params = {'q': term}
         response = requests.get(url=self.url + serviceName, params=params)
+        print(self.url + serviceName)
         data = response.json()
         return data
 
@@ -64,13 +60,12 @@ class MetMuseum:
         serviceName = "objects/" + str(assetOriginalID)
         async with aiohttp.ClientSession() as session:
             async with session.get(self.url + serviceName) as response:
+                print(self.url + serviceName)
                 return await response.json()
 
     def getData(self, q, page, pageSize):
-        s = time.perf_counter()
         results = []
         retrievedAssets = self.searchMetForAssets(q)
-
         start = (page - 1) * pageSize
         step = pageSize
 
@@ -79,13 +74,10 @@ class MetMuseum:
         if int(start) + int(step) > retrievedAssets['total']:
             step = retrievedAssets['total'] - int(start) - 1
         assets = retrievedAssets['objectIDs'][int(start):int(start) + int(step)]
-        print(time.perf_counter() - s)
-        s = time.perf_counter()
+
         loop = asyncio.get_event_loop()
         coroutines = [self.getAssetMetaData(assetId) for assetId in assets]
         results = loop.run_until_complete(asyncio.gather(*coroutines))
-        print(time.perf_counter() - s)
-        s = time.perf_counter()
         pool = ThreadPool(len(results))
         tempResults=[]
         for assetId in results:
@@ -93,6 +85,5 @@ class MetMuseum:
         pool.close()
         pool.join()
         finalResults = [r.get() for r in tempResults]
-        print(time.perf_counter() - s)
 
         return {"total": retrievedAssets['total'], "sourceName": "MET","data": finalResults}
