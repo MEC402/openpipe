@@ -1,0 +1,3 @@
+-- select * from metaTag join asset on asset.metaDataId=metaTag.metaDataId  where tagName='openpipe_canonical_nation' and value <> '' and value <> 'OpenPipe People' group by value;
+-- select * from metaTag join asset on asset.metaDataId=metaTag.metaDataId  where tagName='openpipe_canonical_city' and value <> '' and value <> 'OpenPipe City' group by value;
+-- select * from metaTag join asset on asset.metaDataId=metaTag.metaDataId  where tagName='openpipe_canonical_culture' and value <> '' and value <> 'OpenPipe Culture' group by value;
