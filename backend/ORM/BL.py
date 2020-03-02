@@ -126,6 +126,7 @@ class BL:
             if key != 'metaDataId':
                 value = data[key]
                 results.append(orm.insert(MetaTag(metaDataId=str(metaDataId), tagName=str(key), value=str(value))))
+        print(results)
         return 1
 
 
