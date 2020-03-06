@@ -95,6 +95,15 @@ class BL:
         results["data"] = rows
         return results
 
+    def insertUserAsset(self, files):
+        orm = ORM()
+        table = self.tables
+        results = []
+        for file in files:
+            results.append(orm.insert(file))
+        return results
+    
+
     def insertIntoAsset(self, shortName, uri, idAtSource, sourceId, metaDataId, scope):
         orm = ORM()
         Asset = self.tables["asset"]

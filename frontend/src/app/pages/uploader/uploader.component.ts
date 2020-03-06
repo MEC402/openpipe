@@ -5,7 +5,7 @@ import {DataAccessService } from '../../services/data-access.service';
 //tslint:disable
 
 // const URL = '/api/';
-const URL = 'null';
+const URL = 'http://mec402.boisestate.edu/cgi-bin/dataAccess/addUserAssets.py';
 
 @ Component ({
   selector : 'ngx-uploader',
@@ -21,7 +21,7 @@ export class UploaderComponent  {
   }
 
   ngOnInit() {
-    this.uploader.uploadAll = () => this.uploadAll();
+    //this.uploader.uploadAll = () => this.uploadAll();
   }
 
   public uploadAll() {

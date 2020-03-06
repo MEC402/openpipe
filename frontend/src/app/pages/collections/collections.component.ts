@@ -40,7 +40,7 @@ export class CollectionsComponent {
   isSingleView: any;
 
   open() {
-    this.contextMenu.position="top";
+   // this.contextMenu.position="top";
     this.contextMenu.show();
     return false;
   }
