@@ -11,8 +11,8 @@ import {log} from "util";
 export class DataAccessService {
   webServerURL;
   constructor(private http: HttpClient) {
-    this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/';
-    //this.webServerURL = 'http://localhost/cgi-bin/';
+   // this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/';
+    this.webServerURL = 'http://localhost/cgi-bin/';
   }
 
   public getMuseumData(searchTerm: string, museumName  , page: number , pageSize: number) {
@@ -55,14 +55,18 @@ export class DataAccessService {
     return this.http.get<InsertionResponse>(url, {params: params});
   }
 
-  public uploadImages(fileItems : File[]) : Observable<InsertionResponse> {
+  public uploadImages(files : File[])  {
    const url = this.webServerURL + 'dataAccess/addUserAssets.py';
-   const postBody = fileItems;
+   const postBody = files;
    const headers = new HttpHeaders({
-      'Content-Type': 'text/plain',
+      'Content-Type': 'image/jpeg',
       'Access-Control-Allow-Origin': '*',
+   });
+    this.http.post<any>(url, postBody, { headers }).subscribe(data => {
+      console.log(data);
     });
-    return this.http.post<InsertionResponse>(url, postBody, {headers});
+
+   
   }
 
   public saveAssetIntoCollection(asset, metaTags, collection, searchTerm, source, scope): Observable<InsertionResponse> {

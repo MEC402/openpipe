@@ -97,7 +97,7 @@ class BL:
 
     def insertUserAsset(self, files):
         orm = ORM()
-        table = self.tables
+        table = self.tables["images"]
         results = []
         for file in files:
             results.append(orm.insert(file))

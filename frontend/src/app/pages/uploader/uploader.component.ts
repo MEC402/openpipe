@@ -5,7 +5,7 @@ import {DataAccessService } from '../../services/data-access.service';
 //tslint:disable
 
 // const URL = '/api/';
-const URL = 'http://mec402.boisestate.edu/cgi-bin/dataAccess/addUserAssets.py';
+const URL = 'http://localhost/cgi-bin/dataAccess/addUserAssets.py';
 
 @ Component ({
   selector : 'ngx-uploader',
@@ -21,13 +21,17 @@ export class UploaderComponent  {
   }
 
   ngOnInit() {
-    //this.uploader.uploadAll = () => this.uploadAll();
+    this.uploader.uploadAll = () => {
+      this.uploadAll();
+    }
   }
 
   public uploadAll() {
-    console.log(this.uploader.queue);
-    
-    //this.dataAccess.uploadImages(null);
+    var files = new Array<File>();
+    this.uploader.queue.forEach(value => {
+      files.push(value._file);
+    })
+    this.dataAccess.uploadImages(files);
   }
 
   public fileOverBase (e : any): void {
