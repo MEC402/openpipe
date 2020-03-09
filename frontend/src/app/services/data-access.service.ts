@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import * as url from 'url';
 import {Observable} from 'rxjs';
+import {FileItem} from 'ng2-file-upload';
 import {log} from "util";
 
 @Injectable({
@@ -10,8 +11,8 @@ import {log} from "util";
 export class DataAccessService {
   webServerURL;
   constructor(private http: HttpClient) {
-    this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/';
-    //this.webServerURL = 'http://localhost/cgi-bin/';
+   // this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/';
+    this.webServerURL = 'http://localhost/cgi-bin/';
   }
 
   public getMuseumData(searchTerm: string, museumName  , page: number , pageSize: number) {
@@ -52,6 +53,20 @@ export class DataAccessService {
     const url = this.webServerURL + 'dataAccess/createCollection.py';
     const params = new HttpParams().set('name', name);
     return this.http.get<InsertionResponse>(url, {params: params});
+  }
+
+  public uploadImages(files : File[])  {
+   const url = this.webServerURL + 'dataAccess/addUserAssets.py';
+   const postBody = files;
+   const headers = new HttpHeaders({
+      'Content-Type': 'image/jpeg',
+      'Access-Control-Allow-Origin': '*',
+   });
+    this.http.post<any>(url, postBody, { headers }).subscribe(data => {
+      console.log(data);
+    });
+
+   
   }
 
   public saveAssetIntoCollection(asset, metaTags, collection, searchTerm, source, scope): Observable<InsertionResponse> {
