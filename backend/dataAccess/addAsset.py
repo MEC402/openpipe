@@ -12,9 +12,9 @@ def cgiFieldStorageToDict(fieldStorage):
 
 
 print("Content-Type: text/json\n")
-# dict = cgiFieldStorageToDict(cgi.FieldStorage())
+dict = cgiFieldStorageToDict(cgi.FieldStorage())
 
-dict={"shortName":"test", "uri":"test", "idAtSource":123, "sourceId":223, "metaDataId":1234,"scope":1}
+# dict={"shortName":"test", "uri":"test", "idAtSource":123, "sourceId":223, "metaDataId":1234,"scope":1}
 
 if 'shortName' not in dict.keys() and 'uri' not in dict.keys() and 'idAtSource' not in dict.keys() \
         and 'sourceId' not in dict.keys() and 'metaDataId' not in dict.keys() and 'scope' not in dict.keys():
