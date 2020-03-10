@@ -95,6 +95,18 @@ class BL:
         results["data"] = rows
         return results
 
+    def getAsset(self, assetID):
+        orm = ORM()
+        queryStatement = "SELECT * FROM artmaster.asset join metaTag on metaTag.metaDataId=asset.metaDataId where asset.id="+str(int(assetID))
+        results = orm.executeSelect(queryStatement)
+        rows=[]
+        results['total']=1
+        rowInfo = {"id": results['data'][0]['id'], "metaDataId": results['data'][0]['metaDataId'], "name": results['data'][0]['shortName']}
+        for row in results['data']:
+            rowInfo[row['tagName'][0]] = [row['value'][0]]
+        results["data"] = rows
+        return results
+
     def insertIntoAsset(self, shortName, uri, idAtSource, sourceId, metaDataId, scope):
         orm = ORM()
         Asset = self.tables["asset"]
@@ -149,11 +161,21 @@ class BL:
         return results
 
     def getCollectionByID(self,id):
+        url="http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/"
         result = {}
         orm = ORM()
-        queryStatement = "select * from collection where id="+id
+        queryStatement = "SELECT collection.*, assetId FROM collection join collectionMember on collection.id=collectionMember.collectionId where collection.id="+str(int(id))
         results = orm.executeSelect(queryStatement)
-        return results
+        result['total']=1
+        result['id']=results['data'][0]['id']
+        result['name'] = results['data'][0]['name']
+        result['layoutType'] = results['data'][0]['layoutType']
+        result['insertTime'] = results['data'][0]['insertTime']
+        result['lastModified'] = results['data'][0]['lastModified']
+        result['assets']=[]
+        for r in results['data']:
+            result['assets'].append(url+str(r['assetId'][0]))
+        return result
 
     def getRangeOfCollections(self,start, end):
         result = {}
@@ -182,4 +204,42 @@ class BL:
             # rows.append(rowInfo)
         results["data"] = rows
         return results
+
+    def getAllAssetIDs(self):
+        url="http://mec402.boisestate.edu/cgi-bin/openpipe/data/asset/"
+        result = []
+        orm = ORM()
+        queryStatement = "select id from asset"
+        results = orm.executeSelect(queryStatement)
+        for r in results['data']:
+            result.append(url+str(r['id'][0]))
+        results['data']=result
+        return results
+
+    def getAllFolderIDs(self):
+        url="http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/"
+        result = []
+        orm = ORM()
+        queryStatement = "select id from collection"
+        results = orm.executeSelect(queryStatement)
+        for r in results['data']:
+            result.append(url+str(r['id'][0]))
+        results['data']=result
+        return results
+
+    def getGUIDInfo(self,tableName,id):
+        orm=ORM()
+        if(tableName not in ["asset","folder"]):
+            return "entity does not exist"
+        elif tableName=="asset" :
+            if id is not None and id!="":
+                return self.getAsset(id)
+            else:
+                return self.getAllAssetIDs()
+        elif tableName=="folder":
+            if id is not None and id!="":
+                return self.getCollectionByID(id)
+            else:
+                return self.getAllFolderIDs()
+        return {"data":"bad GUID"}
 

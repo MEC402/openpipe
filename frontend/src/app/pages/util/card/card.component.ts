@@ -102,7 +102,7 @@ export class CardComponent implements OnInit {
   }
 
   saveAsset() {
-    console.log(this.chosenCollection.id[0])
+    console.log(this.chosenCollection.id[0]);
     this.dataAccess.saveAssetIntoCollection(this.asset, this.chosenMetaData ,this.chosenCollection, this.searchTerm, this.source, this.scope);
     this.dialogRef.close();
   }

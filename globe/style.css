@@ -1,0 +1,56 @@
+body {
+    margin: 0px;
+    overflow: hidden;
+    background-color: seashell ;
+}
+
+.water {
+    fill: #bfdbe4;
+}
+
+.country {
+    /*fill: lightgreen;*/
+    stroke: black;
+    stroke-width: 0.05px;
+}
+
+.country:hover {
+    stroke-width: 1px;
+    stroke: #ffffff;
+}
+
+.legend{
+    margin-top: 2%;
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-bottom: 2%;
+}
+
+.main{
+    width: 100%;
+    display: table;
+}
+
+.globe{
+    display: table-cell;
+}
+
+.flat{
+    display: table-cell;
+}
+
+
+.button{
+    margin-top: 2%;
+    margin-left: 20%;
+    margin-bottom: 2%;
+}
+
+.title{
+    font-size: 230%;
+    fill: #635F5D;
+}
+
+.y-axis{
+    font-size: 85%;
+}
