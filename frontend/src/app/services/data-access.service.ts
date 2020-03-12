@@ -11,8 +11,8 @@ import {log} from "util";
 export class DataAccessService {
   webServerURL;
   constructor(private http: HttpClient) {
-   // this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/';
-    this.webServerURL = 'http://localhost/cgi-bin/';
+    this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/';
+   // this.webServerURL = 'http://localhost/cgi-bin/';
   }
 
   public getMuseumData(searchTerm: string, museumName  , page: number , pageSize: number) {
