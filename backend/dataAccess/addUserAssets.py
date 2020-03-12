@@ -1,7 +1,7 @@
 #! C:/Users/walluser/AppData/Local/Programs/Python/Python38-32/python.exe
 import cgi, os
 import cgitb; cgitb.enable()
-cgitb.enable(display=1, logdir="C:/Users/walluser/Desktop/logs")
+cgitb.enable(display=1, logdir="~/added_user_assets_logs/")
 
 
 
@@ -15,5 +15,4 @@ form = cgi.FieldStorage()
 fileitem = form["file"]
 if fileitem.file:
     fn = os.path.basename(fileitem.filename)
-    
-   # open('C:/Users/walluser/Desktop/logs/'+fn, 'wb').write(fileitem.file.read())
+    open('~/added_user_assets/'+fn, 'wb').write(fileitem.file.read())
