@@ -1,47 +1,52 @@
 #!/bin/python3
 
 import json
-import mysql.connector
-from mysql.connector import Error
 import cgi
 
+from ORM.BL import BL
 
 
-def getAllAssets():
-    result = {}
-    try:
-        connection = mysql.connector.connect(
-            host="artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
-            user="artmaster",
-            passwd="ArtMaster51",
-            database="artmaster"
-        )
+def cgiFieldStorageToDict(fieldStorage):
+    params = {}
+    for key in fieldStorage.keys():
+        params[key] = fieldStorage[key].value
+    return params
 
-        sql_select_Query = "SELECT id,metaDataId,shortName FROM asset limit 500;"
-        cursor = connection.cursor()
-        cursor.execute(sql_select_Query)
-        records = cursor.fetchall()
-        result["total"] = cursor.rowcount
-        rows = []
-        for row in records:
-            rowInfo = {"id":row[0],"metaDataId":row[1], "name":row[2]}
-            metaDataId=row[1]
-            sql_select_Query = "select tagName,value from metaTag where metaDataId=%s"
-            if (metaDataId):
-                cursor = connection.cursor()
-                cursor.execute(sql_select_Query, (metaDataId,))
-                metaTagsRecords = cursor.fetchall()
-                for metaTagRow in metaTagsRecords:
-                    rowInfo[metaTagRow[0]]=metaTagRow[1]
-            rows.append(rowInfo)
-        result["data"] = rows
-    except Error as e:
-        print("Error reading data from MySQL table", e)
-    finally:
-        if (connection.is_connected()):
-            connection.close()
-            cursor.close()
-    return result
 
 print("Content-Type: text/json\n")
-print(json.dumps(getAllAssets(), default=str))
+
+dict = cgiFieldStorageToDict(cgi.FieldStorage())
+
+
+dict={'p':1,'ps':3,'type':1}
+
+if 'p' not in dict.keys():
+    dict['p'] = 1
+
+if 'ps' not in dict.keys():
+    dict['ps'] = 10
+
+if 'changeStart' not in dict.keys():
+    dict['changeStart'] = '1900-01-01'
+
+if 'changeEnd' not in dict.keys():
+    dict['changeEnd'] = '5000-01-01'
+
+if 'type' not in dict.keys():
+    dict['type'] = 0
+
+data=BL().getAllAssets(int(dict["p"]), int(dict["ps"]), dict['changeStart'], dict['changeEnd'])
+
+if(dict['type']==1):
+    dt=BL().getCanonicalTags().values()
+    print(dt)
+    for dd in data['data']:
+        for d in dd.keys():
+            if "openpipe_canonical_" in d:
+                for i in dd[d]:
+                    if i in dt:
+                        print(i)
+                        dd[d]=[""]
+                        break
+
+print(json.dumps(data, default=str))

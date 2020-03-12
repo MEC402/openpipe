@@ -22,14 +22,10 @@ def getAllTags():
     canonicalMetaTag = db.Table('canonicalMetaTag', metadata, autoload=True, autoload_with=engine)
     query = db.select([canonicalMetaTag])
     result = connection.execute(query).fetchall()
-    columns = canonicalMetaTag.columns.keys()
-    rows=[]
+    res = {}
     for row in result:
-        res={}
-        for i,c in enumerate(columns):
-            res[c]=row[i]
-        rows.append(res)
-    return rows
+        res[row[1]] =[row[2]]
+    return res
 
 
 print("Content-Type: text/json\n")
