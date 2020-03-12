@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams, HttpRequest, HttpEventType, HttpResponse} from '@angular/common/http';
 import * as url from 'url';
 import {Observable} from 'rxjs';
 import {FileItem} from 'ng2-file-upload';
@@ -56,16 +56,51 @@ export class DataAccessService {
   }
 
   public uploadImages(files : File[])  {
-   const url = this.webServerURL + 'dataAccess/addUserAssets.py';
-   const postBody = files;
-   const headers = new HttpHeaders({
-      'Content-Type': 'image/jpeg',
-      'Access-Control-Allow-Origin': '*',
-   });
-    this.http.post<any>(url, postBody, { headers }).subscribe(data => {
-      console.log(data);
+    const url = this.webServerURL + 'dataAccess/addUserAssets.py';
+    const postBody = { "files": files };
+
+    files.forEach(file => {
+
+      const formData: FormData = new FormData();
+      formData.append('file', file, file.name);
+      const req = new HttpRequest('POST', url, formData, {
+        reportProgress: true
+      })
+
+
+      this.http.request(req).subscribe(event => {
+        if (event.type === HttpEventType.UploadProgress) {
+
+          // calculate the progress percentage
+          const percentDone = Math.round(100 * event.loaded / event.total);
+          console.log(percentDone);
+          // pass the percentage into the progress-stream
+        } else if (event instanceof HttpResponse) {
+
+          // Close the progress-stream if we get an answer form the API
+          // The upload is complete
+          console.log("done");
+        }
+      });
+
+
+
     });
 
+    
+    /*
+
+    console.log(files[0]);
+    console.log(formData);
+   const headers = new HttpHeaders({
+      'Content-Type': 'image/jpeg',
+      'Access-Control-Allow-Origin': '',
+   });
+    console.log(files);
+    this.http.post<any>(url, formData, { headers }).subscribe(data => {
+      console.log(data);
+    });
+    */
    
   }
 
