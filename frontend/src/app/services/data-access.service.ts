@@ -87,7 +87,7 @@ export class DataAccessService {
 
     });
 
-    
+
     /*
 
     console.log(files[0]);
@@ -101,7 +101,7 @@ export class DataAccessService {
       console.log(data);
     });
     */
-   
+
   }
 
   public saveAssetIntoCollection(asset, metaTags, collection, searchTerm, source, scope): Observable<InsertionResponse> {
@@ -201,9 +201,9 @@ export class DataAccessService {
     return this.http.get<Results>(getAssetMetaTagsURL, {params: getAssetMetaTagsParams});
   }
 
-  public getAllAssets() {
+  public getAllAssets(): Observable<Results> {
     const getAllAssetURL = this.webServerURL + 'dataAccess/getAllAssets.py';
-    return this.http.get(getAllAssetURL);
+    return this.http.get<Results>(getAllAssetURL);
   }
 
   public getAssetsReport(): Observable<Results> {
@@ -211,7 +211,7 @@ export class DataAccessService {
     return this.http.get<Results>(getAssetsReport);
   }
 
-  public getAssetsMissingImageReport(): Observable<Results>{
+  public getAssetsMissingImageReport(): Observable<Results> {
     const getAssetsMissingImageReportURL = this.webServerURL + 'dataAccess/getAssetsWithoutImages.py';
     return this.http.get<Results>(getAssetsMissingImageReportURL);
   }

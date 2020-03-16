@@ -2,11 +2,8 @@
   <div class="col-md-4 ">
     <nb-card size="large">
       <nb-card-body>
-        <nb-list *ngIf="assets">
-          <nb-list-item *ngFor="let asset of assets.data; let i = index;" [ngClass]="{'highlight': selectedIndex === i}" (click)="onClick(asset,i)">
-            <nb-user shape="rectangle" [name]="asset.openpipe_canonical_title[0]" [picture]="asset.openpipe_canonical_smallImage"  ></nb-user>
-          </nb-list-item>
-        </nb-list>
+        <ng2-smart-table [settings]="assetsSettings" [source]="assetsSource" (userRowSelect)="onClick($event)"	>
+        </ng2-smart-table>
       </nb-card-body>
     </nb-card>
   </div>
@@ -14,7 +11,7 @@
   <div class="col-md-8 ">
     <nb-card>
       <nb-card-header>
-        {{currentAsset}} Meta-Tags
+        {{currentAssetName}} Meta-Tags
       </nb-card-header>
 
       <nb-card-body>

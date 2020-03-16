@@ -50,8 +50,6 @@ export class CollectionsComponent {
     this.contextMenu.hide();
   }
 
-
-
   onClick(element) {
     this.currentFolder = element.name;
     this.dataAccess.getPublicAssetsInCollection(element.id).subscribe(res => {

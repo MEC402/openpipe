@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import {
-  NbAccordionModule,
+  NbAccordionModule, NbActionsModule,
   NbButtonModule,
   NbCardModule,
   NbCheckboxModule, NbContextMenuModule, NbDatepickerModule,
@@ -11,7 +11,7 @@ import {
   NbMenuModule,
   NbPopoverModule,
   NbRadioModule,
-  NbSelectModule,
+  NbSelectModule, NbSidebarModule,
   NbStepperModule,
   NbTabsetModule,
   NbToggleModule,
@@ -42,10 +42,13 @@ import { UploaderComponent } from './uploader/uploader.component';
 import {FileUploadModule} from 'ng2-file-upload';
 import { AssetsComponent } from './assets/assets.component';
 import { ReportsComponent } from './reports/reports.component';
-import {ServiceStatusComponent} from "./reports/service-status/service-status.component";
-import { MissingImagesComponent } from './reports/missing-images/missing-images.component';
-import { AssetDefectsReportComponent } from './reports/asset-defects-report/asset-defects-report.component';
-import { AssetChangesComponent } from './reports/asset-changes/asset-changes.component';
+import {ServiceStatusComponent} from './reports/service-status/service-status.component';
+import {MissingImagesComponent} from './reports/missing-images/missing-images.component';
+import {AssetDefectsReportComponent} from './reports/asset-defects-report/asset-defects-report.component';
+import {AssetChangesComponent} from './reports/asset-changes/asset-changes.component';
+import {DragDropModule} from '@angular/cdk/drag-drop';
+import { LayoutEditorComponent } from './layout-editor/layout-editor.component';
+import { DocsComponent } from './docs/docs.component';
 
 
 @NgModule({
@@ -82,6 +85,9 @@ import { AssetChangesComponent } from './reports/asset-changes/asset-changes.com
     NbLayoutModule,
     NbContextMenuModule,
     NbDatepickerModule,
+    DragDropModule,
+    NbActionsModule,
+    NbSidebarModule,
 
   ],
   declarations: [
@@ -102,6 +108,8 @@ import { AssetChangesComponent } from './reports/asset-changes/asset-changes.com
     MissingImagesComponent,
     AssetDefectsReportComponent,
     AssetChangesComponent,
+    LayoutEditorComponent,
+    DocsComponent,
   ],
 })
 export class PagesModule {

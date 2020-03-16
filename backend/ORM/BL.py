@@ -197,7 +197,7 @@ class BL:
         orm = ORM()
         start = (page - 1) * pageSize
         step = pageSize
-        queryStatement =  "SELECT assetId,metaDataId FROM collectionMember JOIN asset ON collectionMember.assetId = asset.id WHERE scope=0 and collectionId ="+str(collectionId)+" limit "+str(start)+","+str(step)
+        queryStatement =  "SELECT assetId,asset.metaDataId FROM collectionMember JOIN asset ON collectionMember.assetId = asset.id WHERE scope=0 and collectionId ="+str(collectionId)+" limit "+str(start)+","+str(step)
         results = orm.executeSelect(queryStatement)
         rows=[]
         for row in results['data']:

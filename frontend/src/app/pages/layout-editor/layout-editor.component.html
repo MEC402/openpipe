@@ -1,0 +1,49 @@
+<nb-card>
+  <nb-card-body>
+
+    <nb-actions size="tiny" fullWidth>
+      <nb-action (click)="onClick($event)">Load</nb-action>
+      <nb-action (click)="onClick($event)">Insert Asset</nb-action>
+      <nb-action  (click)="onClick($event)">Save</nb-action>
+    </nb-actions>
+
+  </nb-card-body>
+</nb-card>
+
+<div class="scrolling-wrapper-flexbox">
+  <div class="card">
+    <img [src]="rwa.openpipe_canonical_smallImage" *ngFor="let rwa of leftWallAssets">
+  </div>
+  <div class="card">
+    <img [src]="rwa.openpipe_canonical_smallImage" *ngFor="let rwa of centerWallAssets">
+  </div>
+
+  <div class="card">
+    <img [src]="rwa.openpipe_canonical_smallImage" *ngFor="let rwa of rightWallAssets">
+  </div>
+</div>
+
+<ng-template #dialog let-data let-ref="dialogRef">
+  <nb-card size="giant">
+    <nb-card-header>
+      <button nbButton (click)="saveAsset()">Save</button>
+      <button nbButton (click)="ref.close()">Close</button>
+    </nb-card-header>
+    <nb-card-body>
+      <h4>Choose a Folder:</h4>
+      <nb-select placeholder="Select Folder" [(selected)]="chosenCollection">
+        <nb-option *ngFor="let c of collections" [value]="c">{{c.name[0]}}</nb-option>
+      </nb-select>
+      <button nbButton status="warning" [nbPopover]="form">New Folder</button>
+      <h4>Private or Public Asset:</h4>
+      <nb-radio-group [(ngModel)]="scope">
+        <nb-radio value="0" checked=true>Public</nb-radio>
+        <nb-radio value="1">Private</nb-radio>
+      </nb-radio-group>
+      <h4>Meta Data</h4>
+      <ng2-smart-table [settings]="settings" [source]="data" (userRowSelect)="onRowSelect($event)"></ng2-smart-table>
+    </nb-card-body>
+  </nb-card>
+</ng-template>
+
+

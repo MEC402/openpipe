@@ -23,6 +23,11 @@ export const MENU_ITEMS: NbMenuItem[] = [
     link: '/pages/settings',
   },
   {
+    title: 'Faculty Templates',
+    icon: 'edit-2',
+    link: '/pages/layoutEditor',
+  },
+  {
     title: 'Uploader',
     icon: 'upload-outline',
     link: '/pages/uploader',
@@ -31,5 +36,10 @@ export const MENU_ITEMS: NbMenuItem[] = [
     title: 'Reports',
     icon: 'clipboard-outline',
     link: '/pages/reports',
+  },
+  {
+    title: 'Docs',
+    icon: 'question-mark-circle',
+    link: '/pages/docs',
   },
 ];

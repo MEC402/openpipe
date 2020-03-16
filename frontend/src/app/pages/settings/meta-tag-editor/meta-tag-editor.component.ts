@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {DataAccessService} from '../../../services/data-access.service';
-import {LocalDataSource} from "ng2-smart-table";
+import {LocalDataSource} from 'ng2-smart-table';
 
 @Component({
   selector: 'ngx-meta-tag-editor',
@@ -39,27 +39,41 @@ export class MetaTagEditorComponent implements OnInit {
     },
   };
 
+
   source: LocalDataSource = new LocalDataSource();
   currentAsset: any;
-  selectedIndex: number;
+  currentAssetName: any;
+  assetsSource: LocalDataSource = new LocalDataSource();
+
+  assetsSettings = {
+    actions: false,
+    columns: {
+      openpipe_canonical_smallImage: {
+        filter: false,
+        title: 'Picture',
+        type: 'html',
+        valuePrepareFunction: (openpipe_canonical_smallImage) => {
+          return '<img width="50px" src="' + openpipe_canonical_smallImage[0] + '" />';
+        },
+      },
+      openpipe_canonical_title: {
+        title: 'Title',
+        type: 'string',
+      },
+    },
+  };
+
+
   constructor(private dataAccess: DataAccessService) {
     this.dataAccess.getAllAssets().subscribe(res => {
+      console.log(res);
+      this.assetsSource.load(res.data);
       this.assets = res;
     });
   }
 
   ngOnInit() {
-    // this.dataAccess.getPublicAssetsInCollection(collectionId).subscribe(res => {
-    //
-    // });
   }
-
-  // onCollapseChange(event: boolean, c: any) {
-  //   this.assets=[];
-  //   if (!event) {
-  //
-  //   }
-  // }
 
   onDeleteConfirm(event): void {
     if (window.confirm('Are you sure you want to delete?')) {
@@ -80,17 +94,15 @@ export class MetaTagEditorComponent implements OnInit {
     event.confirm.resolve();
   }
 
-  onClick(asset: any, index:number) {
-    this.currentAsset = asset.name[0];
-    this.selectedIndex=index;
-    this.dataAccess.getAssetMetaTags(asset.id[0]).subscribe(res => {
-
-      let topics = [];
-      res.data.forEach(metaTag => {
-          topics.push({'id': metaTag['id'][0], 'assetId':metaTag['assetId'][0] ,'tagName': metaTag['tagName'][0], 'value': metaTag['value'][0]});
-      });
-      this.source.load(topics);
-    });
-
+  onClick(event) {
+    this.currentAsset = event.data;
+    this.currentAssetName=this.currentAsset.openpipe_canonical_title[0]
+    let temp = [];
+    console.log(event);
+    for (const [key, value] of Object.entries(event.data)) {
+      if (key != 'id' && key!='metaDataId')
+        temp.push({'tagName': key, 'value': value});
+    }
+    this.source.load(temp);
   }
 }

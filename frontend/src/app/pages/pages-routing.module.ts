@@ -9,6 +9,8 @@ import {SettingsComponent} from './settings/settings.component';
 import {UploaderComponent} from './uploader/uploader.component';
 import {AssetsComponent} from './assets/assets.component';
 import {ReportsComponent} from './reports/reports.component';
+import {DocsComponent} from "./docs/docs.component";
+import {LayoutEditorComponent} from "./layout-editor/layout-editor.component";
 
 const routes: Routes = [{
   path: '',
@@ -31,12 +33,20 @@ const routes: Routes = [{
       component: SettingsComponent,
     },
     {
+      path: 'layoutEditor',
+      component: LayoutEditorComponent,
+    },
+    {
       path: 'uploader',
       component: UploaderComponent,
     },
     {
       path: 'reports',
       component: ReportsComponent,
+    },
+    {
+      path: 'docs',
+      component: DocsComponent,
     },
     {
       path: 'miscellaneous',
