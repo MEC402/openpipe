@@ -1,6 +1,7 @@
 import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {NbDialogRef, NbDialogService, NbPopoverDirective, NbWindowService} from '@nebular/theme';
 import {DataAccessService} from '../../../services/data-access.service';
+import {LocalDataSource} from "ng2-smart-table";
 
 @Component({
   selector: 'ngx-card',
@@ -22,21 +23,40 @@ export class CardComponent implements OnInit {
 
   settings = {
     selectMode: 'multi',
+    pager: {
+      display: true,
+      perPage: 70,
+    },
+    add: {
+      addButtonContent: '<i class="nb-plus"></i>',
+      createButtonContent: '<i class="nb-checkmark"></i>',
+      cancelButtonContent: '<i class="nb-close"></i>',
+      confirmCreate: true,
+    },
+    edit: {
+      editButtonContent: '<i class="nb-edit"></i>',
+      saveButtonContent: '<i class="nb-checkmark"></i>',
+      cancelButtonContent: '<i class="nb-close"></i>',
+      confirmSave : true,
+    },
+    delete: {
+      deleteButtonContent: '<i class="nb-trash"></i>',
+      confirmDelete: true,
+    },
     columns: {
-      id: {
-        title: 'ID',
+      tagName: {
+        title: 'Tag Name',
+        type: 'string',
       },
-      name: {
-        title: 'Full Name',
-      },
-      username: {
-        title: 'User Name',
-      },
-      email: {
-        title: 'Email',
+      value: {
+        title: 'Value',
+        type: 'string',
       },
     },
   };
+
+  assetsSource: LocalDataSource = new LocalDataSource();
+
 
   constructor(private dialogService: NbDialogService,
               protected dialogRef: NbDialogRef<any>,
@@ -64,7 +84,15 @@ export class CardComponent implements OnInit {
         data.push([s, JSON.stringify(this.asset[s][0]).replace(/['"]+/g, '')]);
         this.chosenMetaData[s] = JSON.stringify(this.asset[s][0]).replace(/['"]+/g, '');
       }
-    });
+    })
+
+    let temp=[];
+    for (const [key, value] of Object.entries(data)) {
+      if (key != 'id' && key!='metaDataId')
+        temp.push({'tagName': key, 'value': value});
+    }
+    this.assetsSource.load(temp);
+
     this.dataAccess.getCollections().subscribe(res => {
       console.log(res);
       this.collections = res.data;
