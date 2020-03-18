@@ -107,13 +107,10 @@ class BL:
         results["data"] = rows
         return results
 
-    def insertUserAsset(self, files):
+    def insertUserAsset(self, shortName, fileName, uri):
         orm = ORM()
-        table = self.tables["images"]
-        results = []
-        for file in files:
-            results.append(orm.insert(file))
-        return results
+        Images = self.tables["images"]
+        return orm.insert(Images(shortName=shortName,fileName=fileName,uri=uri))
 
 
     def insertIntoAsset(self, shortName, uri, idAtSource, sourceId, metaDataId, scope):
