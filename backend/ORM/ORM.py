@@ -1,7 +1,10 @@
+import json
+
 import mysql
 import sqlalchemy as db
 from mysql.connector import Error
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
 
 from ORM.DBInfo import DBInfo
 
@@ -9,31 +12,41 @@ from ORM.DBInfo import DBInfo
 class ORM:
 
     connection=DBInfo().getConnectionInfo()
-    # TODO: Make this singleton
+    engine = db.create_engine(
+        'mysql+mysqlconnector://' + connection["username"] + ':' + connection["password"] + '@' +
+        connection["address"] + '/' + connection["schema"])
+    Session = sessionmaker(bind=engine)
+    session=Session();
     # TODO: Password Manger
+
     def getSession(self):
-        engine = db.create_engine(
-            'mysql+mysqlconnector://' + self.connection["username"] + ':' + self.connection["password"] + '@' + self.connection["address"] + '/' + self.connection["schema"])
-        Session = sessionmaker(bind=engine)
-        return Session()
+        return self.session
 
     def selectAll(self, TOClass):
-        session = self.getSession()
-        result = session.query(TOClass).all()
+        result = self.session.query(TOClass).all()
         return result
 
     def insert(self, obj):
-        session = self.getSession()
-        result = session.add(obj)
-        result = session.commit()
-        session.flush()
+        self.session.add(obj)
+        self.session.flush()
         return obj.id
+
+    def bulkInsert(self, objArray):
+        self.session.bulk_save_objects(objArray)
+        self.session.flush()
+        return objArray[0].id
 
     def update(self, object):
         return
 
     def delete(self, obj):
-        return
+        self.session.delete(obj)
+        self.session.flush()
+        return obj.id
+
+    def commitClose(self):
+        self.session.commit()
+        self.session.close()
 
     def executeSelect(self, query):
         try:
@@ -62,6 +75,29 @@ class ORM:
                 connection.close()
                 cursor.close()
         return jsonRes
+
+    def batchInsert(self,data,query):
+        try:
+            connection = mysql.connector.connect(
+                host=self.connection["address"],
+                user=self.connection["username"],
+                passwd=self.connection["password"],
+                database=self.connection["schema"]
+            )
+            cursor = connection.cursor()
+            cursor.executemany(query, data)
+            # affected_rows = cursor.rowcount
+
+            # print("Number of rows affected : {}".format(affected_rows))
+            connection.commit()
+
+        except Error as e:
+            print("Error reading data from MySQL table", e)
+        finally:
+            if (connection.is_connected()):
+                connection.close()
+                cursor.close()
+
 
 # to=TO()
 # orm=ORM()

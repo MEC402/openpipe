@@ -6,7 +6,7 @@ import sys
 from ORM.BL import BL
 
 postBody = sys.stdin.read()
-data = json.loads(postBody)
+data = json.loads(json.dumps(postBody))
 
 print("Content-Type: text/json\n")
-print(json.dumps(BL().insertIntoMetaTags(data), default=str))
+print(json.dumps(BL().insertIntoMetaTags(json.loads(data)), default=str))
