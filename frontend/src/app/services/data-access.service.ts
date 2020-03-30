@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams, HttpRequest, HttpEventType, HttpResponse} from '@angular/common/http';
-import * as url from 'url';
 import {Observable} from 'rxjs';
-import {FileItem} from 'ng2-file-upload';
-import {log} from "util";
+import {forkJoin} from 'rxjs';
+import {map} from "rxjs/operators";
+
 
 @Injectable({
   providedIn: 'root',
@@ -15,14 +15,14 @@ export class DataAccessService {
    // this.webServerURL = 'http://localhost/cgi-bin/';
   }
 
-  public getMuseumData(searchTerm: string, museumName  , page: number , pageSize: number) {
+  public getMuseumData(searchTerm: string, museumName  , page: number , pageSize: number): Observable<Results> {
     const url = this.webServerURL + 'assetSources/museums.py';
     const params = new HttpParams()
                   .set('q', searchTerm)
                   .set('name', museumName)
                   .set('p', String(page))
                   .set('ps', String(pageSize));
-    return this.http.get(url, {params: params});
+    return this.http.get<Results>(url, {params: params});
   }
 
   public getMETsData(searchTerm: string , start: number , step: number) {
@@ -82,26 +82,7 @@ export class DataAccessService {
           console.log("done");
         }
       });
-
-
-
     });
-
-
-    /*
-
-    console.log(files[0]);
-    console.log(formData);
-   const headers = new HttpHeaders({
-      'Content-Type': 'image/jpeg',
-      'Access-Control-Allow-Origin': '',
-   });
-    console.log(files);
-    this.http.post<any>(url, formData, { headers }).subscribe(data => {
-      console.log(data);
-    });
-    */
-
   }
 
   public saveAssetIntoCollection(asset, metaTags, collection, searchTerm, source, scope): Observable<InsertionResponse> {
@@ -137,6 +118,7 @@ export class DataAccessService {
     const metaTagsURL = this.webServerURL + 'dataAccess/createMetaTags.py';
     metaTags['metaDataId'] = metaDataId;
     const postBody = metaTags;
+    console.log('post body');
     console.log(postBody);
     const headers = new HttpHeaders({
       'Content-Type': 'text/plain',
@@ -160,9 +142,9 @@ export class DataAccessService {
     return this.http.get<InsertionResponse>(assetMetaDataURL);
   }
 
-  public getPublicAssetsInCollection(collectionId): Observable<Assets> {
+  public getPublicAssetsInCollection(collectionId, p, ps): Observable<Assets> {
     const getAssetsInCollectionURL = this.webServerURL + 'dataAccess/getPublicAssetsInCollection.py';
-    const assetsInCollectionParams = new HttpParams().set('collectionId', collectionId);
+    const assetsInCollectionParams = new HttpParams().set('collectionId', collectionId).set('p', p).set('ps', ps);
     return this.http.get<Assets>(getAssetsInCollectionURL, {params: assetsInCollectionParams});
   }
 
@@ -201,9 +183,10 @@ export class DataAccessService {
     return this.http.get<Results>(getAssetMetaTagsURL, {params: getAssetMetaTagsParams});
   }
 
-  public getAllAssets(): Observable<Results> {
+  public getAllAssets(p, ps): Observable<Results> {
     const getAllAssetURL = this.webServerURL + 'dataAccess/getAllAssets.py';
-    return this.http.get<Results>(getAllAssetURL);
+    const getAssetParams = new HttpParams().set('p', p).set('ps', ps);
+    return this.http.get<Results>(getAllAssetURL,{params: getAssetParams});
   }
 
   public getAssetsReport(): Observable<Results> {
@@ -216,12 +199,86 @@ export class DataAccessService {
     return this.http.get<Results>(getAssetsMissingImageReportURL);
   }
 
+  // public getAssetsWithGUID(collectionId): Observable<Results> {
+  //   const getAssetsMissingImageReportURL = this.webServerURL + 'dataAccess/getAssetsWithoutImages.py';
+  //   return this.http.get<Results>(getAssetsMissingImageReportURL);
+  // }
+  //
+  // getBooksAndMovies() {
+  //   return Observable.forkJoin(
+  //     this.http.get('/app/books.json').map((res:Response) => res.json()),
+  //     this.http.get('/app/movies.json').map((res:Response) => res.json())
+  //   );
+  // }
+  public deleteFolder(FolderId) {
+    const deleteFolderURL = this.webServerURL + 'dataAccess/deleteFolder.py';
+    const deleteFolderParams = new HttpParams().set('collectionId', FolderId);
+    return this.http.get(deleteFolderURL, {params: deleteFolderParams}).subscribe(res => {
+      console.log(res);
+    });
+  }
+
+  public deleteFolderMember(folderId, assetId) {
+    const deleteFolderMemberURL = this.webServerURL + 'dataAccess/deleteFolderMember.py';
+    const deleteFolderMemberParams = new HttpParams().set('collectionId', folderId).set('assetId', assetId);
+    return this.http.get(deleteFolderMemberURL, {params: deleteFolderMemberParams}).subscribe(res => {
+      console.log(res);
+    });
+  }
+
+  public updateMetaTag(metaDataId, oldTagName, oldValue, newTagName, newValue) {
+    const updateMetaTagURL = this.webServerURL + 'dataAccess/updateMetaTag.py';
+    const updateMetaTagParams = new HttpParams()
+      .set('metaDataId', metaDataId)
+      .set('oldTagName', oldTagName)
+      .set('oldValue', oldValue)
+      .set('newTagName', newTagName)
+      .set('newValue', newValue);
+    return this.http.get(updateMetaTagURL, {params: updateMetaTagParams});
+  }
+
+  public deleteMetaTag(metaDataId, tagName, value) {
+    const deleteMetaTagURL = this.webServerURL + 'dataAccess/deleteMetaTag.py';
+    const deleteMetaTagParams = new HttpParams()
+      .set('metaDataId', metaDataId)
+      .set('tagName', tagName)
+      .set('value', value);
+    return this.http.get(deleteMetaTagURL, {params: deleteMetaTagParams});
+  }
+
+  public insertMetaTag(metaDataId, tagName, value) {
+    const insertMetaTagURL = this.webServerURL + 'dataAccess/addMetaTag.py';
+    const insertMetaTagParams = new HttpParams()
+      .set('metaDataId', metaDataId)
+      .set('tagName', tagName)
+      .set('value', value);
+    return this.http.get(insertMetaTagURL, {params: insertMetaTagParams});
+  }
+
+  public updateFolder(folderId, newName, newImage) {
+    const updateFolderURL = this.webServerURL + 'dataAccess/updateFolder.py';
+    const updateFolderParams = new HttpParams()
+      .set('collectionId', folderId)
+      .set('newName', newName)
+      .set('newImage', newImage);
+    return this.http.get(updateFolderURL, {params: updateFolderParams});
+  }
+
+  public getAssetsWithGUID(): Observable<Results> {
+    const assetsGUIDURL = this.webServerURL + '/openpipe/data/asset';
+    return this.http.get<Results>(assetsGUIDURL);
+  }
+
+  public getGUID(GUIDURL): Observable<Results> {
+    return this.http.get<Results>(GUIDURL);
+  }
 }
 
 
 class Results {
   total;
   data: any[];
+  assets: any[];
 }
 
 class CollectionResults {

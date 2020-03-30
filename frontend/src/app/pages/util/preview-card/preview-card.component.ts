@@ -18,10 +18,10 @@ export class PreviewCardComponent implements OnInit {
   ngOnInit() {
   }
 
-
-  showMeta(assetElem) {
-    this.dataAccess.getAssetMetaTags(assetElem.id).subscribe(res => {
-      this.valueChange.emit(res);
-    });
-  }
+  //
+  // showMeta(assetElem) {
+  //   this.dataAccess.getAssetMetaTags(assetElem.id).subscribe(res => {
+  //     this.valueChange.emit(res);
+  //   });
+  // }
 }

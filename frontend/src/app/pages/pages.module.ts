@@ -49,6 +49,8 @@ import {AssetChangesComponent} from './reports/asset-changes/asset-changes.compo
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import { LayoutEditorComponent } from './layout-editor/layout-editor.component';
 import { DocsComponent } from './docs/docs.component';
+import {KonvaModule} from "ng2-konva";
+import { FolderCardComponent } from './util/folder-card/folder-card.component';
 
 
 @NgModule({
@@ -88,6 +90,7 @@ import { DocsComponent } from './docs/docs.component';
     DragDropModule,
     NbActionsModule,
     NbSidebarModule,
+    KonvaModule,
 
   ],
   declarations: [
@@ -110,6 +113,7 @@ import { DocsComponent } from './docs/docs.component';
     AssetChangesComponent,
     LayoutEditorComponent,
     DocsComponent,
+    FolderCardComponent,
   ],
 })
 export class PagesModule {

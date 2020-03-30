@@ -10,3 +10,4 @@ data = json.loads(json.dumps(postBody))
 
 print("Content-Type: text/json\n")
 print(json.dumps(BL().insertIntoMetaTags(json.loads(data)), default=str))
+

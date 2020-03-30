@@ -93,6 +93,9 @@ class RijksMuseum:
         return {"total": retrievedAssets["count"], "sourceName": "Rijks","data": rrr}
 
     def getTileImages(self, objectId, z):
+        tileData=0
+        imgWidth=0
+        imgHeight=0
         serviceName = "collection/" + objectId + "/tiles"
         params = {'key': "qvMYRE87"}
         response = requests.get(url=self.url + serviceName, params=params)

@@ -49,7 +49,6 @@ class ORM:
         self.session.close()
 
     def executeSelect(self, query):
-        var jsonRes = None
         try:
             connection = mysql.connector.connect(
                 host=self.connection["address"],

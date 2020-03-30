@@ -1,0 +1,45 @@
+<nb-card size="small">
+  <nb-card-header>
+    {{collection.name}}
+  </nb-card-header>
+  <nb-card-body>
+    <img [src]="collection.image">
+  </nb-card-body>
+  <nb-card-footer>
+    <button
+      size="tiny"
+      status="success"
+      (click)="onFolderOpenClick()"
+      nbButton> Open </button>
+    <button
+      size="tiny"
+      status="info"
+      (click)="onFolderEditClick(dialog)"
+      nbButton> Edit </button>
+    <button
+      size="tiny"
+      status="danger"
+      (click)="onFolderDeleteClick()"
+      nbButton>
+      Delete
+    </button>
+  </nb-card-footer>
+</nb-card>
+
+<ng-template #dialog let-data let-ref="dialogRef">
+  <nb-card size="medium">
+    <nb-card-header>
+      <button nbButton (click)="saveFolderChanges()" size="tiny" status="success">Save</button>
+      <button nbButton (click)="ref.close()" size="tiny" status="danger">Close</button>
+    </nb-card-header>
+    <nb-card-body>
+      <label>Folder Name:
+        <input type="text" nbInput [placeholder]="collection.name[0]" [(ngModel)]="newName">
+      </label>
+      <br/>
+      <label>Image URL:
+        <input type="text" nbInput fullWidth  [placeholder]="collection.image[0]" [(ngModel)]="newImage">
+      </label>
+    </nb-card-body>
+  </nb-card>
+</ng-template>

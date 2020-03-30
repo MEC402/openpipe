@@ -1,3 +1,4 @@
+
 import {Component, OnInit, TemplateRef} from '@angular/core';
 import {NbDialogRef, NbDialogService} from "@nebular/theme";
 import {DataAccessService} from "../../services/data-access.service";
@@ -37,6 +38,7 @@ export class LayoutEditorComponent implements OnInit {
       },
     },
   };
+  imageConfig: any;
 
   constructor(private dialogService: NbDialogService,
               protected dialogRef: NbDialogRef<any>,
@@ -82,7 +84,7 @@ export class LayoutEditorComponent implements OnInit {
 
   onSelect() {
     console.log(this.chosenCollection);
-    this.dataAccess.getPublicAssetsInCollection(this.chosenCollection.id).subscribe(res => {
+    this.dataAccess.getPublicAssetsInCollection(this.chosenCollection.id,1,10).subscribe(res => {
       this.assetsSource.load(res.data);
     });
   }
@@ -131,3 +133,82 @@ export class LayoutEditorComponent implements OnInit {
     console.log(event);
   }
 }
+
+
+
+
+
+
+
+// import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+// import {NbDialogRef, NbDialogService} from "@nebular/theme";
+// import {DataAccessService} from "../../services/data-access.service";
+// import {LocalDataSource} from "ng2-smart-table";
+// import {CdkDragDrop} from "@angular/cdk/drag-drop";
+// import {KonvaComponent} from "ng2-konva";
+// import {Observable, of} from "rxjs";
+// import Konva from "konva";
+//
+// @Component({
+//   selector: 'ngx-layout-editor',
+//   templateUrl: './layout-editor.component.html',
+//   styleUrls: ['./layout-editor.component.scss']
+// })
+// export class LayoutEditorComponent implements OnInit {
+//   @ViewChild('stage', {static: true}) stage: KonvaComponent;
+//   @ViewChild('layer', {static: true}) layer: KonvaComponent;
+//
+//   public width = 800;
+//   public height = 200;
+//
+//   image= new Image();
+//
+//   public stageConfig: Observable<any> = of({
+//     width: this.width,
+//     height: this.height,
+//   });
+//
+//   public imageConfig: Observable<any> = of({
+//     width: this.width/10,
+//     height: this.height/10,
+//     image: this.image,
+//     draggable: true,
+//   });
+//
+//
+//
+// // Konva.Image.fromURL('https://images.metmuseum.org/CRDImages/es/web-large/DP105723.jpg',c => {
+// //   this.layer.getStage().add(c);
+// //   this.layer.getStage().draw();
+// // }),
+//
+//   constructor() {
+//     this.image.src='https://images.metmuseum.org/CRDImages/es/web-large/DP105723.jpg';
+//   }
+//
+//   ngOnInit(): void {
+//   }
+//
+//   onTap(e) {
+//     console.log(e)
+//     // if click on empty area - remove all transformers
+//     if (e.target === this.stage) {
+//       this.stage.getStage().find('Transformer').destroy();
+//       this.layer.getStage().draw();
+//       return;
+//     }
+//     // do nothing if clicked NOT on our rectangles
+//     // if (!e.target.hasName('image')) {
+//     //   return;
+//     // }
+//     // remove old transformers
+//     // TODO: we can skip it if current rect is already selected
+//     this.stage.getStage().find('Transformer').destroy();
+//
+//     // create new transformer
+//     var tr = new Konva.Transformer();
+//     this.layer.getStage().add(tr);
+//     tr.attachTo(e.target);
+//     this.layer.getStage().draw();
+//   }
+// }

@@ -1,59 +1,73 @@
-<nb-stepper orientation="horizontal" disableStepNavigation>
-  <nb-step hidden="true">
-    <div class="row" >
-      <div class="thumbnail" *ngFor="let c of collections">
-        <nb-card [ngStyle]="{'width':'300' + 'px'}" size="tiny" (click)="onClick(c)">
-          <nb-card-body>
+<button nbButton status="warning" [nbPopover]="form">New Folder</button>
 
-          </nb-card-body>
-          <nb-card-footer>
-            {{c.name}}
-            <button
-              size="tiny"
-              [nbContextMenu]="items"
-              nbContextMenuTrigger="click"
-              [nbContextMenuTag]="c"
-              nbButton nbStepperNext>
-              ...
-            </button>
-          </nb-card-footer>
-        </nb-card>
+<div class="row" *ngIf="folderPage">
+    <div  *ngFor="let c of collections" class="thumbnail">
+      <ngx-folder-card [ngStyle]="{'width':'300' + 'px'}" [collection]="c" (folderDelete)="onFolderDeleteClick(c)" (folderOpen)="onFolderOpenClick(c)"></ngx-folder-card>
+    </div>
+</div>
+<div *ngIf="!folderPage">
+  <div class="topbar">
+    <button class="prev-button" (click)="backToFolders()" size="tiny" nbButton>Back to Folders</button>
+    <label class="single-view-button"><h5>{{currentFolder.name[0]}}</h5></label>
+    <button class="single-view-button"
+            nbButton
+            size="tiny"
+            [appearance]="isSingleView ? 'filled' : 'outline'"
+            (click)="isSingleView = true">
+      <i class="nb-square"></i>
+    </button>
+    <button class="grid-view-button"
+            nbButton
+            size="tiny"
+            [appearance]="isSingleView ? 'outline' : 'filled'"
+            (click)="isSingleView = false">
+      <nb-icon icon="grid" pack="eva"></nb-icon>
+    </button>
+  </div>
+
+
+  <div class="grid-container">
+    <div class="single-view" *ngIf="isSingleView">
+      <div class="camera" >
+        <div class="lists row">
+          <div class="col-md-4 ">
+            <nb-card size="large">
+              <nb-card-body>
+                <ng2-smart-table [settings]="assetsSettings" [source]="currentFolderAssets" (userRowSelect)="onClick($event)" (deleteConfirm)="onFolderMemberDeleteConfirm($event)"	>
+                </ng2-smart-table>
+              </nb-card-body>
+            </nb-card>
+          </div>
+
+          <div class="col-md-8 ">
+            <nb-card>
+              <nb-card-header>
+                {{currentAssetName}} Meta-Tags
+              </nb-card-header>
+
+              <nb-card-body>
+                <ng2-smart-table [settings]="settings" [source]="source" (deleteConfirm)="onDeleteConfirm($event)"
+                                 (editConfirm)="onEditConfirm($event)" (createConfirm)="onCreateConfirm($event)">
+                </ng2-smart-table>
+              </nb-card-body>
+            </nb-card>
+          </div>
+        </div>
       </div>
     </div>
-  </nb-step>
-  <nb-step hidden="true">
 
-        <button class="single-view-button"
-                nbButton
-                size="small"
-                [appearance]="isSingleView ? 'filled' : 'outline'"
-                (click)="isSingleView = true">
-          <i class="nb-square"></i>
-        </button>
-        <button class="grid-view-button"
-                nbButton
-                size="small"
-                [appearance]="isSingleView ? 'outline' : 'filled'"
-                (click)="isSingleView = false">
-          <nb-icon icon="grid" pack="eva"></nb-icon>
-        </button>
-        <button class="prev-button" (click)="backToFolders()" nbButton nbStepperPrevious>prev</button>
+    <div class="row" *ngIf="!isSingleView">
+      <div  *ngFor="let asset of assets" class="thumbnail">
+        <ngx-preview-card [ngStyle]="{'width':'300' + 'px'}" [asset]="asset" (valueChange)="metaShow($event)"></ngx-preview-card>
+      </div>
+    </div>
 
-        <div class="grid-container">
-          <div class="single-view" *ngIf="isSingleView">
-            <div class="camera" >
-              <ngx-meta-tag-editor></ngx-meta-tag-editor>
-            </div>
-          </div>
+  </div>
+</div>
 
-          <div class="row" *ngIf="!isSingleView">
-            <div  *ngFor="let asset of assets" class="thumbnail">
-              <ngx-preview-card [ngStyle]="{'width':'300' + 'px'}" [asset]="asset" (valueChange)="metaShow($event)"></ngx-preview-card>
-            </div>
-          </div>
-
-        </div>
-
-  </nb-step>
-</nb-stepper>
-
+<ng-template #form>
+  <nb-card>
+    <input type="text" nbInput placeholder="Folder Name" [(ngModel)]="newCollectionName">
+    <button nbButton (click)="onCreateCollection()">save</button>
+  </nb-card>
+</ng-template>

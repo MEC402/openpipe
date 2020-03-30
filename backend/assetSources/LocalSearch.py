@@ -11,15 +11,15 @@ class LocalSearch:
         result = {}
         try:
             connection = mysql.connector.connect(
-                host="artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
+                host="artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
                 user="artmaster",
                 passwd="ArtMaster51",
                 database="artmaster"
             )
 
-            sql_select_Query = "SELECT asset.id FROM metaTag join asset on metaTag.metaDataId=asset.metaDataId where metaTag.value like %s group by asset.id;"
+            sql_select_Query = "SELECT asset.id, MATCH(metaTag.tagName,metaTag.value) AGAINST(%s IN NATURAL LANGUAGE MODE) as relevance FROM metaTag join asset on metaTag.metaDataId=asset.metaDataId where MATCH(metaTag.tagName,metaTag.value) AGAINST(%s IN NATURAL LANGUAGE MODE)  ORDER BY relevance DESC"
             cursor = connection.cursor()
-            cursor.execute(sql_select_Query, ("%"+term+"%",))
+            cursor.execute(sql_select_Query, (term,term))
             records = cursor.fetchall()
             result["total"] = cursor.rowcount
             rows = []
@@ -38,7 +38,7 @@ class LocalSearch:
         result = {}
         try:
             connection = mysql.connector.connect(
-                host="artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
+                host="artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
                 user="artmaster",
                 passwd="ArtMaster51",
                 database="artmaster"
@@ -76,7 +76,7 @@ class LocalSearch:
         if int(start) + int(step) > retrievedAssets['total']:
             step = retrievedAssets['total'] - int(start) - 1
         assets = retrievedAssets['assetIDs'][int(start):int(start) + int(step)]
-        if len(retrievedAssets['assetIDs']>0):
+        if len(retrievedAssets['assetIDs'])>0:
             pool = ThreadPool(len(assets))
             for assetId in assets:
                 results.append(pool.apply_async(self.getAssetMetaData, args=[assetId]))

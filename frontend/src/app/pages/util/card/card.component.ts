@@ -25,7 +25,7 @@ export class CardComponent implements OnInit {
     selectMode: 'multi',
     pager: {
       display: true,
-      perPage: 70,
+      perPage: 10,
     },
     add: {
       addButtonContent: '<i class="nb-plus"></i>',
@@ -85,12 +85,12 @@ export class CardComponent implements OnInit {
         this.chosenMetaData[s] = JSON.stringify(this.asset[s][0]).replace(/['"]+/g, '');
       }
     })
-
     let temp=[];
-    for (const [key, value] of Object.entries(data)) {
-      if (key != 'id' && key!='metaDataId')
-        temp.push({'tagName': key, 'value': value});
-    }
+    data.forEach(d=>{
+      if (d[0] != 'id' && d[0]!='metaDataId')
+        temp.push({'tagName': d[0], 'value': d[1]});
+
+    });
     this.assetsSource.load(temp);
 
     this.dataAccess.getCollections().subscribe(res => {
@@ -119,13 +119,11 @@ export class CardComponent implements OnInit {
 
 
   onCreateCollection() {
+    this.popover.hide();
     this.dataAccess.createCollection(this.newCollectionName).subscribe(res => {
-      if (res.result == 'Success') {
-        this.dataAccess.getCollections().subscribe(res => {
-          this.collections = res.data;
-        });
-        this.popover.hide();
-      }
+      this.dataAccess.getCollections().subscribe(resp => {
+        this.collections = resp.data;
+      });
     });
   }
 

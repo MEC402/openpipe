@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {DataAccessService} from '../../services/data-access.service';
+import {LocalDataSource} from 'ng2-smart-table';
 
 @Component({
   selector: 'ngx-assets',
@@ -8,19 +9,37 @@ import {DataAccessService} from '../../services/data-access.service';
 })
 export class AssetsComponent implements OnInit {
   searchTerm: string;
+  currentAssets: LocalDataSource = new LocalDataSource();
   assets: any;
-  page=1;
+  page= 1;
   total;
-  pageSize=10;
+  pageSize= 10;
   constructor(private dataAccess: DataAccessService) {
 
   }
 
   ngOnInit() {
-    this.dataAccess.getAllAssets().subscribe(res => {
-      console.log(res);
-      this.assets = res;
+    this.dataAccess.getAssetsWithGUID().subscribe(res => {
+      for (let i = 1; i < res.total; i += 10) {
+        this.dataAccess.getAllAssets(i,10).subscribe(resp => {
+          resp.data.forEach(d => {
+            this.currentAssets.add(d);
+            this.currentAssets.refresh();
+          });
+        });
+      }
     });
+  }
+
+  @HostListener('body:click', ['$event'])
+  onMouseclick(event: any) {
+
+    if ( (event.target && event.target.attributes.class &&
+      event.target.attributes['class'].value.includes('ng2-smart-page'))) {
+      console.log(event.target.innerText);
+    }
+
+
   }
 
   onClick(asset: any) {
@@ -32,9 +51,12 @@ export class AssetsComponent implements OnInit {
 
   searchAssets() {
       this.dataAccess.getMuseumData(this.searchTerm, 'local' , 1, 20).subscribe(res => {
-        this.assets=[];
+        this.currentAssets.load([]);
+
+        this.assets = [];
         console.log('hi is search');
-        this.assets=res;
+        this.currentAssets.load(res.data);
+        this.assets = res;
       });
   }
 

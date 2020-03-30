@@ -44,12 +44,23 @@
 
   }
 
+  ngx-folder-card {
+    margin: 1%;
+
+  }
+
   .thumbnail {
     display: flex;
 
   }
   .row {
     margin-left: 1%;
+  }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
 }
