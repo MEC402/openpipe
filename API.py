@@ -27,13 +27,14 @@ class OpenPipePy:
         if assetId is None or  collectionId is None or searchTerm is None:
            return {"result": "Fail"}
         else:
-             {"result": BL().insertIntoCollectionMember(dict["assetId"],dict["collectionId"],dict["searchTerm"])}
+             return {"result": BL().insertIntoCollectionMember(dict["assetId"],dict["collectionId"],dict["searchTerm"])}
 
-    def addCanonicalMetaTag:
+    def addCanonicalMetaTag(self, name):
+	if name is None:
+		return {"result": "Fail"}
 
-
-
-    def addUserAssets: 
+	else:
+		return {"result":insertCanonicalMetaTag(dict["name"])
 
 
 
@@ -42,7 +43,7 @@ class OpenPipePy:
       if name is None:
         return{"result": "Fail"}
       else:
-        {'result':BL().insertIntoCollection(dict["name"])}
+       return {'result':BL().insertIntoCollection(dict["name"])}
 
     def createMetaData(self)
           return{"result": BL().insertIntoMetaData()}
@@ -51,8 +52,7 @@ class OpenPipePy:
     def createMetaTags(self):
           return {insertIntoMetaTags(data)}
 
-    def createMetaTagsBV1.0():
-
+    
 
 
     def deleteCanonicalMetaTag(self, id):
