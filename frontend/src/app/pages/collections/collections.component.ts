@@ -159,9 +159,10 @@ export class CollectionsComponent implements OnInit {
     this.folderPage = false;
     this.currentFolder = element;
     this.dataAccess.getGUID('http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/'+this.currentFolder.id[0]).subscribe(res => {
-      for (let i = 1; i < res.assets.length; i += 10) {
+      console.log(res.assets.length)
+      for (let i = 1; i < (res.assets.length / 10) + 1; i += 1) {
         this.dataAccess.getPublicAssetsInCollection(element.id,i,10).subscribe(resp => {
-          // console.log(resp.data);
+          console.log(resp.data);
           // this.assets.concat(resp.data);
           resp.data.forEach(d => {
             this.assets.push(d);
