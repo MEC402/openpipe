@@ -3,7 +3,8 @@
 from multiprocessing.pool import ThreadPool
 
 import requests
-from ImageUtil import ImageUtil
+
+from assetSources.ImageUtil import ImageUtil
 
 
 class MetMuseum:

@@ -60,8 +60,8 @@ class ClevelandMuseum:
         response.update(data)
         return response
 
-    def getAssetMetaData(self, asset):
-        serviceName = str(asset["id"])
+    def getAssetMetaData(self, assetId):
+        serviceName = str(assetId)
         response = requests.get(url=self.url + serviceName)
         data = response.json()
         metaData = self.getMetaTagMapping(data)
@@ -89,8 +89,8 @@ class ClevelandMuseum:
         assets = retrievedAssets['data'][int(start):int(start) + int(step)]
 
         pool = ThreadPool(len(assets))
-        for assetId in assets:
-            results.append(pool.apply_async(self.getAssetMetaData, args=[assetId]))
+        for asset in assets:
+            results.append(pool.apply_async(self.getAssetMetaData, args=[asset["id"]]))
         pool.close()
         pool.join()
         results = [r.get() for r in results]

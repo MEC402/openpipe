@@ -1,11 +1,11 @@
 
-
 from ORM.ORM import ORM
 from ORM.TO import TO
 import requests
 
 
 class BL:
+    sourceTable = {'MET': 1, 'Rijk': 2, 'Cleveland': 3}
     tables = TO().getClasses()
 
     def getCanonicalTags(self):
@@ -103,7 +103,7 @@ class BL:
         queryStatement = "SELECT * FROM artmaster.asset join metaTag on metaTag.metaDataId=asset.metaDataId where asset.id=" + str(
             int(assetID))
         results = orm.executeSelect(queryStatement)
-        if results['total']>0:
+        if results['total' ] >0:
             results['total'] = 1
             rowInfo = {"id": results['data'][0]['id'], "metaDataId": results['data'][0]['metaDataId'],
                        "name": results['data'][0]['shortName']}
@@ -113,17 +113,17 @@ class BL:
             results["data"] = [rowInfo]
             return results
         else:
-            return {"total":0 , "data":[]}
+            return {"total" :0 , "data" :[]}
 
     def insertUserAsset(self, shortName, fileName, uri):
         orm = ORM()
         Images = self.tables["images"]
-        return orm.insert(Images(shortName=shortName,fileName=fileName,uri=uri))
+        return orm.insert(Images(shortName=shortName ,fileName=fileName ,uri=uri))
 
     def insertIntoAsset(self, shortName, uri, idAtSource, sourceId, metaDataId, scope):
         orm = ORM()
         Asset = self.tables["asset"]
-        result=orm.insert(
+        result =orm.insert(
             Asset(shortName=shortName, uri=uri, IdAtSource=idAtSource, sourceId=sourceId, metaDataId=metaDataId,
                   scope=scope))
         orm.commitClose()
@@ -132,21 +132,21 @@ class BL:
     def insertIntoCollectionMember(self, assetId, collectionId, searchTerm):
         orm = ORM()
         CollectionMember = self.tables["collectionMember"]
-        result=orm.insert(CollectionMember(assetId=assetId, collectionId=collectionId, searchTerm=searchTerm))
+        result =orm.insert(CollectionMember(assetId=assetId, collectionId=collectionId, searchTerm=searchTerm))
         orm.commitClose()
         return result
 
     def insertIntoCollection(self, name):
         orm = ORM()
         Collection = self.tables["collection"]
-        result=orm.insert(Collection(name=name,image='http://mec402.boisestate.edu/assets/blue-folder.png'))
+        result =orm.insert(Collection(name=name ,image='http://mec402.boisestate.edu/assets/blue-folder.png'))
         orm.commitClose()
         return result
 
     def insertIntoMetaData(self):
         orm = ORM()
         MetaData = self.tables["metaData"]
-        result=orm.insert(MetaData())
+        result =orm.insert(MetaData())
         orm.commitClose()
         return result
 
@@ -158,11 +158,41 @@ class BL:
         for key in data.keys():
             if key != 'metaDataId':
                 value = data[key]
-                results.append(MetaTag(metaDataId=metaDataId, tagName= key.encode('utf-8','surrogateescape'), value= value.encode('utf-8','surrogateescape')))
+                results.append(MetaTag(metaDataId=metaDataId, tagName= key.encode('utf-8' ,'surrogateescape'), value= value.encode('utf-8' ,'surrogateescape')))
         orm.bulkInsert(results)
         orm.commitClose()
         return 1
 
+    def addAsset(self,asset):
+        orm = ORM()
+        MetaTag = self.tables["metaTag"]
+        MetaData = self.tables["metaData"]
+        Asset = self.tables["asset"]
+        asset["metaDataId"] = orm.insert(MetaData())
+        assetId = orm.insert(
+            Asset(shortName=asset["openpipe_canonical_title"][0], uri='', IdAtSource=asset["openpipe_canonical_id"][0], sourceId=self.sourceTable[asset['openpipe_canonical_source'][0]], metaDataId=asset["metaDataId"],
+                  scope=0))
+        results = []
+        print(asset)
+        for key in asset.keys():
+            if key != 'metaDataId':
+                if str(key).find("openpipe") >= 0:
+                    value = asset[key][0]
+                else:
+                    value = asset[key]
+                results.append(MetaTag(metaDataId=asset["metaDataId"], tagName=str(key),value=str(value)))
+        orm.bulkInsert(results)
+        orm.commitClose()
+        return assetId
+
+    def addAssetsToFolder(self,folderId,assetIds,searchTerm):
+        orm = ORM()
+        FolderMember = self.tables["collectionMember"]
+        folderMembers=[]
+        for assetId in assetIds:
+            folderMembers.append(FolderMember(assetId=assetId, collectionId=folderId, searchTerm=searchTerm))
+        orm.bulkInsert(folderMembers)
+        orm.commitClose()
 
     def getAssetMetaTags(self, id):
         result = {}
@@ -212,7 +242,6 @@ class BL:
         step = pageSize
         queryStatement = "SELECT assetId,asset.metaDataId FROM collectionMember JOIN asset ON collectionMember.assetId = asset.id WHERE scope=0 and collectionId =" + str(
             collectionId) + " limit " + str(start) + "," + str(step)
-        print(queryStatement)
         results = orm.executeSelect(queryStatement)
         rows = []
         for row in results['data']:
@@ -226,7 +255,7 @@ class BL:
                     rowInfo[metaTagRow['tagName'][0]] = [metaTagRow['value'][0]]
                 rows.append(rowInfo)
             # rows.append(rowInfo)
-            rowInfo["id"]=row['assetId']
+            rowInfo["id" ] =row['assetId']
         results["data"] = rows
         return results
 
@@ -271,19 +300,21 @@ class BL:
     def deleteMetaTag(self, metaDataId, tagName, value):
         orm = ORM()
         MetaTag = self.tables["metaTag"]
-        orm.session.query(MetaTag).filter(MetaTag.metaDataId == metaDataId,MetaTag.tagName == tagName,MetaTag.value == value).delete()
+        orm.session.query(MetaTag).filter(MetaTag.metaDataId == metaDataId ,MetaTag.tagName == tagName
+                                          ,MetaTag.value == value).delete()
         orm.commitClose()
         return {"data": 1}
 
     def deleteFolderMember(self, collectionId, assetId):
-        orm=ORM()
+        orm =ORM()
         CollectionMember = self.tables["collectionMember"]
-        orm.session.query(CollectionMember).filter(CollectionMember.collectionId == collectionId,CollectionMember.assetId==assetId).delete()
+        orm.session.query(CollectionMember).filter(CollectionMember.collectionId == collectionId
+                                                   ,CollectionMember.assetId==assetId).delete()
         orm.commitClose()
         return {"data": 1}
 
     def deleteFolder(self, collectionId):
-        orm=ORM()
+        orm =ORM()
         Collection = self.tables["collection"]
         CollectionMember = self.tables["collectionMember"]
         orm.session.query(CollectionMember).filter(CollectionMember.collectionId == collectionId).delete()
@@ -291,30 +322,25 @@ class BL:
         orm.commitClose()
         return {"data": 1}
 
-    def updateFolder(self,folderId,newName,newImage):
+    def updateFolder(self ,folderId ,newName ,newImage):
         orm = ORM()
-        Collection=self.tables["collection"]
-        orm.session.query(Collection).filter(Collection.id==folderId).update({"name": newName,"image":newImage})
+        Collection =self.tables["collection"]
+        orm.session.query(Collection).filter(Collection.id==folderId).update({"name": newName ,"image" :newImage})
         orm.commitClose()
         return {"data": 1}
 
-    def updateMetaTag(self,metaDataId,oldTagName,oldValue,newTagName,newValue):
+    def updateMetaTag(self ,metaDataId ,oldTagName ,oldValue ,newTagName ,newValue):
         orm = ORM()
-        MetaTag=self.tables["metaTag"]
-        orm.session.query(MetaTag).filter(MetaTag.metaDataId==metaDataId,MetaTag.tagName==oldTagName,MetaTag.value==oldValue).update({"metaDataId": metaDataId,"tagName":newTagName,"value":newValue})
+        MetaTag =self.tables["metaTag"]
+        orm.session.query(MetaTag).filter(MetaTag.metaDataId==metaDataId ,MetaTag.tagName==oldTagName
+                                          ,MetaTag.value==oldValue).update \
+            ({"metaDataId": metaDataId ,"tagName" :newTagName ,"value" :newValue})
         orm.commitClose()
         return {"data": 1}
 
     def insertMetaTag(self, metaDataId, tagName, value):
         orm = ORM()
-        MetaTag=self.tables["metaTag"]
+        MetaTag =self.tables["metaTag"]
         result = orm.insert(MetaTag(metaDataId=metaDataId, tagName=tagName, value=value))
         orm.commitClose()
         return result
-
-
-
-
-
-
-

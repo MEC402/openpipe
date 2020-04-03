@@ -9,4 +9,4 @@ class DBInfo:
                     "password": "ArtMaster51"}}
 
     def getConnectionInfo(self):
-        return self.data["dev"]
+        return self.data["production"]
