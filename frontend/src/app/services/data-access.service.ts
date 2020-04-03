@@ -11,7 +11,7 @@ import {map} from "rxjs/operators";
 export class DataAccessService {
   webServerURL;
   constructor(private http: HttpClient) {
-    this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/';
+    this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/dev/';
    // this.webServerURL = 'http://localhost/cgi-bin/';
   }
 

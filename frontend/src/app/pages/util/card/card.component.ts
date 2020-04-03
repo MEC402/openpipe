@@ -25,7 +25,7 @@ export class CardComponent implements OnInit {
     selectMode: 'multi',
     pager: {
       display: true,
-      perPage: 10,
+      perPage: 100,
     },
     add: {
       addButtonContent: '<i class="nb-plus"></i>',
