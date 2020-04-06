@@ -94,5 +94,26 @@ class TestApp(unittest.TestCase):
     # def testGuid(self):
     #     print( BL().getGUIDInfo("asset",1))
 
-    def testGetPublicAssets(cls):
-        print(BL().getPublicAsssetsInCollection(20,0,10));
+    # def testGetPublicAssets(cls):
+    #     print(BL().getPublicAsssetsInCollection(20,0,10));
+
+    # def testInsertIntoImages(cls):
+    #     assert (BL().insertIntoImages("aaa","aaa","")==3412)
+
+    def testWebdav(self):
+        from webdav3.client import Client
+        import json
+
+        print("Content-Type: text/html")
+        print()
+
+        print("<h1>help</h1>")
+        options = {
+                'webdav_hostname': "http://mec402.boisestate.edu/",
+                'webdav_root': "webdav",
+                'webdav_login': "openpipedev",
+                'webdav_password': "openPipeArtMaster51"
+                }
+        client = Client(options)
+        print(client.list())
+        print(client.info("user_assets/"))

@@ -1,4 +1,3 @@
-
 from ORM.ORM import ORM
 from ORM.TO import TO
 import requests
@@ -236,7 +235,7 @@ class BL:
         results = orm.executeSelect(queryStatement)
         return result
 
-    def getPublicAsssetsInCollection(self, collectionId, page, pageSize):
+    def getPublicAssetsInCollection(self, collectionId, page, pageSize):
         orm = ORM()
         start = (page - 1) * pageSize
         step = pageSize
@@ -342,5 +341,12 @@ class BL:
         orm = ORM()
         MetaTag =self.tables["metaTag"]
         result = orm.insert(MetaTag(metaDataId=metaDataId, tagName=tagName, value=value))
+        orm.commitClose()
+        return result
+
+    def insertIntoImages(self, shortName, fileName, uri):
+        orm = ORM()
+        Images = self.tables["images"]
+        result = orm.insert(Images(shortname=shortName,filename=fileName,uri=uri))
         orm.commitClose()
         return result

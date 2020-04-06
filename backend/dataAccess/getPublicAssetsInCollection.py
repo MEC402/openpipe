@@ -29,4 +29,4 @@ if 'ps' not in dict.keys():
 if 'collectionId' not in dict.keys():
     print(json.dumps({"total": "-1", "data": [{}]}))
 else:
-    print(json.dumps(BL().getPublicAsssetsInCollection(dict['collectionId'],int(dict["p"]), int(dict["ps"])), default=str))
+    print(json.dumps(BL().getPublicAssetsInCollection(dict['collectionId'],int(dict["p"]), int(dict["ps"])), default=str))
