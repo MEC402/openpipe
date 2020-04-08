@@ -1,4 +1,5 @@
 # openpipe
+[![CodeFactor](https://www.codefactor.io/repository/github/mec402/openpipe/badge/master)](https://www.codefactor.io/repository/github/mec402/openpipe/overview/master)
 A Distributed Content Production Pipeline with a DAMS system attached that runs on AWS
 
 OpenPipe is an open source federated content production pipeline this is lightweight, extensible and documented.
