@@ -3,7 +3,7 @@ import json
 from ORM.BL import BL
 
 
-# TODO: GetFolderLayout
+# TODO: GetFolderLayout -> create the BL function
 # TODO: Better Error reporting in Json
 # TODO: Code Review
 # TODO: Update/add/delete Canonical MetaTAg in BL
@@ -20,6 +20,9 @@ class OpenPipePy:
             return {"result": "Fail"}
         else:
             return {"result": BL().insertIntoAsset(shortName, uri, idAtSource, sourceId, metaDataId, scope)}
+
+    def getAllAssets(self,page,pageSize,changeStart,changeEnd,type):
+        return BL().getAllAssets(int(dict["p"]), int(dict["ps"]), dict['changeStart'], dict['changeEnd'])
 
     # **********************************************************************************************
     # ************************************** Folder Member *****************************************
