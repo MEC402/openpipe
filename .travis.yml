@@ -6,7 +6,7 @@ before_install:
   - pip install -U pip
   - pip install -U pytest
   - pip install codecov
-  - "export PYTHONPATH=$PYTHONPATH:$(pwd)"
+  - "export PYTHONPATH=$PYTHONPATH:$(pwd)/backend"
 script: python -m pytest # run tests
 after_success:
   - codecov # submit coverage
