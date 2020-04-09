@@ -206,7 +206,7 @@ class BL:
         if limit == -1:
             queryStatement = "select * from collection"
         else:
-            queryStatement = "select * from collection LIMIT " + limit
+            queryStatement = "select * from collection LIMIT " + str(limit)
         results = orm.executeSelect(queryStatement)
         return results
 
