@@ -1,6 +1,7 @@
 # openpipe
 [![CodeFactor](https://www.codefactor.io/repository/github/mec402/openpipe/badge/master)](https://www.codefactor.io/repository/github/mec402/openpipe/overview/master)
 [![Build Status](https://travis-ci.com/MEC402/openpipe.svg?branch=master)](https://travis-ci.com/MEC402/openpipe)
+[![codecov](https://codecov.io/gh/MEC402/openpipe/branch/master/graph/badge.svg)](https://codecov.io/gh/MEC402/openpipe)
 
 A Distributed Content Production Pipeline with a DAMS system attached that runs on AWS
 
