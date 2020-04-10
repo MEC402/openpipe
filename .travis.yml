@@ -9,4 +9,4 @@ before_install:
   - "export PYTHONPATH=$PYTHONPATH:$(pwd)/backend"
 script: python -m pytest # run tests
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash) -v
