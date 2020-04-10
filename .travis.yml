@@ -5,8 +5,9 @@ before_install:
   - python --version
   - pip install -U pip
   - pip install -U pytest
+  - pip install -U pytest-cov
   - pip install codecov
   - "export PYTHONPATH=$PYTHONPATH:$(pwd)/backend"
-script: python -m pytest --cov-report term --cov=myproj tests/
+script: python -m pytest --cov-report= --cov=../backend tests/
 after_success:
   - bash <(curl -s https://codecov.io/bash) -v
