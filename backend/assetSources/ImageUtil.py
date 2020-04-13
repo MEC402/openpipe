@@ -1,3 +1,4 @@
+import traceback
 import urllib.request as urllib2
 from io import BytesIO
 from multiprocessing.pool import ThreadPool
@@ -5,17 +6,39 @@ from multiprocessing.pool import ThreadPool
 from PIL import Image
 from requests import get
 
+import Slack
+
 
 class ImageUtil:
     def __init__(self):
         self.fullImage = None
 
     def getPixelDimentions(self, url):
-        url = url.replace(" ", "%20")
-        # file = urllib2.urlopen(urllib2.Request(url, headers={"Range": "5000"})).read()
-        file = get(url)
-        im = Image.open(BytesIO(file.content))
-        width, height = im.size
+        """ Get all the canonical tags from DB and Returns a json obj.
+            Parameter
+            ---------
+
+            Returns
+            -------
+            JSON
+                {
+                ...,
+                tagName:Default value,
+                ...
+                }
+        """
+        width = 0
+        height = 0
+        if url is not None and url != "":
+            try:
+                url = url.replace(" ", "%20")
+                print(url)
+                file = get(url)
+                im = Image.open(BytesIO(file.content))
+                width, height = im.size
+            except Exception as e:
+                track = traceback.format_exc()
+                Slack.sendMessage(track)
         return width, height
 
     def concatTiles(self, tilesData, imageWidth, imageHeight):
