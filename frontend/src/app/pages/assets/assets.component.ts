@@ -21,7 +21,7 @@ export class AssetsComponent implements OnInit {
   ngOnInit() {
     this.dataAccess.getAssetsWithGUID().subscribe(res => {
       for (let i = 1; i < res.total; i += 10) {
-        this.dataAccess.getAllAssets(i,10).subscribe(resp => {
+        this.dataAccess.getAllAssets(i, 10).subscribe(resp => {
           resp.data.forEach(d => {
             this.currentAssets.add(d);
             this.currentAssets.refresh();
@@ -36,7 +36,6 @@ export class AssetsComponent implements OnInit {
 
     if ( (event.target && event.target.attributes.class &&
       event.target.attributes['class'].value.includes('ng2-smart-page'))) {
-      console.log(event.target.innerText);
     }
 
 
@@ -54,7 +53,6 @@ export class AssetsComponent implements OnInit {
         this.currentAssets.load([]);
 
         this.assets = [];
-        console.log('hi is search');
         this.currentAssets.load(res.data);
         this.assets = res;
       });

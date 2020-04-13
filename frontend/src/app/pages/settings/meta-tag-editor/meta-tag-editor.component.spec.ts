@@ -8,7 +8,7 @@ describe('MetaTagEditorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MetaTagEditorComponent ]
+      declarations: [ MetaTagEditorComponent ],
     })
     .compileComponents();
   }));

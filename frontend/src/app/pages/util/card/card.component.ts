@@ -1,7 +1,7 @@
 import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {NbDialogRef, NbDialogService, NbPopoverDirective, NbWindowService} from '@nebular/theme';
 import {DataAccessService} from '../../../services/data-access.service';
-import {LocalDataSource} from "ng2-smart-table";
+import {LocalDataSource} from 'ng2-smart-table';
 
 @Component({
   selector: 'ngx-card',
@@ -84,34 +84,30 @@ export class CardComponent implements OnInit {
         data.push([s, JSON.stringify(this.asset[s][0]).replace(/['"]+/g, '')]);
         this.chosenMetaData[s] = JSON.stringify(this.asset[s][0]).replace(/['"]+/g, '');
       }
-    })
-    let temp=[];
-    data.forEach(d=>{
-      if (d[0] != 'id' && d[0]!='metaDataId')
+    });
+    const temp = [];
+    data.forEach(d => {
+      if (d[0] != 'id' && d[0] != 'metaDataId')
         temp.push({'tagName': d[0], 'value': d[1]});
 
     });
     this.assetsSource.load(temp);
 
     this.dataAccess.getCollections().subscribe(res => {
-      console.log(res);
       this.collections = res.data;
     });
     this.dialogRef = this.dialogService.open(dialog, { context: data });
   }
 
   toggle(event, d: any) {
-    console.log(event);
     if (event)
       this.chosenMetaData[d[0]] = d[1];
     else
       delete this.chosenMetaData[d[0]];
-    console.log(this.chosenMetaData);
   }
 
   openCollectionDialog(collectionDialog: TemplateRef<any>) {
     this.dataAccess.getCollections().subscribe(res => {
-      console.log(res);
       this.collections = res.data;
       this.collectionDialogRef = this.dialogService.open(collectionDialog);
     });
@@ -128,8 +124,8 @@ export class CardComponent implements OnInit {
   }
 
   saveAsset() {
-    console.log(this.chosenCollection.id[0]);
-    this.dataAccess.saveAssetIntoCollection(this.asset, this.chosenMetaData ,this.chosenCollection, this.searchTerm, this.source, this.scope);
+    this.dataAccess.saveAssetIntoCollection(this.asset, this.chosenMetaData , this.chosenCollection,
+      this.searchTerm, this.source, this.scope);
     this.dialogRef.close();
   }
 
@@ -138,6 +134,5 @@ export class CardComponent implements OnInit {
   }
 
   onRowSelect(event: any) {
-    console.log(event);
   }
 }

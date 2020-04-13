@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams, HttpRequest, HttpEventType, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {forkJoin} from 'rxjs';
-import {map} from "rxjs/operators";
+
 
 
 @Injectable({
@@ -55,17 +54,17 @@ export class DataAccessService {
     return this.http.get<InsertionResponse>(url, {params: params});
   }
 
-  public uploadImages(files : File[])  {
+  public uploadImages(files: File[])  {
     const url = this.webServerURL + 'dataAccess/addUserAssets.py';
-    const postBody = { "files": files };
+    const postBody = { 'files': files };
 
     files.forEach(file => {
 
       const formData: FormData = new FormData();
       formData.append('file', file, file.name);
       const req = new HttpRequest('POST', url, formData, {
-        reportProgress: true
-      })
+        reportProgress: true,
+      });
 
 
       this.http.request(req).subscribe(event => {
@@ -73,29 +72,24 @@ export class DataAccessService {
 
           // calculate the progress percentage
           const percentDone = Math.round(100 * event.loaded / event.total);
-          console.log(percentDone);
           // pass the percentage into the progress-stream
         } else if (event instanceof HttpResponse) {
 
           // Close the progress-stream if we get an answer form the API
           // The upload is complete
-          console.log("done");
         }
       });
     });
   }
 
-  public saveAssetIntoCollection(asset, metaTags, collection, searchTerm, source, scope): Observable<InsertionResponse> {
+  public saveAssetIntoCollection(asset, metaTags, collection, searchTerm, source, scope):
+    Observable<InsertionResponse> {
     this.createMetaData().subscribe(res => {
       const metaDataId = res.result;
-      this.saveAsset(asset, source, metaDataId, scope).subscribe(res => {
-        const assetId = res.result;
-        this.addMetaTags(metaDataId, metaTags).subscribe(res => {
-          console.log("after adding metaTags");
-          console.log(res);
-          this.addAssetToCollection(assetId, collection, searchTerm).subscribe(res => {
-            console.log("test");
-            console.log(res);
+      this.saveAsset(asset, source, metaDataId, scope).subscribe(res0 => {
+        const assetId = res0.result;
+        this.addMetaTags(metaDataId, metaTags).subscribe(res1 => {
+          this.addAssetToCollection(assetId, collection, searchTerm).subscribe(res2 => {
           });
         });
       });
@@ -118,8 +112,6 @@ export class DataAccessService {
     const metaTagsURL = this.webServerURL + 'dataAccess/createMetaTags.py';
     metaTags['metaDataId'] = metaDataId;
     const postBody = metaTags;
-    console.log('post body');
-    console.log(postBody);
     const headers = new HttpHeaders({
       'Content-Type': 'text/plain',
       'Access-Control-Allow-Origin': '*',
@@ -129,8 +121,6 @@ export class DataAccessService {
 
   public addAssetToCollection(assetId, collection, searchTerm): Observable<InsertionResponse> {
     const addAssetToCollectionURL = this.webServerURL + 'dataAccess/addAssetIntoCollection.py';
-    console.log(collection.id)
-    console.log(collection.id[0])
     const assetCollectionParams = new HttpParams().set('assetId', assetId)
       .set('collectionId', collection.id[0])
       .set('searchTerm', searchTerm);
@@ -157,7 +147,6 @@ export class DataAccessService {
     const addCanonicalMetaTagURL = this.webServerURL + 'dataAccess/addCanonicalMetaTag.py';
     const addCanonicalMetaTagParams = new HttpParams().set('name', name);
     this.http.get(addCanonicalMetaTagURL, {params: addCanonicalMetaTagParams}).subscribe(res => {
-      console.log(res);
     });
   }
 
@@ -165,7 +154,6 @@ export class DataAccessService {
     const updateCanonicalMetaTagURL = this.webServerURL + 'dataAccess/updateCanonicalMetaTag.py';
     const updateCanonicalMetaTagParams = new HttpParams().set('id', id).set('name', newName);
     return this.http.get(updateCanonicalMetaTagURL, {params: updateCanonicalMetaTagParams}).subscribe(res => {
-      console.log(res);
     });
   }
 
@@ -173,7 +161,6 @@ export class DataAccessService {
     const deleteCanonicalMetaTagURL = this.webServerURL + 'dataAccess/deleteCanonicalMetaTag.py';
     const deleteCanonicalMetaTagParams = new HttpParams().set('id', id);
     return this.http.get(deleteCanonicalMetaTagURL, {params: deleteCanonicalMetaTagParams}).subscribe(res => {
-      console.log(res);
     });
   }
 
@@ -186,7 +173,7 @@ export class DataAccessService {
   public getAllAssets(p, ps): Observable<Results> {
     const getAllAssetURL = this.webServerURL + 'dataAccess/getAllAssets.py';
     const getAssetParams = new HttpParams().set('p', p).set('ps', ps);
-    return this.http.get<Results>(getAllAssetURL,{params: getAssetParams});
+    return this.http.get<Results>(getAllAssetURL, {params: getAssetParams});
   }
 
   public getAssetsReport(): Observable<Results> {
@@ -214,7 +201,6 @@ export class DataAccessService {
     const deleteFolderURL = this.webServerURL + 'dataAccess/deleteFolder.py';
     const deleteFolderParams = new HttpParams().set('collectionId', FolderId);
     return this.http.get(deleteFolderURL, {params: deleteFolderParams}).subscribe(res => {
-      console.log(res);
     });
   }
 
@@ -222,7 +208,6 @@ export class DataAccessService {
     const deleteFolderMemberURL = this.webServerURL + 'dataAccess/deleteFolderMember.py';
     const deleteFolderMemberParams = new HttpParams().set('collectionId', folderId).set('assetId', assetId);
     return this.http.get(deleteFolderMemberURL, {params: deleteFolderMemberParams}).subscribe(res => {
-      console.log(res);
     });
   }
 

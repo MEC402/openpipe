@@ -1,11 +1,11 @@
 import {Component, EventEmitter, Input, OnInit, Output, TemplateRef} from '@angular/core';
-import {DataAccessService} from "../../../services/data-access.service";
-import {NbDialogRef, NbDialogService, NbMenuService} from "@nebular/theme";
+import {DataAccessService} from '../../../services/data-access.service';
+import {NbDialogRef, NbDialogService, NbMenuService} from '@nebular/theme';
 
 @Component({
   selector: 'ngx-folder-card',
   templateUrl: './folder-card.component.html',
-  styleUrls: ['./folder-card.component.scss']
+  styleUrls: ['./folder-card.component.scss'],
 })
 export class FolderCardComponent implements OnInit {
   @Input() collection;
@@ -33,14 +33,12 @@ export class FolderCardComponent implements OnInit {
   }
 
   onFolderDeleteClick() {
-    console.log('delete');
     this.dataAccess.deleteFolder(this.collection.id[0]);
     this.folderDelete.emit(this.collection);
   }
 
   saveFolderChanges() {
-    this.dataAccess.updateFolder(this.collection.id[0],this.newName,this.newImage).subscribe(res => {
-      console.log(res);
+    this.dataAccess.updateFolder(this.collection.id[0], this.newName, this.newImage).subscribe(res => {
     });
   }
 }

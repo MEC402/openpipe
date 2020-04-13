@@ -13,7 +13,7 @@ export class CollectionsComponent implements OnInit {
   protected destroy$ = new Subject<void>();
 
   collections: any;
-  assets=[];
+  assets= [];
   currentFolder = {'name': ['test'], 'id': [-1]};
   metaTags: any;
   newCollectionName;
@@ -99,10 +99,7 @@ export class CollectionsComponent implements OnInit {
 
 
   onFolderMemberDeleteConfirm(event): void {
-    console.log('delete');
-    console.log(event);
     if (window.confirm('Are you sure you want to delete?')) {
-      console.log(this.currentFolder);
       this.dataAccess.deleteFolderMember(this.currentFolder.id[0], event.data.id[0]);
       event.confirm.resolve();
     } else {
@@ -111,11 +108,10 @@ export class CollectionsComponent implements OnInit {
   }
 
   onDeleteConfirm(event): void {
-    console.log('delete');
-    console.log(event);
+
     if (window.confirm('Are you sure you want to delete?')) {
-      this.dataAccess.deleteMetaTag(this.currentAsset.metaDataId, event.data.tagName, event.data.value[0]).subscribe(res => {
-        console.log(res);
+      this.dataAccess.deleteMetaTag(this.currentAsset.metaDataId, event.data.tagName, event.data.value[0])
+        .subscribe(res => {
       });
       event.confirm.resolve();
     } else {
@@ -124,20 +120,16 @@ export class CollectionsComponent implements OnInit {
   }
 
   onEditConfirm(event) {
-    console.log('edit');
-    console.log(event);
-    this.dataAccess.updateMetaTag(this.currentAsset.metaDataId,event.data.tagName,event.data.value,event.newData.tagName,event.newData.value)
+    this.dataAccess.updateMetaTag(this.currentAsset.metaDataId, event.data.tagName, event.data.value,
+      event.newData.tagName, event.newData.value)
       .subscribe(res => {
-        console.log(res);
         event.confirm.resolve();
     });
   }
 
   onCreateConfirm(event) {
-    console.log('add');
-    console.log(event);
-    this.dataAccess.insertMetaTag(this.currentAsset.metaDataId, event.newData.tagName, event.newData.value).subscribe(res => {
-      console.log(res);
+    this.dataAccess.insertMetaTag(this.currentAsset.metaDataId, event.newData.tagName, event.newData.value)
+      .subscribe(res => {
     });
     event.confirm.resolve();
   }
@@ -146,7 +138,6 @@ export class CollectionsComponent implements OnInit {
     this.currentAsset = event.data;
     this.currentAssetName = this.currentAsset.openpipe_canonical_title[0];
     const temp = [];
-    console.log(event);
     for (const [key, value] of Object.entries(event.data)) {
       if (key != 'id' && key != 'metaDataId')
         temp.push({'tagName': key, 'value': value});
@@ -158,11 +149,10 @@ export class CollectionsComponent implements OnInit {
   onFolderOpenClick(element) {
     this.folderPage = false;
     this.currentFolder = element;
-    this.dataAccess.getGUID('http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/'+this.currentFolder.id[0]).subscribe(res => {
-      console.log(res.assets.length)
+    this.dataAccess.getGUID('http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/' +
+      this.currentFolder.id[0]).subscribe(res => {
       for (let i = 1; i < (res.assets.length / 10) + 1; i += 1) {
-        this.dataAccess.getPublicAssetsInCollection(element.id,i,10).subscribe(resp => {
-          console.log(resp.data);
+        this.dataAccess.getPublicAssetsInCollection(element.id, i, 10).subscribe(resp => {
           // this.assets.concat(resp.data);
           resp.data.forEach(d => {
             this.assets.push(d);
@@ -175,7 +165,6 @@ export class CollectionsComponent implements OnInit {
   }
 
   metaShow(event) {
-    console.log(event);
     this.metaTags = event.data;
   }
 
@@ -187,7 +176,6 @@ export class CollectionsComponent implements OnInit {
   }
 
   onFolderDeleteClick(c) {
-    console.log('delete');
     this.dataAccess.deleteFolder(c.id[0]);
     for ( let i = 0; i < this.collections.length; i++) {
       if ( this.collections[i].id[0] === c.id[0]) {
@@ -199,7 +187,7 @@ export class CollectionsComponent implements OnInit {
 
   onCreateCollection() {
     this.popover.hide();
-    this.dataAccess.createCollection(this.newCollectionName).subscribe(res => {
+    this.dataAccess.createCollection(this.newCollectionName).subscribe(res0 => {
       this.dataAccess.getCollections().subscribe(res => {
           this.collections = res.data;
       });

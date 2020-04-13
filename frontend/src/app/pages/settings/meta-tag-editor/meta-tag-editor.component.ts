@@ -85,11 +85,9 @@ export class MetaTagEditorComponent implements OnInit {
   }
 
   onDeleteConfirm(event): void {
-    console.log('delete');
-    console.log(event);
-    if (window.confirm('Are you sure you want to delete?')) {
-      this.dataAccess.deleteMetaTag(this.currentAsset.metaDataId, event.data.tagName, event.data.value[0]).subscribe(res => {
-        console.log(res);
+     if (window.confirm('Are you sure you want to delete?')) {
+      this.dataAccess.deleteMetaTag(this.currentAsset.metaDataId, event.data.tagName, event.data.value[0])
+        .subscribe(res => {
       });
       event.confirm.resolve();
     } else {
@@ -98,31 +96,25 @@ export class MetaTagEditorComponent implements OnInit {
   }
 
   onEditConfirm(event) {
-    console.log('edit');
-    console.log(event);
-    this.dataAccess.updateMetaTag(this.currentAsset.metaDataId,event.data.tagName,event.data.value,event.newData.tagName,event.newData.value)
-      .subscribe(res => {
-        console.log(res);
+    this.dataAccess.updateMetaTag(this.currentAsset.metaDataId, event.data.tagName,
+      event.data.value, event.newData.tagName, event.newData.value).subscribe(res => {
         event.confirm.resolve();
       });
   }
 
   onCreateConfirm(event) {
-    console.log('add');
-    console.log(event);
-    this.dataAccess.insertMetaTag(this.currentAsset.metaDataId, event.newData.tagName, event.newData.value).subscribe(res => {
-      console.log(res);
+    this.dataAccess.insertMetaTag(this.currentAsset.metaDataId, event.newData.tagName, event.newData.value)
+      .subscribe(res => {
     });
     event.confirm.resolve();
   }
 
   onClick(event) {
     this.currentAsset = event.data;
-    this.currentAssetName=this.currentAsset.openpipe_canonical_title[0]
-    let temp = [];
-    console.log(event);
+    this.currentAssetName = this.currentAsset.openpipe_canonical_title[0];
+    const temp = [];
     for (const [key, value] of Object.entries(event.data)) {
-      if (key != 'id' && key!='metaDataId')
+      if (key != 'id' && key != 'metaDataId')
         temp.push({'tagName': key, 'value': value});
     }
     this.source.load(temp);
