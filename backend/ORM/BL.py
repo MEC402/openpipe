@@ -1,3 +1,5 @@
+import json
+
 from ORM.ORM import ORM
 from ORM.TO import TO
 import requests
@@ -7,7 +9,19 @@ class BL:
     sourceTable = {'MET': 1, 'Rijk': 2, 'Cleveland': 3}
     tables = TO().getClasses()
 
-    def getCanonicalTags(self):
+    def getCanonicalTags(self) -> json:
+        """ Get all the canonical tags from DB and Returns a json obj.
+
+            Returns
+            -------
+            JSON
+                {
+                ...,
+                tagName:Default value,
+                ...
+                }
+        """
+        # select all CanonicalTags by Passing in the Class
         canonicalTags = ORM().selectAll(self.tables["canonicalMetaTag"])
         res = {}
         for c in canonicalTags:
@@ -282,7 +296,7 @@ class BL:
 
     def getGUIDInfo(self, tableName, id):
         orm = ORM()
-        if (tableName not in ["asset", "folder"]):
+        if (tableName not in ["asset", "folder","artist"]):
             return "entity does not exist"
         elif tableName == "asset":
             if id is not None and id != "":
@@ -294,6 +308,11 @@ class BL:
                 return self.getCollectionByID(id)
             else:
                 return self.getAllFolderIDs()
+        elif tableName == "artist":
+            if id is not None and id != "":
+                return self.getArtist(id)
+            else:
+                return self.getAllArtistIDs()
         return {"data": "bad GUID"}
 
     def deleteMetaTag(self, metaDataId, tagName, value):
@@ -350,3 +369,33 @@ class BL:
         result = orm.insert(Images(shortname=shortName,filename=fileName,uri=uri))
         orm.commitClose()
         return result
+
+    def addArtist(self,name,nationality,aliases):
+        orm = ORM()
+        Artist = self.tables["artist"]
+        result = orm.insert(Artist(name=name,nationality=nationality, otherNames=aliases))
+        orm.commitClose()
+        return result
+
+    def getArtist(self,id):
+        result = {}
+        orm = ORM()
+        queryStatement = "select * from artist where id=" + id
+        result = orm.executeSelect(queryStatement)
+        return result
+
+    def getAllArtistIDs(self):
+        url = "http://mec402.boisestate.edu/cgi-bin/openpipe/data/artist/"
+        result = []
+        orm = ORM()
+        queryStatement = "select id from artist"
+        results = orm.executeSelect(queryStatement)
+        for r in results['data']:
+            result.append(url + str(r['id'][0]))
+        results['data'] = result
+        return results
+
+
+
+
+# help(BL().getCanonicalTags())

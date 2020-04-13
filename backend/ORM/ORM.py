@@ -4,7 +4,6 @@ import mysql
 import sqlalchemy as db
 from mysql.connector import Error
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import NullPool
 
 from ORM.DBInfo import DBInfo
 
