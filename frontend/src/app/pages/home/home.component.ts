@@ -9,11 +9,11 @@ import {DataAccessService} from '../../services/data-access.service';
 export class HomeComponent implements OnInit {
 
   searchTerm: string;
-  source= [];
+  source = [];
   met= true;
-  rijk= true;
-  cleveland= true;
-  local= true;
+  rijk = true;
+  cleveland = true;
+  local = true;
 
   constructor(private dataAccess: DataAccessService) {
   }
@@ -30,9 +30,7 @@ export class HomeComponent implements OnInit {
         res['name'] = 'MET Museum';
         res['page'] = 1;
         res['pageSize'] = 20;
-        //const data = {'name': 'MET Museum', 'data': res};
         this.source.push(res);
-        console.log(this.source);
       });
     }
 
@@ -44,7 +42,6 @@ export class HomeComponent implements OnInit {
         res['page'] = 1;
         res['pageSize'] = 20;
         this.source.push(res);
-        console.log(this.source);
       });
     }
 
@@ -56,7 +53,6 @@ export class HomeComponent implements OnInit {
         res['page'] = 1;
         res['pageSize'] = 20;
         this.source.push(res);
-        console.log(this.source);
       });
     }
 
@@ -68,17 +64,13 @@ export class HomeComponent implements OnInit {
         res['page'] = 1;
         res['pageSize'] = 20;
         this.source.push(res);
-        console.log(this.source);
       });
     }
   }
 
   nextPage(source) {
-    console.log(source);
-
     this.dataAccess.getMuseumData(this.searchTerm, source.sourceName , source.page + 1, source.pageSize)
       .subscribe(res => {
-      console.log(res);
       source.data = res['data'];
       source.page = source.page + 1;
     });
@@ -86,11 +78,9 @@ export class HomeComponent implements OnInit {
   }
 
   prevPage(source) {
-    console.log(source);
 
     this.dataAccess.getMuseumData(this.searchTerm, source.sourceName , source.page - 1, source.pageSize)
       .subscribe(res => {
-        console.log(res);
         source.data = res['data'];
         source.page = source.page - 1;
       });
