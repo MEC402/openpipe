@@ -391,8 +391,8 @@ class BL:
     def getArtist(self, id):
         result = {}
         orm = ORM()
-        queryStatement = "select * from artist where id=" + id
-        result = orm.executeSelect(queryStatement)
+        queryStatement = "select * from artist where id=%s"
+        result = orm.executeSelect(queryStatement, (id,))
         return result
 
     def getAllArtistIDs(self):

@@ -21,7 +21,7 @@ class OpenPipePy:
         else:
             return {"result": BL().insertIntoAsset(shortName, uri, idAtSource, sourceId, metaDataId, scope)}
 
-    def getAllAssets(self,page,pageSize,changeStart,changeEnd, type):
+    def getAllAssets(self, page, pageSize, changeStart, changeEnd, type):
         return BL().getAllAssets(int(page), int(pageSize), changeStart, changeEnd)
 
     # **********************************************************************************************
@@ -110,3 +110,12 @@ class OpenPipePy:
     def addMetaData(self):
         return {"result": BL().insertIntoMetaData()}
 
+    # **********************************************************************************************
+    # **************************************** GUID ************************************************
+    # **********************************************************************************************
+
+    def guid(self, guidRelativePath):
+        guids = guidRelativePath.split("/")
+        if len(guids) < 2:
+            guids[1] = ""
+        return BL().getGUIDInfo(guids[0], guids[1])

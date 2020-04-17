@@ -54,3 +54,27 @@ class TestOpenPipePy():
 
     def test_addMetaData(self):
         pass
+
+    def test_guid_folders(self):
+        result = OpenPipePy().guid("folder/")
+        assert ("total" in result)
+
+    def test_guid_folder(self):
+        result = OpenPipePy().guid("folder/28")
+        assert ("total" in result)
+
+    def test_guid_assets(self):
+        result = OpenPipePy().guid("asset/")
+        assert ("total" in result)
+
+    def test_guid_asset(self):
+        result = OpenPipePy().guid("asset/1")
+        assert ("total" in result)
+
+    def test_guid_artists(self):
+        result = OpenPipePy().guid("artist/")
+        assert ("total" in result)
+
+    def test_guid_artist(self):
+        result = OpenPipePy().guid("artist/1")
+        assert ("total" in result)
