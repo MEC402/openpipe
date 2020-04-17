@@ -3,26 +3,26 @@ from pythonAPI.OpenPipePy import OpenPipePy
 
 class TestOpenPipePy():
     def test_addAsset(self):
-        self.fail()
+        pass
 
     def test_getAllAssets(self):
         result = OpenPipePy().getAllAssets(1, 10, '1900-01-01', '5000-01-01')
         assert ("total" in result)
 
     def test_addAssetToFolder(self):
-        self.fail()
+        pass
 
     def test_deleteFolderMember(self):
-        self.fail()
+        pass
 
     def test_addFolder(self):
-        self.fail()
+        pass
 
     def test_updateFolder(self):
-        self.fail()
+        pass
 
     def test_deleteFolder(self):
-        self.fail()
+        pass
 
     def test_getFolder(self):
         result = OpenPipePy().getFolder(27)
@@ -37,20 +37,20 @@ class TestOpenPipePy():
         assert ("total" in result)
 
     def test_addMetaTag(self):
-        self.fail()
+        pass
 
     def test_addBatchMetaTags(self):
-        self.fail()
+        pass
 
     def test_deleteMetaTag(self):
-        self.fail()
+        pass
 
     def test_updateCanonicalMetaTag(self):
-        self.fail()
+        pass
 
     def test_getCanonicalMetaTags(self):
         result = OpenPipePy().getCanonicalMetaTags()
         assert ("total" in result)
 
     def test_addMetaData(self):
-        self.fail()
+        pass

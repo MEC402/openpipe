@@ -9,16 +9,15 @@ from ORM.DBInfo import DBInfo
 
 
 class ORM:
-
-    connection=DBInfo().getConnectionInfo()
+    connection = DBInfo().getConnectionInfo()
     engine = db.create_engine(
         'mysql+mysqlconnector://' + connection["username"] + ':' + connection["password"] + '@' +
         connection["address"] + '/' + connection["schema"])
     Session = sessionmaker(bind=engine)
-    session=Session();
+    session = Session();
 
-    fetchTime=0
-    forTime=0
+    fetchTime = 0
+    forTime = 0
 
     # TODO: Password Manger
 
@@ -51,10 +50,8 @@ class ORM:
         self.session.commit()
         self.session.close()
 
-    def executeSelect(self, query):
+    def executeSelect(self, query, param):
         import time
-
-
 
         t0 = time.time()
 
@@ -66,7 +63,7 @@ class ORM:
                 database=self.connection["schema"]
             )
             cursor = connection.cursor()
-            cursor.execute(query, )
+            cursor.execute(query, param)
             records = cursor.fetchall()
             fieldNames = [i[0] for i in cursor.description]
 
@@ -84,8 +81,8 @@ class ORM:
             t1 = time.time()
 
             self.forTime = t1 - t0
-            jsonRes["fetch"]=self.fetchTime
-            jsonRes["for"]=self.forTime
+            jsonRes["fetch"] = self.fetchTime
+            jsonRes["for"] = self.forTime
 
 
 
@@ -97,7 +94,7 @@ class ORM:
                 cursor.close()
         return jsonRes
 
-    def batchInsert(self,data,query):
+    def batchInsert(self, data, query):
         try:
             connection = mysql.connector.connect(
                 host=self.connection["address"],
@@ -119,10 +116,3 @@ class ORM:
                 connection.close()
                 cursor.close()
 
-
-# to=TO()
-# orm=ORM()
-# print(to.getClasses())
-# r=orm.selectAll(to.getClasses()['canonicalMetaTag'])
-# for a in r:
-#     print(a.default)
