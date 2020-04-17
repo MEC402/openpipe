@@ -135,8 +135,7 @@ class BL:
 
             results["data"] = [rowInfo]
             return results
-        else:
-            return {"total": 0, "data": []}
+        return {"total": 0, "data": []}
 
     def insertUserAsset(self, shortName, fileName, uri):
         orm = ORM()
@@ -219,11 +218,11 @@ class BL:
         orm.bulkInsert(folderMembers)
         orm.commitClose()
 
-    def getAssetMetaTags(self, id):
+    def getAssetMetaTags(self, assetId):
         result = {}
         orm = ORM()
         queryStatement = "select metaTag.id, asset.id as assetId, tagName, value from asset join metaTag on asset.metaDataId=metaTag.metaDataId where asset.id=%s"
-        results = orm.executeSelect(queryStatement, (id,))
+        results = orm.executeSelect(queryStatement, (assetId,))
         return results
 
     def getAllCollections(self, limit):
@@ -237,12 +236,12 @@ class BL:
             results = orm.executeSelect(queryStatement, (limit,))
         return results
 
-    def getCollectionByID(self, id):
+    def getCollectionByID(self, collectionId):
         url = "http://mec402.boisestate.edu/cgi-bin/openpipe/data/asset/"
         result = {}
         orm = ORM()
         queryStatement = "SELECT collection.*, assetId FROM collection join collectionMember on collection.id=collectionMember.collectionId where collection.id=%s"
-        results = orm.executeSelect(queryStatement, (id,))
+        results = orm.executeSelect(queryStatement, (collectionId,))
         result['total'] = 1
         result['id'] = results['data'][0]['id']
         result['name'] = results['data'][0]['name']
@@ -307,7 +306,7 @@ class BL:
 
     def getGUIDInfo(self, tableName, id):
         orm = ORM()
-        if (tableName not in ["asset", "folder", "artist"]):
+        if tableName not in ["asset", "folder", "artist"]:
             return "entity does not exist"
         elif tableName == "asset":
             if id is not None and id != "":
