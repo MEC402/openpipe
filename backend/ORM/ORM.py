@@ -16,6 +16,10 @@ class ORM:
         connection["address"] + '/' + connection["schema"])
     Session = sessionmaker(bind=engine)
     session=Session();
+
+    fetchTime=0
+    forTime=0
+
     # TODO: Password Manger
 
     def getSession(self):
@@ -48,6 +52,12 @@ class ORM:
         self.session.close()
 
     def executeSelect(self, query):
+        import time
+
+
+
+        t0 = time.time()
+
         try:
             connection = mysql.connector.connect(
                 host=self.connection["address"],
@@ -60,12 +70,24 @@ class ORM:
             records = cursor.fetchall()
             fieldNames = [i[0] for i in cursor.description]
 
+            t1 = time.time()
+
+            self.fetchTime = t1 - t0
+
+            t0 = time.time()
             jsonRes = {'total': len(records), 'data': []}
             for r in records:
                 row = {}
                 for i in range(len(fieldNames)):
                     row[fieldNames[i]] = [r[i]]
                 jsonRes['data'].append(row)
+            t1 = time.time()
+
+            self.forTime = t1 - t0
+            jsonRes["fetch"]=self.fetchTime
+            jsonRes["for"]=self.forTime
+
+
 
         except Error as e:
             print("Error reading data from MySQL table", e)

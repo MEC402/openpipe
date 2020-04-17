@@ -1,8 +1,10 @@
 import json
 
+import Slack
 from ORM.ORM import ORM
 from ORM.TO import TO
 import requests
+
 
 
 class BL:
@@ -89,9 +91,11 @@ class BL:
                                        metaTagValue=r["value"], defectId=4))
 
     def getAllAssets(self, page, pageSize, changeStart, changeEnd):
+        Slack.sendMessage("getAllAssets")
         start = (page - 1) * pageSize
         step = pageSize
-
+        f=0
+        t=0
         orm = ORM()
         queryStatement = "SELECT id,metaDataId,shortName FROM asset where insertTime between \'" + changeStart + "\' and \'" + changeEnd + "\' limit " + str(
             start) + "," + str(step)
@@ -103,12 +107,19 @@ class BL:
             queryStatement = "select tagName,value from metaTag where metaDataId="
             if metaDataId:
                 queryStatement = queryStatement + str(metaDataId)
-                tags = orm.executeSelect(queryStatement)['data']
+                res=orm.executeSelect(queryStatement)
+                tags = res['data']
+                f=f+res["fetch"]
+                t = t + res["for"]
                 for metaTagRow in tags:
                     rowInfo[metaTagRow['tagName'][0]] = [metaTagRow['value'][0]]
                 rows.append(rowInfo)
             # rows.append(rowInfo)
         results["data"] = rows
+        Slack.sendMessage("total fetch")
+        Slack.sendMessage(f)
+        Slack.sendMessage("total for")
+        Slack.sendMessage(t)
         return results
 
     def getAsset(self, assetID):
