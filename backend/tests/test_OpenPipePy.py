@@ -6,7 +6,7 @@ class TestOpenPipePy():
         pass
 
     def test_getAllAssets(self):
-        result = OpenPipePy().getAllAssets(1, 10, '1900-01-01', '5000-01-01')
+        result = OpenPipePy().getAllAssets(1, 10, '1900-01-01', '5000-01-01', 1)
         assert ("total" in result)
 
     def test_addAssetToFolder(self):
@@ -50,7 +50,7 @@ class TestOpenPipePy():
 
     def test_getCanonicalMetaTags(self):
         result = OpenPipePy().getCanonicalMetaTags()
-        assert ("total" in result)
+        assert ("openpipe_canonical_artist" in result)
 
     def test_addMetaData(self):
         pass

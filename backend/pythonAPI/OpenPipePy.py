@@ -21,8 +21,8 @@ class OpenPipePy:
         else:
             return {"result": BL().insertIntoAsset(shortName, uri, idAtSource, sourceId, metaDataId, scope)}
 
-    def getAllAssets(self,page,pageSize,changeStart,changeEnd,type):
-        return BL().getAllAssets(int(dict["p"]), int(dict["ps"]), dict['changeStart'], dict['changeEnd'])
+    def getAllAssets(self,page,pageSize,changeStart,changeEnd, type):
+        return BL().getAllAssets(int(page), int(pageSize), changeStart, changeEnd)
 
     # **********************************************************************************************
     # ************************************** Folder Member *****************************************

@@ -99,7 +99,7 @@ class BL:
         t = 0
         orm = ORM()
         queryStatement = "SELECT id,metaDataId,shortName FROM asset where insertTime between %s and %s limit %s,%s"
-        data_tuple = (changeStart, changeEnd, str(start), str(step))
+        data_tuple = (changeStart, changeEnd, start, step)
         results = orm.executeSelect(queryStatement, data_tuple)
         rows = []
         for row in results['data']:

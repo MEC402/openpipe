@@ -84,8 +84,6 @@ class ORM:
             jsonRes["fetch"] = self.fetchTime
             jsonRes["for"] = self.forTime
 
-
-
         except Error as e:
             print("Error reading data from MySQL table", e)
         finally:
