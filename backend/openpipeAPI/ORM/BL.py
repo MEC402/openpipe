@@ -68,6 +68,13 @@ class BL:
                     orm.insert(
                         AssetDefect(assetId=asset["id"], metaDataId=asset["metaDataId"], metaTagName=mc, defectId=2))
 
+    def getAllImages(self):
+        orm = ORM()
+        queryStatement = "SELECT * from images limit 10;"
+        results = orm.executeSelect(queryStatement,())
+        orm.commitClose()
+        return results
+
     def getAssetReport(self):
         orm = ORM()
         queryStatement = """SELECT assetId,assetDefect.metaDataId,metaTagId,metaTagName,metaTagValue,defectType, asset.shortName as assetName, source.sourceName FROM assetDefect join defect on assetDefect.defectId=defect.id join asset on assetDefect.assetId=asset.id join source on asset.sourceId=source.id order by assetId asc;"""
