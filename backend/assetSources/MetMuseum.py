@@ -66,6 +66,8 @@ class MetMuseum:
     def getData(self, q, page, pageSize):
         results = []
         retrievedAssets = self.searchMetForAssets(q)
+        if retrievedAssets['total'] == 0:
+            return {"data": [], "total": 0, "sourceName": "MET"}
 
         start = (page - 1) * pageSize
         step = pageSize

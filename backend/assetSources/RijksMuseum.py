@@ -86,20 +86,19 @@ class RijksMuseum:
     def getData(self, q, page, pageSize):
         results = []
         retrievedAssets = self.searchRijkForAssets(q, page, pageSize)
+        if len(retrievedAssets) == 0:
+            return {"data": [], "total": 0, "sourceName": "Rijks"}
+        pool = ThreadPool(len(retrievedAssets))
 
-        loop = asyncio.get_event_loop()
-        coroutines = [self.getAssetMetaData(assetId['objectNumber']) for assetId in retrievedAssets["artObjects"]]
-        results = loop.run_until_complete(asyncio.gather(*coroutines))
-        loop.close()
-
-        finalRes=[]
-        pool = ThreadPool(len(results))
-        for i in results:
-            finalRes.append(pool.apply_async(self.getMetaTagMapping, args=[i['artObject']]))
+        for assetId in retrievedAssets["artObjects"]:
+            results.append(pool.apply_async(self.getRijkMetaTagMapping, args=[assetId["objectNumber"]]))
         pool.close()
         pool.join()
-        rrr = [r.get() for r in finalRes]
-        return {"total": retrievedAssets["count"], "sourceName": "Rijks","data": rrr}
+        results = [r.get() for r in results]
+        return {"data": results, "total": retrievedAssets["count"], "sourceName": "Rijks"}
+
+
+
 
     def getTileImages(self, objectId, z):
         tileData=0

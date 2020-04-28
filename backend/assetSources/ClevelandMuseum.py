@@ -80,6 +80,8 @@ class ClevelandMuseum:
         start = (page - 1) * pageSize
         step = pageSize
         total = retrievedAssets['info']['total']
+        if total == 0:
+            return {"data": [], "total": 0, "sourceName": "Cleveland"}
 
         if int(start) > total:
             start = total - 1
