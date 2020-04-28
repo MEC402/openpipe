@@ -1,4 +1,5 @@
 import json
+import sys
 
 from ORM.ORM import ORM
 from ORM.TO import TO
@@ -309,7 +310,7 @@ class BL:
         entities = Topics().getCanonicalTagsList()
 #        if (tableName not in ["asset", "folder","artist"]):
         if (tableName not in entities):
-            return {"data": "Not a Valid entityName"}
+            return {"total" :0 , "data" :[], "error": "invalid topic"}
         elif tableName == "asset":
             if id is not None and id != "":
                 return self.getAsset(id)
@@ -325,7 +326,7 @@ class BL:
                 return self.getArtist(id)
             else:
                 return self.getAllArtistIDs()
-        return {"data": "empty"}
+        return {"total" :0 , "data" :[], "error": "empty topic"}
 
     def deleteMetaTag(self, metaDataId, tagName, value):
         orm = ORM()
@@ -390,10 +391,12 @@ class BL:
         return result
 
     def getArtist(self,id):
-        result = {}
-        orm = ORM()
-        queryStatement = "select * from artist where id=" + id
-        result = orm.executeSelect(queryStatement)
+        result = {"total" :0 , "data" :[], "error": "invalid id"}
+        if id.isnumeric():
+          orm = ORM()
+          queryStatement = "select * from artist where id=" + id
+#          print(queryStatement,file=sys.stderr)
+          result = orm.executeSelect(queryStatement)
         return result
 
     def getAllArtistIDs(self):

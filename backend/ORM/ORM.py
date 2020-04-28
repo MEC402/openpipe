@@ -58,6 +58,7 @@ class ORM:
         return acon
 
     def executeSelectPersist(self, query,acon):
+        jsonRes = { "total": 0, "data": [], "error": "executeSelect"}
         try:
             cursor = acon.cursor()
             cursor.execute(query, )
@@ -78,6 +79,7 @@ class ORM:
         return jsonRes
         
     def executeSelect(self, query):
+        jsonRes = { "total": 0, "data": [], "error": "executeSelect"}
         try:
             connection = mysql.connector.connect(
                 host=self.connection["address"],
