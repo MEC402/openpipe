@@ -236,10 +236,16 @@ class BL:
     def getCollectionByID(self, id):
         url = "http://mec402.boisestate.edu/cgi-bin/openpipe/data/asset/"
         result = {}
+        if id.isnumeric() != True:
+             return { "total": 0, "data": [], "error": "no such collection"}
+
         orm = ORM()
         queryStatement = "SELECT collection.*, assetId FROM collection join collectionMember on collection.id=collectionMember.collectionId where collection.id=" + str(
             int(id))
         results = orm.executeSelect(queryStatement)
+        if results['total']  == 0:
+           return { "total": 0, "data": [], "error": "no such collection"}
+
         result['total'] = 1
         result['id'] = results['data'][0]['id']
         result['name'] = results['data'][0]['name']
