@@ -1,8 +1,8 @@
 import re
 
-from ORM.BL import BL
-from ORM.ORM import ORM
-from oracles.Oracle import Oracle
+from openpipeAPI.ORM.BL import BL
+from openpipeAPI.ORM.ORM import ORM
+from openpipeAPI.oracles.Oracle import Oracle
 
 
 def getGISInfo():

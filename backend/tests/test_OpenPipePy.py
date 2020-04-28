@@ -1,4 +1,4 @@
-from pythonAPI.OpenPipePy import OpenPipePy
+from openpipeAPI.OpenPipePy import OpenPipePy
 
 
 class TestOpenPipePy():
