@@ -15,7 +15,7 @@ def cgiFieldStorageToDict(fieldStorage):
 print("Content-Type: text/json\n")
 
 dict = cgiFieldStorageToDict(cgi.FieldStorage())
-dict={"path":"artist/28"}
+#dict={"path":"artist/28"}
 guids=dict['path'].split("/")
 if len(guids)<2:
     guids[1]=""

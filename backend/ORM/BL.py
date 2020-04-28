@@ -1,9 +1,9 @@
 import json
 
-import Slack
 from ORM.ORM import ORM
 from ORM.TO import TO
 import requests
+import time
 
 
 class BL:
@@ -35,8 +35,7 @@ class BL:
                          "from metaTag join asset on metaTag.metaDataId=asset.metaDataId join source on asset.sourceId=source.id " \
                          "where (tagName='openpipe_canonical_largeImage' and (value is null or value='' or value='http://mec402.boisestate.edu/assets/largeImage.jpg')) " \
                          "or (tagName='openpipe_canonical_smallImage' and (value is null or value='' or value='http://mec402.boisestate.edu/assets/smallImage.jpg'))"
-
-        results = orm.executeSelect(queryStatement, ())
+        results = orm.executeSelect(queryStatement)
         return results
 
     def getAssetsWithBadMetaTags(self):
@@ -50,10 +49,9 @@ class BL:
             if asset["metaDataId"] is None:
                 orm.insert(AssetDefect(assetId=asset["id"], defectId=1))
             else:
-                queryStatement = """select metaTag.id as metaTagID, metaTag.tagName, metaTag.value from  metaTag 
-                where metaDataId=%s """
-                data_tuple = (str(asset["metaDataId"]),)
-                results = orm.executeSelect(queryStatement, data_tuple)
+                queryStatement = """select metaTag.id as metaTagID, metaTag.tagName, metaTag.value from  metaTag where metaDataId=""" + str(
+                    asset["metaDataId"])
+                results = orm.executeSelect(queryStatement)
                 res = {}
                 for row in results["data"]:
                     if "openpipe_canonical_" in row["tagName"]:
@@ -81,7 +79,7 @@ class BL:
                          "from metaTag join asset on metaTag.metaDataId=asset.metaDataId join source on asset.sourceId=source.id " \
                          "where (tagName='openpipe_canonical_largeImage') " \
                          "or (tagName='openpipe_canonical_smallImage')"
-        results = orm.executeSelect(queryStatement, ())
+        results = orm.executeSelect(queryStatement)
         for r in results["data"]:
             request = requests.head(r["value"])
             if request.status_code == 200:
@@ -92,41 +90,40 @@ class BL:
                                        metaTagValue=r["value"], defectId=4))
 
     def getAllAssets(self, page, pageSize, changeStart, changeEnd):
-        Slack.sendMessage("getAllAssets")
         start = (page - 1) * pageSize
         step = pageSize
-        f = 0
-        t = 0
+
         orm = ORM()
-        queryStatement = "SELECT id,metaDataId,shortName FROM asset where insertTime between %s and %s limit %s,%s"
-        data_tuple = (changeStart, changeEnd, start, step)
-        results = orm.executeSelect(queryStatement, data_tuple)
+        queryStatement = "SELECT id,metaDataId,shortName FROM asset where insertTime between \'" + changeStart + "\' and \'" + changeEnd + "\' limit " + str(
+            start) + "," + str(step)
+        t0 = time.time()
+        newcon = orm.simpConnect()
+        results = orm.executeSelectPersist(queryStatement,newcon)
         rows = []
         for row in results['data']:
             rowInfo = {"id": row['id'], "metaDataId": row['metaDataId'], "name": row['shortName']}
             metaDataId = row['metaDataId'][0]
-            queryStatement = "select tagName,value from metaTag where metaDataId=%s"
+            queryStatement = "select tagName,value from metaTag where metaDataId="
             if metaDataId:
-                res = orm.executeSelect(queryStatement, (str(metaDataId),))
-                tags = res['data']
-                f = f + res["fetch"]
-                t = t + res["for"]
+                queryStatement = queryStatement + str(metaDataId)
+                tags = orm.executeSelectPersist(queryStatement,newcon)['data']
                 for metaTagRow in tags:
                     rowInfo[metaTagRow['tagName'][0]] = [metaTagRow['value'][0]]
                 rows.append(rowInfo)
             # rows.append(rowInfo)
         results["data"] = rows
-        Slack.sendMessage("total fetch")
-        Slack.sendMessage(f)
-        Slack.sendMessage("total for")
-        Slack.sendMessage(t)
+        newcon.close()
+        t1 = time.time()
+        #print("broken")
+        #print(t1-t0)
         return results
 
     def getAsset(self, assetID):
         orm = ORM()
-        queryStatement = "SELECT * FROM artmaster.asset join metaTag on metaTag.metaDataId=asset.metaDataId where asset.id=%s"
-        results = orm.executeSelect(queryStatement, (assetID,))
-        if results['total'] > 0:
+        queryStatement = "SELECT * FROM artmaster.asset join metaTag on metaTag.metaDataId=asset.metaDataId where asset.id=" + str(
+            int(assetID))
+        results = orm.executeSelect(queryStatement)
+        if results['total' ] >0:
             results['total'] = 1
             rowInfo = {"id": results['data'][0]['id'], "metaDataId": results['data'][0]['metaDataId'],
                        "name": results['data'][0]['shortName']}
@@ -135,17 +132,18 @@ class BL:
 
             results["data"] = [rowInfo]
             return results
-        return {"total": 0, "data": []}
+        else:
+            return {"total" :0 , "data" :[]}
 
     def insertUserAsset(self, shortName, fileName, uri):
         orm = ORM()
         Images = self.tables["images"]
-        return orm.insert(Images(shortName=shortName, fileName=fileName, uri=uri))
+        return orm.insert(Images(shortName=shortName ,fileName=fileName ,uri=uri))
 
     def insertIntoAsset(self, shortName, uri, idAtSource, sourceId, metaDataId, scope):
         orm = ORM()
         Asset = self.tables["asset"]
-        result = orm.insert(
+        result =orm.insert(
             Asset(shortName=shortName, uri=uri, IdAtSource=idAtSource, sourceId=sourceId, metaDataId=metaDataId,
                   scope=scope))
         orm.commitClose()
@@ -154,21 +152,21 @@ class BL:
     def insertIntoCollectionMember(self, assetId, collectionId, searchTerm):
         orm = ORM()
         CollectionMember = self.tables["collectionMember"]
-        result = orm.insert(CollectionMember(assetId=assetId, collectionId=collectionId, searchTerm=searchTerm))
+        result =orm.insert(CollectionMember(assetId=assetId, collectionId=collectionId, searchTerm=searchTerm))
         orm.commitClose()
         return result
 
     def insertIntoCollection(self, name):
         orm = ORM()
         Collection = self.tables["collection"]
-        result = orm.insert(Collection(name=name, image='http://mec402.boisestate.edu/assets/blue-folder.png'))
+        result =orm.insert(Collection(name=name ,image='http://mec402.boisestate.edu/assets/blue-folder.png'))
         orm.commitClose()
         return result
 
     def insertIntoMetaData(self):
         orm = ORM()
         MetaData = self.tables["metaData"]
-        result = orm.insert(MetaData())
+        result =orm.insert(MetaData())
         orm.commitClose()
         return result
 
@@ -180,21 +178,19 @@ class BL:
         for key in data.keys():
             if key != 'metaDataId':
                 value = data[key]
-                results.append(MetaTag(metaDataId=metaDataId, tagName=key.encode('utf-8', 'surrogateescape'),
-                                       value=value.encode('utf-8', 'surrogateescape')))
+                results.append(MetaTag(metaDataId=metaDataId, tagName= key.encode('utf-8' ,'surrogateescape'), value= value.encode('utf-8' ,'surrogateescape')))
         orm.bulkInsert(results)
         orm.commitClose()
         return 1
 
-    def addAsset(self, asset):
+    def addAsset(self,asset):
         orm = ORM()
         MetaTag = self.tables["metaTag"]
         MetaData = self.tables["metaData"]
         Asset = self.tables["asset"]
         asset["metaDataId"] = orm.insert(MetaData())
         assetId = orm.insert(
-            Asset(shortName=asset["openpipe_canonical_title"][0], uri='', IdAtSource=asset["openpipe_canonical_id"][0],
-                  sourceId=self.sourceTable[asset['openpipe_canonical_source'][0]], metaDataId=asset["metaDataId"],
+            Asset(shortName=asset["openpipe_canonical_title"][0], uri='', IdAtSource=asset["openpipe_canonical_id"][0], sourceId=self.sourceTable[asset['openpipe_canonical_source'][0]], metaDataId=asset["metaDataId"],
                   scope=0))
         results = []
         print(asset)
@@ -204,25 +200,25 @@ class BL:
                     value = asset[key][0]
                 else:
                     value = asset[key]
-                results.append(MetaTag(metaDataId=asset["metaDataId"], tagName=str(key), value=str(value)))
+                results.append(MetaTag(metaDataId=asset["metaDataId"], tagName=str(key),value=str(value)))
         orm.bulkInsert(results)
         orm.commitClose()
         return assetId
 
-    def addAssetsToFolder(self, folderId, assetIds, searchTerm):
+    def addAssetsToFolder(self,folderId,assetIds,searchTerm):
         orm = ORM()
         FolderMember = self.tables["collectionMember"]
-        folderMembers = []
+        folderMembers=[]
         for assetId in assetIds:
             folderMembers.append(FolderMember(assetId=assetId, collectionId=folderId, searchTerm=searchTerm))
         orm.bulkInsert(folderMembers)
         orm.commitClose()
 
-    def getAssetMetaTags(self, assetId):
+    def getAssetMetaTags(self, id):
         result = {}
         orm = ORM()
-        queryStatement = "select metaTag.id, asset.id as assetId, tagName, value from asset join metaTag on asset.metaDataId=metaTag.metaDataId where asset.id=%s"
-        results = orm.executeSelect(queryStatement, (assetId,))
+        queryStatement = "select metaTag.id, asset.id as assetId, tagName, value from asset join metaTag on asset.metaDataId=metaTag.metaDataId where asset.id=" + id
+        results = orm.executeSelect(queryStatement)
         return results
 
     def getAllCollections(self, limit):
@@ -230,18 +226,18 @@ class BL:
         orm = ORM()
         if limit == -1:
             queryStatement = "select * from collection"
-            results = orm.executeSelect(queryStatement, ())
         else:
-            queryStatement = "select * from collection LIMIT %s "
-            results = orm.executeSelect(queryStatement, (limit,))
+            queryStatement = "select * from collection LIMIT " + str(limit)
+        results = orm.executeSelect(queryStatement)
         return results
 
-    def getCollectionByID(self, collectionId):
+    def getCollectionByID(self, id):
         url = "http://mec402.boisestate.edu/cgi-bin/openpipe/data/asset/"
         result = {}
         orm = ORM()
-        queryStatement = "SELECT collection.*, assetId FROM collection join collectionMember on collection.id=collectionMember.collectionId where collection.id=%s"
-        results = orm.executeSelect(queryStatement, (collectionId,))
+        queryStatement = "SELECT collection.*, assetId FROM collection join collectionMember on collection.id=collectionMember.collectionId where collection.id=" + str(
+            int(id))
+        results = orm.executeSelect(queryStatement)
         result['total'] = 1
         result['id'] = results['data'][0]['id']
         result['name'] = results['data'][0]['name']
@@ -256,29 +252,30 @@ class BL:
     def getRangeOfCollections(self, start, end):
         result = {}
         orm = ORM()
-        queryStatement = "select * from collection LIMIT %s,%s"
-        results = orm.executeSelect(queryStatement, (start, end))
+        queryStatement = "select * from collection LIMIT " + start + "," + end
+        results = orm.executeSelect(queryStatement)
         return result
 
     def getPublicAssetsInCollection(self, collectionId, page, pageSize):
         orm = ORM()
         start = (page - 1) * pageSize
         step = pageSize
-        queryStatement = "SELECT assetId,asset.metaDataId FROM collectionMember JOIN asset ON collectionMember.assetId = asset.id WHERE scope=0 and collectionId =%s limit %s,%s"
-        results = orm.executeSelect(queryStatement, (collectionId, start, step))
+        queryStatement = "SELECT assetId,asset.metaDataId FROM collectionMember JOIN asset ON collectionMember.assetId = asset.id WHERE scope=0 and collectionId =" + str(
+            collectionId) + " limit " + str(start) + "," + str(step)
+        results = orm.executeSelect(queryStatement)
         rows = []
         for row in results['data']:
             metaDataId = row['metaDataId'][0]
             rowInfo = {"id": row['assetId'], "metaDataId": row['metaDataId']}
-            queryStatement = "select tagName,value from metaTag where metaDataId=%s"
+            queryStatement = "select tagName,value from metaTag where metaDataId="
             if metaDataId:
-                queryStatement = queryStatement
-                tags = orm.executeSelect(queryStatement, (metaDataId,))['data']
+                queryStatement = queryStatement + str(metaDataId)
+                tags = orm.executeSelect(queryStatement)['data']
                 for metaTagRow in tags:
                     rowInfo[metaTagRow['tagName'][0]] = [metaTagRow['value'][0]]
                 rows.append(rowInfo)
             # rows.append(rowInfo)
-            rowInfo["id"] = row['assetId']
+            rowInfo["id" ] =row['assetId']
         results["data"] = rows
         return results
 
@@ -287,7 +284,7 @@ class BL:
         result = []
         orm = ORM()
         queryStatement = "select id from asset"
-        results = orm.executeSelect(queryStatement, ())
+        results = orm.executeSelect(queryStatement)
         for r in results['data']:
             result.append(url + str(r['id'][0]))
         results['data'] = result
@@ -298,7 +295,7 @@ class BL:
         result = []
         orm = ORM()
         queryStatement = "select id from collection"
-        results = orm.executeSelect(queryStatement, ())
+        results = orm.executeSelect(queryStatement)
         for r in results['data']:
             result.append(url + str(r['id'][0]))
         results['data'] = result
@@ -306,8 +303,8 @@ class BL:
 
     def getGUIDInfo(self, tableName, id):
         orm = ORM()
-        if tableName not in ["asset", "folder", "artist"]:
-            return "entity does not exist"
+        if (tableName not in ["asset", "folder","artist"]):
+            return {"data": "No Such GUID"}
         elif tableName == "asset":
             if id is not None and id != "":
                 return self.getAsset(id)
@@ -328,21 +325,21 @@ class BL:
     def deleteMetaTag(self, metaDataId, tagName, value):
         orm = ORM()
         MetaTag = self.tables["metaTag"]
-        orm.session.query(MetaTag).filter(MetaTag.metaDataId == metaDataId, MetaTag.tagName == tagName
-                                          , MetaTag.value == value).delete()
+        orm.session.query(MetaTag).filter(MetaTag.metaDataId == metaDataId ,MetaTag.tagName == tagName
+                                          ,MetaTag.value == value).delete()
         orm.commitClose()
         return {"data": 1}
 
     def deleteFolderMember(self, collectionId, assetId):
-        orm = ORM()
+        orm =ORM()
         CollectionMember = self.tables["collectionMember"]
         orm.session.query(CollectionMember).filter(CollectionMember.collectionId == collectionId
-                                                   , CollectionMember.assetId == assetId).delete()
+                                                   ,CollectionMember.assetId==assetId).delete()
         orm.commitClose()
         return {"data": 1}
 
     def deleteFolder(self, collectionId):
-        orm = ORM()
+        orm =ORM()
         Collection = self.tables["collection"]
         CollectionMember = self.tables["collectionMember"]
         orm.session.query(CollectionMember).filter(CollectionMember.collectionId == collectionId).delete()
@@ -350,25 +347,25 @@ class BL:
         orm.commitClose()
         return {"data": 1}
 
-    def updateFolder(self, folderId, newName, newImage):
+    def updateFolder(self ,folderId ,newName ,newImage):
         orm = ORM()
-        Collection = self.tables["collection"]
-        orm.session.query(Collection).filter(Collection.id == folderId).update({"name": newName, "image": newImage})
+        Collection =self.tables["collection"]
+        orm.session.query(Collection).filter(Collection.id==folderId).update({"name": newName ,"image" :newImage})
         orm.commitClose()
         return {"data": 1}
 
-    def updateMetaTag(self, metaDataId, oldTagName, oldValue, newTagName, newValue):
+    def updateMetaTag(self ,metaDataId ,oldTagName ,oldValue ,newTagName ,newValue):
         orm = ORM()
-        MetaTag = self.tables["metaTag"]
-        orm.session.query(MetaTag).filter(MetaTag.metaDataId == metaDataId, MetaTag.tagName == oldTagName
-                                          , MetaTag.value == oldValue).update \
-            ({"metaDataId": metaDataId, "tagName": newTagName, "value": newValue})
+        MetaTag =self.tables["metaTag"]
+        orm.session.query(MetaTag).filter(MetaTag.metaDataId==metaDataId ,MetaTag.tagName==oldTagName
+                                          ,MetaTag.value==oldValue).update \
+            ({"metaDataId": metaDataId ,"tagName" :newTagName ,"value" :newValue})
         orm.commitClose()
         return {"data": 1}
 
     def insertMetaTag(self, metaDataId, tagName, value):
         orm = ORM()
-        MetaTag = self.tables["metaTag"]
+        MetaTag =self.tables["metaTag"]
         result = orm.insert(MetaTag(metaDataId=metaDataId, tagName=tagName, value=value))
         orm.commitClose()
         return result
@@ -376,22 +373,22 @@ class BL:
     def insertIntoImages(self, shortName, fileName, uri):
         orm = ORM()
         Images = self.tables["images"]
-        result = orm.insert(Images(shortname=shortName, filename=fileName, uri=uri))
+        result = orm.insert(Images(shortname=shortName,filename=fileName,uri=uri))
         orm.commitClose()
         return result
 
-    def addArtist(self, name, nationality, aliases):
+    def addArtist(self,name,nationality,aliases):
         orm = ORM()
         Artist = self.tables["artist"]
-        result = orm.insert(Artist(name=name, nationality=nationality, otherNames=aliases))
+        result = orm.insert(Artist(name=name,nationality=nationality, otherNames=aliases))
         orm.commitClose()
         return result
 
-    def getArtist(self, id):
+    def getArtist(self,id):
         result = {}
         orm = ORM()
-        queryStatement = "select * from artist where id=%s"
-        result = orm.executeSelect(queryStatement, (id,))
+        queryStatement = "select * from artist where id=" + id
+        result = orm.executeSelect(queryStatement)
         return result
 
     def getAllArtistIDs(self):
@@ -399,10 +396,13 @@ class BL:
         result = []
         orm = ORM()
         queryStatement = "select id from artist"
-        results = orm.executeSelect(queryStatement, ())
+        results = orm.executeSelect(queryStatement)
         for r in results['data']:
             result.append(url + str(r['id'][0]))
         results['data'] = result
         return results
+
+
+
 
 # help(BL().getCanonicalTags())
