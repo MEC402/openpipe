@@ -95,8 +95,6 @@ class BL:
         Slack.sendMessage("getAllAssets")
         start = (page - 1) * pageSize
         step = pageSize
-        f = 0
-        t = 0
         orm = ORM()
         queryStatement = "SELECT id,metaDataId,shortName FROM asset where insertTime between %s and %s limit %s,%s"
         data_tuple = (changeStart, changeEnd, start, step)
@@ -109,17 +107,11 @@ class BL:
             if metaDataId:
                 res = orm.executeSelect(queryStatement, (str(metaDataId),))
                 tags = res['data']
-                f = f + res["fetch"]
-                t = t + res["for"]
                 for metaTagRow in tags:
                     rowInfo[metaTagRow['tagName'][0]] = [metaTagRow['value'][0]]
                 rows.append(rowInfo)
             # rows.append(rowInfo)
         results["data"] = rows
-        Slack.sendMessage("total fetch")
-        Slack.sendMessage(f)
-        Slack.sendMessage("total for")
-        Slack.sendMessage(t)
         return results
 
     def getAsset(self, assetID):
