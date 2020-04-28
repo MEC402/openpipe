@@ -10,6 +10,9 @@ class ClevelandMuseum:
     def __init__(self, schema):
         self.schema = schema
 
+    def setName(self,aname):
+        self.name = aname
+
     def searchForAssets(self, term):
         params = {'q': term}
         response = requests.get(url=self.url, params=params)

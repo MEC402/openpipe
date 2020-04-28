@@ -95,6 +95,11 @@ class BL:
         start = (page - 1) * pageSize
         step = pageSize
 
+        results = { "total": 0, "data": [] }
+
+        if int(page) < 0:
+          return results
+
         orm = ORM()
         queryStatement = "SELECT id,metaDataId,shortName FROM asset where insertTime between \'" + changeStart + "\' and \'" + changeEnd + "\' limit " + str(
             start) + "," + str(step)

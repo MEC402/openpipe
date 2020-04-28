@@ -4,7 +4,7 @@ from multiprocessing.pool import ThreadPool
 
 import requests
 
-from assetSources.ImageUtil import ImageUtil
+from ImageUtil import ImageUtil
 
 
 class MetMuseum:
@@ -19,6 +19,9 @@ class MetMuseum:
         response = requests.get(url=self.url + serviceName, params=params)
         data = response.json()
         return data
+
+    def setName(self,aname):
+        self.name = aname
 
     def getMetaTagMapping(self, data):
         response = {}
