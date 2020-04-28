@@ -2,6 +2,7 @@ import json
 
 from ORM.ORM import ORM
 from ORM.TO import TO
+from ORM.Topics import Topics
 import requests
 import time
 
@@ -303,8 +304,12 @@ class BL:
 
     def getGUIDInfo(self, tableName, id):
         orm = ORM()
-        if (tableName not in ["asset", "folder","artist"]):
-            return {"data": "No Such GUID"}
+        if (tableName == "entities"):
+           return Topics().getCanonicalTagsJSON()
+        entities = Topics().getCanonicalTagsList()
+#        if (tableName not in ["asset", "folder","artist"]):
+        if (tableName not in entities):
+            return {"data": "Not a Valid entityName"}
         elif tableName == "asset":
             if id is not None and id != "":
                 return self.getAsset(id)
@@ -320,7 +325,7 @@ class BL:
                 return self.getArtist(id)
             else:
                 return self.getAllArtistIDs()
-        return {"data": "bad GUID"}
+        return {"data": "empty"}
 
     def deleteMetaTag(self, metaDataId, tagName, value):
         orm = ORM()
