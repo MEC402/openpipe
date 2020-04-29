@@ -1,11 +1,14 @@
 
+from abc import ABC, abstractmethod
 
-#from abc import ABC, abstractmethod
 
+class MuseumsTM(ABC):
+# all museum classes must have
+# name a string name
+# attributes the Dictionary of museum specific attributes like URL, apiKey
 
-class MuseumsTM():
     """
-        The abstract class for museums. All new museum classes should inharit this class and override the methods below
+        The abstract class for museums. All new museum classes should inherit this class and override the methods below
     """
     def __init__(self, schema):
         """
@@ -17,6 +20,9 @@ class MuseumsTM():
 
     def setName(self,aname):
         self.name = aname
+
+    def setAttr(self,attr):
+        self.attributes = attr
 
     def searchForAssets(self, term):
         """

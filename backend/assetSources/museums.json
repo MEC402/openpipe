@@ -1,15 +1,15 @@
 {
  "museum1": [ {"source": "MET",
-             "searchurl": "https://collectionapi.metmuseum.org/public/collection/v1/search",
+             "url": "https://collectionapi.metmuseum.org/public/collection/v1/",
              "class": "MetMuseum", "key": "none" },
   {"source": "Cleveland",
-             "searchurl": "https://openaccess-api.clevelandart.org/api/artworks",
+             "url": "https://openaccess-api.clevelandart.org/api/artworks/",
              "class": "ClevelandMuseum", "key": "none" },
   {"source": "Rijsk",
-             "searchurl": "https://rijksmuseum.nl/api/en/",
-             "class": "RijksMuseum", "key": "none" },
+             "url": "https://www.rijksmuseum.nl/api/en/",
+             "class": "RijksMuseum", "key": "qvMYRE87" },
   {"source": "Europe",
-             "searchurl": "https://api.eruopeana.eu/api/v2/opensearch.rss",
+             "url": "https://api.europeana.eu/api/v2/",
              "class": "EuropeMuseum", "key": "ixzop5MkY" }
   ]
 }

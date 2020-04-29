@@ -1,29 +1,24 @@
 #!/bin/python3
 
 import requests
+from MuseumsTM import MuseumsTM
 from multiprocessing.pool import ThreadPool
+#    url = "https://www.rijksmuseum.nl/api/en/"
 
+class RijksMuseum(MuseumsTM):
 
-class RijksMuseum:
-    url = "https://www.rijksmuseum.nl/api/en/"
-
-    def __init__(self, schema):
-        self.schema = schema
-
-    def setName(self, aname):
-        self.name = aname
 
     def searchRijkForAssets(self, term, page, pageSize):
         serviceName = "collection"
-        params = {'key': "qvMYRE87", 'format': "json", 'q': term, 'p': page, 'ps': pageSize}
-        response = requests.get(url=self.url + serviceName, params=params)
+        params = {'key': self.attributes['key'], 'format': "json", 'q': term, 'p': page, 'ps': pageSize}
+        response = requests.get(url=self.attributes['url'] + serviceName, params=params)
         data = response.json()
         return data
 
     def getRijkMetaTagMapping(self, assetOriginalID):
         serviceName = "collection/" + str(assetOriginalID) + "/"
-        params = {'key': "qvMYRE87", 'format': "json"}
-        response = requests.get(url=self.url + serviceName, params=params)
+        params = {'key': self.attributes['key'], 'format': "json"}
+        response = requests.get(url=self.attributes['url'] + serviceName, params=params)
         data = response.json()
         return self.getRijkAssetMetaData(data["artObject"])
 
@@ -76,7 +71,6 @@ class RijksMuseum:
         if len(retrievedAssets) == 0:
             return {"data": [], "total": 0, "sourceName": "Rijks"}
         pool = ThreadPool(len(retrievedAssets))
-
         for assetId in retrievedAssets["artObjects"]:
             results.append(pool.apply_async(self.getRijkMetaTagMapping, args=[assetId["objectNumber"]]))
         pool.close()
@@ -89,8 +83,8 @@ class RijksMuseum:
         imgWidth=0
         imgHeight=0
         serviceName = "collection/" + objectId + "/tiles"
-        params = {'key': "qvMYRE87"}
-        response = requests.get(url=self.url + serviceName, params=params)
+        params = {'key': self.attributes['key']}
+        response = requests.get(url=self.attributes['url'] + serviceName, params=params)
         data = response.json()
         for d in data["levels"]:
             if d['name'] == "z" + str(z):

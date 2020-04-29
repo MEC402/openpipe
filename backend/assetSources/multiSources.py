@@ -25,7 +25,7 @@ dict = cgiFieldStorageToDict(cgi.FieldStorage())
 
 #debuging code for test of implementation
 # comment out before deploy
-dict = {'q': 'Van Gogh',
+dict = {'q': 'cats',
          'p': 1,
          'ps': 10}
 

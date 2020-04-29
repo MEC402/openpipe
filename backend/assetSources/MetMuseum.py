@@ -1,5 +1,7 @@
 #!/bin/python3
 
+from MuseumsTM import MuseumsTM
+
 from multiprocessing.pool import ThreadPool
 
 import requests
@@ -7,21 +9,15 @@ import requests
 from ImageUtil import ImageUtil
 
 
-class MetMuseum:
-    url = "https://collectionapi.metmuseum.org/public/collection/v1/"
-
-    def __init__(self, schema):
-        self.schema = schema
+class MetMuseum(MuseumsTM):
 
     def searchMetForAssets(self, term):
         serviceName = "search"
         params = {'q': term}
-        response = requests.get(url=self.url + serviceName, params=params)
+        response = requests.get(url=self.attributes['url'] + serviceName, params=params)
         data = response.json()
         return data
 
-    def setName(self,aname):
-        self.name = aname
 
     def getMetaTagMapping(self, data):
         response = {}
@@ -61,7 +57,7 @@ class MetMuseum:
 
     def getAssetMetaData(self, assetOriginalID):
         serviceName = "objects/" + str(assetOriginalID)
-        response = requests.get(url=self.url + serviceName)
+        response = requests.get(url=self.attributes['url'] + serviceName)
         data = response.json()
         metaData = self.getMetaTagMapping(data)
         return metaData

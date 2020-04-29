@@ -4,7 +4,7 @@
 
 import json
 import MuseumsTM
-import MetMuseum
+
 from CanonicalSchema import CanonicalSchema
 
 class MuseumsR:
@@ -27,6 +27,7 @@ class MuseumsR:
         aschema = cs.getSchema(1)
         amuseum = class_(aschema)
         amuseum.setName(i['source'])
+        amuseum.setAttr(i)
         self.sources.append(i['source'])
         self.sourceobjs.append(amuseum)
         print(i)

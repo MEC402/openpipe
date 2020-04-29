@@ -1,11 +1,15 @@
 #!/bin/python3
 
 from multiprocessing.pool import ThreadPool
+from MuseumsTM import MuseumsTM
 import json
 import requests
 import xmltodict
 
 from ImageUtil import ImageUtil
+
+# backup of URL
+#    url = "https://api.europeana.eu/api/v2/"
 
 def fA(aitem):
    if isinstance(aitem,list):
@@ -13,21 +17,15 @@ def fA(aitem):
    else:
       return aitem
 
-class EuropeMuseum:
-    url = "https://api.europeana.eu/api/v2/"
-
-    def __init__(self, schema):
-        self.schema = schema
+class EuropeMuseum(MuseumsTM):
 
     def searchEuropeForAssets(self, term):
         serviceName = "search.json"
-        params = {'query': term, 'wskey': "ixzop5MkY" }
-        response = requests.get(url=self.url + serviceName, params=params)
+        params = {'query': term, 'wskey': self.attributes['key'] }
+        response = requests.get(url=self.attributes['url'] + serviceName, params=params)
         data = response.json()
         return data
 
-    def setName(self,aname):
-        self.name = aname
 
     def getMetaTagMapping(self, data):
         response = {}

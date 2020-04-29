@@ -1,21 +1,15 @@
 #!/bin/python3
 
 import requests
+from MuseumsTM import MuseumsTM
 from multiprocessing.pool import ThreadPool
 
 
-class ClevelandMuseum:
-    url = "https://openaccess-api.clevelandart.org/api/artworks/"
-
-    def __init__(self, schema):
-        self.schema = schema
-
-    def setName(self,aname):
-        self.name = aname
+class ClevelandMuseum(MuseumsTM):
 
     def searchForAssets(self, term):
         params = {'q': term}
-        response = requests.get(url=self.url, params=params)
+        response = requests.get(url=self.attributes['url'], params=params)
         data = response.json()
         return data
 
@@ -65,7 +59,7 @@ class ClevelandMuseum:
 
     def getAssetMetaData(self, assetId):
         serviceName = str(assetId)
-        response = requests.get(url=self.url + serviceName)
+        response = requests.get(url=self.attributes['url'] + serviceName)
         data = response.json()
         metaData = self.getMetaTagMapping(data)
         return metaData
