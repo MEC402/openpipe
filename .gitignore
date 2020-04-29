@@ -15,6 +15,7 @@
 /*/*.launch
 /*/.settings/
 /*/*.sublime-workspace
+/*/*.vs
 
 __pycache__/
 venv/
