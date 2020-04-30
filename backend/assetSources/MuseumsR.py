@@ -20,7 +20,7 @@ class MuseumsR:
 
 #now we create a collection of Museum Objects to handle the specific museum
       for i in museumjson['museum1']:
-        print (i['class'])
+#        print (i['class'])
         mod = __import__(i['class'])
         class_ = getattr(mod,i['class'])
         cs = CanonicalSchema()
