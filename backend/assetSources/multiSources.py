@@ -45,11 +45,11 @@ if int(dict["p"]) < 1:
 if int(dict["ps"]) < 1:
     dict["ps"] = 1
 
+if 'name' in dict.keys():
+    musename = dict["name"]
+
 if 'q' not in dict.keys():
     print(json.dumps([{}]))
-
-if 'name' in dict.keys():
-    musename = dict["key"]
 
 else:
     threads = []
