@@ -21,6 +21,7 @@ print("Content-Type: text/json\n")
 
 dict = cgiFieldStorageToDict(cgi.FieldStorage())
 
+musename = "all"
 # remberandt
 
 #debuging code for test of implementation
@@ -47,6 +48,9 @@ if int(dict["ps"]) < 1:
 if 'q' not in dict.keys():
     print(json.dumps([{}]))
 
+if 'name' in dict.keys():
+    musename = dict["key"]
+
 else:
     threads = []
     museums = []
@@ -66,6 +70,7 @@ else:
 
     pool = ThreadPool(len(amuseumreg.sourceobjs))
     for museum in amuseumreg.sourceobjs:
+       if musename == "all" or musename.lower() == museum.name.lower():
         threads.append(pool.apply_async(museum.getData, args=[dict["q"], int(dict["p"]), int(dict["ps"])]))
     pool.close()
     pool.join()
