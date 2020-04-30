@@ -32,7 +32,7 @@ class ImageUtil:
         if url is not None and url != "":
             try:
                 url = url.replace(" ", "%20")
-                print(url)
+#                print(url)
                 file = get(url)
                 im = Image.open(BytesIO(file.content))
                 width, height = im.size

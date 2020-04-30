@@ -30,8 +30,8 @@ class MuseumsR:
         amuseum.setAttr(i)
         self.sources.append(i['source'])
         self.sourceobjs.append(amuseum)
-        print(i)
-        print(i['source'])
+#        print(i)
+#        print(i['source'])
              
 
 #test of class

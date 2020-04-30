@@ -4,7 +4,6 @@ from multiprocessing.pool import ThreadPool
 from MuseumsTM import MuseumsTM
 import json
 import requests
-import xmltodict
 
 from ImageUtil import ImageUtil
 
@@ -21,7 +20,9 @@ class EuropeMuseum(MuseumsTM):
 
     def searchEuropeForAssets(self, term):
         serviceName = "search.json"
-        params = {'query': term, 'wskey': self.attributes['key'] }
+        params = {'query': term, 'wskey': self.attributes['key'] , "rows": 100}
+        if "dataprovider" in self.attributes:
+           params["DATA_PROVIDER"] = self.attributes['dataprovider']
         response = requests.get(url=self.attributes['url'] + serviceName, params=params)
         data = response.json()
         return data
@@ -32,7 +33,8 @@ class EuropeMuseum(MuseumsTM):
 #        response = self.schema.copy()
         response["openpipe_canonical_source"] = ["Europe"]
         response["openpipe_canonical_id"] = [data["id"]]
-        response["openpipe_canonical_largeImage"] = [data["edmIsShownAt"]]
+        if "edmIsShownAt" in data:
+          response["openpipe_canonical_largeImage"] = [data["edmIsShownAt"]]
 #        imageInfo = ImageUtil()
 #        dimentions = imageInfo.getPixelDimentions(response["openpipe_canonical_largeImage"][0])
 #        response["openpipe_canonical_largeImageDimensions"] = [str(dimentions[0]) + "," + str(dimentions[1])]
@@ -99,4 +101,4 @@ class EuropeMuseum(MuseumsTM):
 #        pool.close()
 #        pool.join()
 #        results = [r.get() for r in results]
-        return {"data": results, "total": retrievedAssets['itemsCount'], "sourceName": "Europe"}
+        return {"data": results, "total": retrievedAssets['itemsCount'], "sourceName": self.attributes['source']}
