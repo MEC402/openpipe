@@ -241,7 +241,9 @@ class BL:
     def getCollectionByID(self, id):
         url = "http://mec402.boisestate.edu/cgi-bin/openpipe/data/asset/"
         result = {}
-        if id.isnumeric() != True:
+
+        if isinstance(id, int) != True:
+         if id.isnumeric() != True:
              return { "total": 0, "data": [], "error": "no such collection"}
 
         orm = ORM()
@@ -403,7 +405,8 @@ class BL:
 
     def getArtist(self,id):
         result = {"total" :0 , "data" :[], "error": "invalid id"}
-        if id.isnumeric():
+        if isinstance(id, int) != True:
+         if id.isnumeric():
           orm = ORM()
           queryStatement = "select * from artist where id=" + id
 #          print(queryStatement,file=sys.stderr)

@@ -17,7 +17,7 @@ Tools used in development of the system:
 * install python
    install all of mysql connectors as root.
    install mysql alchemy as root
-   install requests, xmltodict, json 
+   install requests, json 
 
 ## Configure the system for local run time testing
 
