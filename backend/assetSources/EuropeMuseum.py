@@ -31,7 +31,7 @@ class EuropeMuseum(MuseumsTM):
     def getMetaTagMapping(self, data):
         response = {}
 #        response = self.schema.copy()
-        response["openpipe_canonical_source"] = ["Europe"]
+        response["openpipe_canonical_source"] = self.attributes["source"]
         response["openpipe_canonical_id"] = [data["id"]]
         if "edmIsShownAt" in data:
           response["openpipe_canonical_largeImage"] = [data["edmIsShownAt"]]
