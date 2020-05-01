@@ -321,6 +321,8 @@ class BL:
         if (tableName == "entities"):
            return Topics().getCanonicalTagsJSON()
         entities = Topics().getCanonicalTagsList()
+        entitites.append("asset")
+        entitites.append("folder")
 #        if (tableName not in ["asset", "folder","artist"]):
         if (tableName not in entities):
             return {"total" :0 , "data" :[], "error": "invalid topic"}
