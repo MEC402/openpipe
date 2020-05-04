@@ -1,37 +1,36 @@
-<!--<ko-stage #stage [config]="stageConfig" (tap)="onTap($event)">-->
-<!--  <ko-layer #layer>-->
-<!--    <ko-image [config]="imageConfig"></ko-image>-->
-<!--  </ko-layer>-->
-<!--</ko-stage>-->
-
-
-
-
-
 <nb-card>
   <nb-card-body>
 
     <nb-actions size="tiny" fullWidth>
       <nb-action (click)="openLoadDialog(dialog)">Load</nb-action>
-      <nb-action (click)="openDialog(dialogAsset)">Insert Asset</nb-action>
       <nb-action  (click)="onClick($event)">Save</nb-action>
     </nb-actions>
 
   </nb-card-body>
 </nb-card>
 
-<div class="scrolling-wrapper-flexbox" >
-  <div id="leftWall" class="card" >
-    <img [id]="r" [src]="r.openpipe_canonical_smallImage" style="width: 50px" *ngFor="let r of leftWallAssets" (contextmenu)="onRightClick(r,0)"  >
-  </div>
-  <div id="centerWall" class="card">
-    <img [id]="r" [src]="r.openpipe_canonical_smallImage" style="width: 50px" *ngFor="let r of centerWallAssets" cdkDrag cdkDragBoundary=".scrolling-wrapper-flexbox" (contextmenu)="onRightClick(r,1)" >
-  </div>
+<!--<div class="scrolling-wrapper-flexbox" >-->
+<!--  <div id="leftWall" class="card" >-->
+<!--    <img [id]="r" [src]="r.openpipe_canonical_smallImage" style="width: 50px" *ngFor="let r of leftWallAssets" (contextmenu)="onRightClick(r,0)"  >-->
+<!--  </div>-->
+<!--  <div id="centerWall" class="card">-->
+<!--    <img [id]="r" [src]="r.openpipe_canonical_smallImage" style="width: 50px" *ngFor="let r of centerWallAssets" cdkDrag cdkDragBoundary=".scrolling-wrapper-flexbox" (contextmenu)="onRightClick(r,1)" >-->
+<!--  </div>-->
 
-  <div id="rightWall" class="card">
-    <img [id]="r" [src]="r.openpipe_canonical_smallImage" style="width: 50px" *ngFor="let r of rightWallAssets" cdkDrag cdkDragBoundary=".scrolling-wrapper-flexbox" (contextmenu)="onRightClick(r,2)" >
-  </div>
-</div>
+<!--  <div id="rightWall" class="card">-->
+<!--    <img [id]="r" [src]="r.openpipe_canonical_smallImage" style="width: 50px" *ngFor="let r of rightWallAssets" cdkDrag cdkDragBoundary=".scrolling-wrapper-flexbox" (contextmenu)="onRightClick(r,2)" >-->
+<!--  </div>-->
+<!--</div>-->
+
+
+
+<ko-stage #stage [config]="configStage">
+  <ko-layer #layer>
+    <ko-image [config]="r.config" *ngFor="let r of centerWallAssets"></ko-image>
+  </ko-layer>
+</ko-stage>
+
+
 
 <ng-template #dialog let-data let-ref="dialogRef">
   <nb-card size="giant">
@@ -43,16 +42,6 @@
       <nb-select placeholder="Select Folder" [(selected)]="chosenCollection" (selectedChange)="onSelect()">
         <nb-option *ngFor="let c of collections" [value]="c">{{c.name[0]}}</nb-option>
       </nb-select>
-    </nb-card-body>
-  </nb-card>
-</ng-template>
-
-<ng-template #dialogAsset let-data let-ref="dialogRef">
-  <nb-card size="giant">
-    <nb-card-header>
-      <button nbButton (click)="ref.close()" size="tiny">Close</button>
-    </nb-card-header>
-    <nb-card-body>
       <h4>Wall Position:</h4>
       <nb-radio-group [(ngModel)]="wall">
         <nb-radio value="0">Left</nb-radio>

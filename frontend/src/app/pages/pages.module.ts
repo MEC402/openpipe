@@ -51,6 +51,8 @@ import { LayoutEditorComponent } from './layout-editor/layout-editor.component';
 import { DocsComponent } from './docs/docs.component';
 import {KonvaModule} from "ng2-konva";
 import { FolderCardComponent } from './util/folder-card/folder-card.component';
+import {MarkdownModule} from "ngx-markdown";
+import {HttpClient, HttpClientModule} from "@angular/common/http";
 
 
 @NgModule({
@@ -91,7 +93,8 @@ import { FolderCardComponent } from './util/folder-card/folder-card.component';
     NbActionsModule,
     NbSidebarModule,
     KonvaModule,
-
+    HttpClientModule,
+    MarkdownModule.forRoot({ loader: HttpClient }),
   ],
   declarations: [
     PagesComponent,
