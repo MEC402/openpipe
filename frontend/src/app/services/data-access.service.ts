@@ -10,12 +10,12 @@ import {Observable} from 'rxjs';
 export class DataAccessService {
   webServerURL;
   constructor(private http: HttpClient) {
-    this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/dev/';
+    this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/';
    // this.webServerURL = 'http://localhost/cgi-bin/';
   }
 
   public getMuseumData(searchTerm: string, museumName  , page: number , pageSize: number): Observable<Results> {
-    const url = this.webServerURL + 'assetSources/museums.py';
+    const url = this.webServerURL + 'assetSources/rona/multiSources.py';
     const params = new HttpParams()
                   .set('q', searchTerm)
                   .set('name', museumName)
@@ -258,6 +258,9 @@ export class DataAccessService {
     return this.http.get<Results>(GUIDURL);
   }
 }
+
+
+
 
 
 class Results {
