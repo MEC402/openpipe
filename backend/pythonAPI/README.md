@@ -1,71 +1,57 @@
-
-
 # VizLab API 
 VizLab API is designed to explore museums’ collections. The API provides direct access to the data of the museums.
-```python
-import urllib3  # first, import the urllib3 module:
-http = urllib3.PoolManager()   # a PoolManager instance to make requests. This object handles all of the details of connection pooling
-
-# Find all of the objects with the word "cat" in the title and return only a few fields per record
-def url():
-    s = input("please enter a museum name: ")
-    new_string = s 
-    return new_string
-def object_name():
-    s1 = input("please enter a object name: ")
-    object_string = s1
-    return object_string
-
-print(object_name());
-
-r = http.request('GET', url(),
-			# request() to make requests using any HTTP verb
-    fields = {
-	'apikey': 'YOUR APIKEY HERE',
-        'title': object_string(),
-        'fields': 'objectnumber,title,dated'
-    })
-
-print(r.status, r.data)
-
-```
-
-## urllib3
-urllib3 is a powerful, _sanity-friendly_ HTTP client for Python. urllib3 brings many critical features that are missing from the Python standard libraries: Connection pooling, Client-side SSL/TLS verification, etc.
 
 
-## **Installing**
+ 1. Must register with yahoo email
+    
+    
+ 2. Go to    [https://www.flickr.com/services/apps/create/apply/](https://www.flickr.com/services/apps/create/apply/)
+    
+    
+ 3. Click Apply for a non-commercial key
+    
+    
+ 4. Put “CatApp” as name of app.  
+    Write something on what you try to building.   
+    Click both check box.    
+    Obtain the following keys access key my secret key
+    
+    **Key:**  
+    **68cc14482d6be482f88a9f5c41e9a___**
+    
+    **Secret:**  
+    **5831bf74fb370___**
+    
+    
+ 5. Go    [https://www.flickr.com/services/api/](https://www.flickr.com/services/api/)
+    
+    Here, many API methods are available that you might want to use and
+    each of these methods comes with their own parameters
+    
+    
+ 6. **Click [flickr.photos.search](https://www.flickr.com/services/api/flickr.photos.search.html)
+    under photos section. We will see many options here. Go to bottom of
+    the page and click** [API Explorer :
+    flickr.photos.search](https://www.flickr.com/services/api/explore/flickr.photos.search)
+    
+    **It will direct to** [https://www.flickr.com/services/api/explore/flickr.photos.search](https://www.flickr.com/services/api/explore/flickr.photos.search)
+    
+   
+ 7.  **Check the tags option and put “cats” as value.**
+    
+    scroll down and choose JSON as output and click on Sign call with no
+    user token? And click call method.
+    
+    You will get a response. Click the URL at bottom and get some JSON
+    code.
+    
+    
+ 8. **Create a file and name index.php and paste the following**
+    
+  <?php
+        $tag='cat'
+         $url = 'https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=1b9b13d16773af7a80a1abd0e94e56ba&tags='.$tag.'&format=json&nojsoncallback=1’;
 
-urllib3 can be installed with [pip](https://pip.pypa.io/):
-
-    $ pip install urllib3
-Alternatively, you can grab the latest source code from [GitHub](https://github.com/urllib3/urllib3):
-
-    $ git clone git://github.com/urllib3/urllib3.git
-    $ python setup.py install
-	
-	
-## Flickr API Keys
-We need to create a pair of Flickr API keys by visiting https://www.flickr.com/services/api/keys/. Note: A Yahoo! account is required to generate the API keys.Flickr will generate two keys:
-`•	A public key, which they call key
-•	A private key, which they call secret`
-##### flickrapi installation
-Create a virtual environment, and then install the flickrapi Python library via
-    `$ pip install flickrapi`
-Search Flickr Images
-Here's an example that searches Flickr for the term "kitten" and retrieves the first 10 results.
-```python
-from flickrapi import FlickrAPI
-
-FLICKR_PUBLIC = 'Your Flickr Key'
-FLICKR_SECRET = 'Your Flickr Secret Key'
-
-flickr = FlickrAPI(FLICKR_PUBLIC, FLICKR_SECRET, format='parsed-json')
-extras='url_sq,url_t,url_s,url_q,url_m,url_n,url_z,url_c,url_l,url_o'
-cats = flickr.photos.search(text='kitten', per_page=5, extras=extras)
-photos = cats['photos']
-from pprint import pprint
-pprint(photos)
-
-```
-
+$data=file_get_contents($url);
+print_r($data);
+        
