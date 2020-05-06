@@ -11,7 +11,7 @@ import {
   NbMenuModule,
   NbPopoverModule,
   NbRadioModule,
-  NbSelectModule, NbSidebarModule,
+  NbSelectModule, NbSidebarModule, NbSpinnerModule,
   NbStepperModule,
   NbTabsetModule,
   NbToggleModule,
@@ -51,7 +51,6 @@ import { LayoutEditorComponent } from './layout-editor/layout-editor.component';
 import { DocsComponent } from './docs/docs.component';
 import {KonvaModule} from "ng2-konva";
 import { FolderCardComponent } from './util/folder-card/folder-card.component';
-import {MarkdownModule} from "ngx-markdown";
 import {HttpClient, HttpClientModule} from "@angular/common/http";
 
 
@@ -94,7 +93,7 @@ import {HttpClient, HttpClientModule} from "@angular/common/http";
     NbSidebarModule,
     KonvaModule,
     HttpClientModule,
-    MarkdownModule.forRoot({ loader: HttpClient }),
+    NbSpinnerModule,
   ],
   declarations: [
     PagesComponent,
