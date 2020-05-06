@@ -1,4 +1,4 @@
 <input type="text" nbInput placeholder="Put the search term here" shape="round" [(ngModel)]="searchTerm" (keydown.enter)="searchAssets()" >
 <button nbButton hero status="primary" shape="round" size="tiny" (click)="searchAssets()"><nb-icon icon="search-outline"></nb-icon></button>
-<ngx-meta-tag-editor [assetsSource]="currentAssets"></ngx-meta-tag-editor>
+<ngx-meta-tag-editor [assetsSource]="currentAssets" [loading]="loading"></ngx-meta-tag-editor>
 

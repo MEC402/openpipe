@@ -1,8 +1,11 @@
 <div class="lists row">
   <div class="col-md-4 ">
-    <nb-card size="giant">
+    <nb-card size="giant" [nbSpinner]="loading"
+             nbSpinnerStatus="info"
+             nbSpinnerSize="giant"
+             nbSpinnerMessage="Loading">
       <nb-card-body>
-        <ng2-smart-table [settings]="assetsSettings" [source]="assetsSource" (userRowSelect)="onClick($event)"	>
+        <ng2-smart-table [settings]="assetsSettings" [source]="assetsSource" (userRowSelect)="onClick($event)">
         </ng2-smart-table>
       </nb-card-body>
     </nb-card>

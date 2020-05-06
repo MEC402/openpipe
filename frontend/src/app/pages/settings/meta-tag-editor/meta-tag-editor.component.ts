@@ -9,6 +9,7 @@ import {LocalDataSource} from 'ng2-smart-table';
 })
 export class MetaTagEditorComponent implements OnInit {
   @Input() assetsSource;
+  @Input() loading = false;
   collections: any;
   settings = {
     add: {

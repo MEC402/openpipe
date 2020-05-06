@@ -18,8 +18,9 @@ export class AssetsComponent implements OnInit, OnDestroy {
   page = 1;
   total;
   pageSize = 10;
-
+  pages = [2, 3, 4, 5, 6, 7, 8, 9, 10];
   private _destroyed$ = new Subject();
+  loading = true;
   constructor(private dataAccess: DataAccessService) {
 
   }
@@ -30,26 +31,27 @@ export class AssetsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    for (let i = 1; i < 100; i += 1) {
-      this.currentAssets.add(1);
-    }
-    for (let i = 1; i < 5000; i += 1) {
-      this.dataAccess.getAllAssets(i, 1).pipe(takeUntil(this._destroyed$)).subscribe(resp => {
-        resp.data.forEach(d => {
-          this.currentAssets.prepend(d);
-          this.currentAssets.refresh();
-        });
-      });
-    }
-    // this.dataAccess.getAssetsWithGUID().pipe(takeUntil(this._destroyed$)).subscribe(res => {
-    //   Observable
-    //     .merge(res.data.slice(0, 100).map( g => this.dataAccess.getGUID(g)))
-    //     .subscribe(ob => {
-    //       ob.pipe(takeUntil(this._destroyed$)).subscribe(resp => {
-    //         this.currentAssets.add(resp.data[0]).then(p => this.currentAssets.refresh());
-    //       });
+
+    // for (let i = 1; i < 5000; i += 1) {
+    //   this.dataAccess.getAllAssets(i, 200).pipe(takeUntil(this._destroyed$)).subscribe(resp => {
+    //     resp.data.forEach(d => {
+    //       this.currentAssets.add(d);
+    //       this.currentAssets.refresh();
     //     });
-    // });
+    //   });
+    // }
+    this.dataAccess.getAllAssets(1, 200).pipe(takeUntil(this._destroyed$)).subscribe(res => {
+      this.loading = false;
+      this.currentAssets.load(res.data);
+      Observable.merge(this.pages.map( g => this.dataAccess.getAllAssets(g, 200)))
+        .subscribe(ob => {
+          ob.pipe(takeUntil(this._destroyed$)).subscribe(resp => {
+            resp.data.forEach(d => {
+              this.currentAssets.add(d).then(p => this.currentAssets.refresh());
+            });
+          });
+        });
+    });
   }
 
   // ngOnInit() {
