@@ -46,3 +46,7 @@ venv/
 /*/Thumbs.db
 
 backend/.coverage
+
+# user specific
+*.suo
+*.slnx.sqlite
