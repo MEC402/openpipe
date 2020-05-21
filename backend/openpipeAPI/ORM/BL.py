@@ -1,6 +1,7 @@
 import json
 
-import Slack
+
+#import Slack
 from openpipeAPI.ORM.ORM import ORM
 from openpipeAPI.ORM.TO import TO
 import requests
@@ -71,6 +72,23 @@ class BL:
     def getAllImages(self):
         orm = ORM()
         queryStatement = "SELECT * from images limit 10;"
+        results = orm.executeSelect(queryStatement,())
+        orm.commitClose()
+        return results
+
+    def getCollections(self):
+        orm = ORM()
+        queryStatement = """select
+                            c.name
+                            ,i.uri 
+                            from collection c
+                                join collectionMember cm
+                                    on cm.collectionId = c.id
+                                join metaData md
+                                    on md.id = cm.metaDataId
+                                join images i
+                                    on i.id = md.imageid
+                            where c.id = 39"""
         results = orm.executeSelect(queryStatement,())
         orm.commitClose()
         return results

@@ -3,7 +3,7 @@ import requests
 import sys
 sys.path.append('c:/Users/Kenny/source/repos/openpipe/backend/')
 
-from ORM.BL import BL
+from openpipeAPI.ORM.BL import BL
 
 results = BL().getAllImages()
 
