@@ -4,6 +4,8 @@ import json
 import cgi
 import sqlalchemy as db
 
+from openpipeAPI.ORM.BL import BL
+
 
 def cgiFieldStorageToDict(fieldStorage):
     """ Get a plain dictionary rather than the '.value' system used by the
@@ -15,16 +17,10 @@ def cgiFieldStorageToDict(fieldStorage):
 
 
 def getAllTags():
-    engine = db.create_engine(
-        'mysql+mysqlconnector://artmaster:ArtMaster51@artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com/artmaster')
-    connection = engine.connect()
-    metadata = db.MetaData()
-    canonicalMetaTag = db.Table('canonicalMetaTag', metadata, autoload=True, autoload_with=engine)
-    query = db.select([canonicalMetaTag])
-    result = connection.execute(query).fetchall()
+    result=BL().getCanonicalTags()
     res = {}
-    for row in result:
-        res[row[1]] =[row[2]]
+    for key in result:
+         res[key.replace('openpipe_canonical_', '')] =[result[key]]
     return res
 
 

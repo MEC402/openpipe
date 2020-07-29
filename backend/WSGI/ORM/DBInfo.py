@@ -14,4 +14,4 @@ class DBInfo:
                     }
 
     def getConnectionInfo(self):
-        return self.data["production"]
+        return self.data["dev"]

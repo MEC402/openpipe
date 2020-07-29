@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams, HttpRequest, HttpEventType, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import set = Reflect.set;
 
 
 
@@ -171,7 +172,8 @@ export class DataAccessService {
   }
 
   public getAllAssets(p, ps): Observable<Results> {
-    const getAllAssetURL = this.webServerURL + 'dataAccess/getAllAssets.py';
+    //const getAllAssetURL = this.webServerURL + 'dataAccess/getAllAssets.py';
+    const getAllAssetURL = 'http://mec402.boisestate.edu/wsgi/getAllAssets.wsgi';
     const getAssetParams = new HttpParams().set('p', p).set('ps', ps);
     return this.http.get<Results>(getAllAssetURL, {params: getAssetParams});
   }
@@ -257,11 +259,22 @@ export class DataAccessService {
   public getGUID(GUIDURL): Observable<Results> {
     return this.http.get<Results>(GUIDURL);
   }
+
+  public getWallAppSettings(): Observable<Results> {
+    return this.http.get<Results>( this.webServerURL + 'dataAccess/settings/getWallAppSettings.py');
+  }
+
+  public setWallAppSettings(settings): Observable<InsertionResponse> {
+    const metaTagsURL = this.webServerURL + 'dataAccess/settings/setWallAppSettings.py';
+    const postBody = settings;
+    const headers = new HttpHeaders({
+      'Content-Type': 'text/json',
+      'Access-Control-Allow-Origin': '*',
+    });
+    return this.http.post<InsertionResponse>(metaTagsURL, postBody);
+  }
+
 }
-
-
-
-
 
 class Results {
   total;

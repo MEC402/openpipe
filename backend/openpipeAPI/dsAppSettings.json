@@ -1,0 +1,46 @@
+{
+  "total": 10,
+  "data": [
+    {
+      "groupName": "timeline",
+      "key": "orientation",
+      "value": "horizontal"
+    },
+    {
+      "groupName": "timeline",
+      "key": "key1",
+      "value": "value1"
+    },
+    {
+      "groupName": "color",
+      "key": "foreground",
+      "value": "blue"
+    },
+    {
+      "groupName": "color",
+      "key": "key1",
+      "value": "value1"
+    },
+    {
+      "groupName": "geo",
+      "key": "key1",
+      "value": "value1"
+    },
+    {
+      "groupName": "collection",
+      "key": "key1",
+      "value": "value1"
+    },
+    {
+      "groupName": "topic",
+      "key": "key1",
+      "value": "value1"
+    },
+    {
+      "groupName": "topic",
+      "key": "key2",
+      "value": "value2"
+    }
+  ]
+
+}

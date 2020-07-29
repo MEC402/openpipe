@@ -1,13 +1,7 @@
-import json
-
 import mysql
 import sqlalchemy as db
 from mysql.connector import Error
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import NullPool
-
-
-import time
 
 from openpipeAPI.ORM.DBInfo import DBInfo
 
@@ -19,6 +13,9 @@ class ORM:
         connection["address"] + '/' + connection["schema"])
     Session = sessionmaker(bind=engine)
     session = Session();
+
+    fetchTime = 0
+    forTime = 0
 
     # TODO: Password Manger
 
@@ -51,46 +48,11 @@ class ORM:
         self.session.commit()
         self.session.close()
 
-    def simpConnect(self):
-        acon = mysql.connector.connect(
-            host=self.connection["address"],
-            user=self.connection["username"],
-            passwd=self.connection["password"],
-            database=self.connection["schema"]
-        )
-        return acon
+    def executeSelect(self, query, param):
+        import time
 
-    def executeSelectPersist(self, query, acon):
-        jsonRes = {"total": 0, "data": [], "error": "executeSelect"}
-        try:
-            cursor = acon.cursor()
-            cursor.execute(query, )
-            records = cursor.fetchall()
-            fieldNames = [i[0] for i in cursor.description]
-            tlist = jsonRes['data']
+        t0 = time.time()
 
-            jsonRes = {'total': len(records), 'data': []}
-            frange = range(len(fieldNames))
-            for r in records:
-                row = {}
-                for i in frange:
-                    row[fieldNames[i]] = [r[i]]
-                tlist.append(row)
-            #                jsonRes['data'].append(row)
-            #            t0 = time.time()
-            jsonRes['data'] = tlist
-        #            t1 = time.time()
-
-        except Error as e:
-            #            print("Error reading data from MySQL table", e)
-            pass
-
-        finally:
-            cursor.close()
-        return jsonRes
-
-    def executeSelect(self, query):
-        jsonRes = {"total": 0, "data": [], "error": "executeSelect"}
         try:
             connection = mysql.connector.connect(
                 host=self.connection["address"],
@@ -99,21 +61,29 @@ class ORM:
                 database=self.connection["schema"]
             )
             cursor = connection.cursor()
-            cursor.execute(query, )
+            cursor.execute(query, param)
             records = cursor.fetchall()
             fieldNames = [i[0] for i in cursor.description]
 
+            t1 = time.time()
+
+            self.fetchTime = t1 - t0
+
+            t0 = time.time()
             jsonRes = {'total': len(records), 'data': []}
             for r in records:
                 row = {}
                 for i in range(len(fieldNames)):
                     row[fieldNames[i]] = [r[i]]
                 jsonRes['data'].append(row)
+            t1 = time.time()
+
+            self.forTime = t1 - t0
+            # jsonRes["fetch"] = self.fetchTime
+            # jsonRes["for"] = self.forTime
 
         except Error as e:
-            #            print("Error reading data from MySQL table", e)
-            pass
-
+            print("Error reading data from MySQL table", e)
         finally:
             if (connection.is_connected()):
                 connection.close()
@@ -136,17 +106,9 @@ class ORM:
             connection.commit()
 
         except Error as e:
-            #            print("Error reading data from MySQL table", e)
-            pass
-
+            print("Error reading data from MySQL table", e)
         finally:
             if (connection.is_connected()):
                 connection.close()
                 cursor.close()
 
-# to=TO()
-# orm=ORM()
-# print(to.getClasses())
-# r=orm.selectAll(to.getClasses()['canonicalMetaTag'])
-# for a in r:
-#     print(a.default)

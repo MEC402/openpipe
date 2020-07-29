@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import {
   NbAccordionModule, NbActionsModule,
   NbButtonModule,
-  NbCardModule,
+  NbCardModule, NbChatModule,
   NbCheckboxModule, NbContextMenuModule, NbDatepickerModule,
   NbDialogRef,
   NbIconModule,
@@ -49,9 +49,11 @@ import {AssetChangesComponent} from './reports/asset-changes/asset-changes.compo
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import { LayoutEditorComponent } from './layout-editor/layout-editor.component';
 import { DocsComponent } from './docs/docs.component';
-import {KonvaModule} from "ng2-konva";
+import {KonvaModule} from 'ng2-konva';
 import { FolderCardComponent } from './util/folder-card/folder-card.component';
-import {HttpClient, HttpClientModule} from "@angular/common/http";
+import {HttpClient, HttpClientModule} from '@angular/common/http';
+import { DsAppSettingsComponent } from './settings/ds-app-settings/ds-app-settings.component';
+import { ChatbotComponent } from './chatbot/chatbot.component';
 
 
 @NgModule({
@@ -94,6 +96,7 @@ import {HttpClient, HttpClientModule} from "@angular/common/http";
     KonvaModule,
     HttpClientModule,
     NbSpinnerModule,
+    NbChatModule,
   ],
   declarations: [
     PagesComponent,
@@ -116,6 +119,8 @@ import {HttpClient, HttpClientModule} from "@angular/common/http";
     LayoutEditorComponent,
     DocsComponent,
     FolderCardComponent,
+    DsAppSettingsComponent,
+    ChatbotComponent,
   ],
 })
 export class PagesModule {

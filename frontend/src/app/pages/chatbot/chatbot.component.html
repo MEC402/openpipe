@@ -1,0 +1,30 @@
+<div class="lists row">
+  <div class="col-md-3 ">
+    <nb-chat title="Museum Assistant Bot" size="giant">
+      <nb-chat-message *ngFor="let message of messages"
+                       [type]="message.type"
+                       [message]="message.text"
+                       [reply]="message.reply"
+                       [sender]="message.user.name"
+                       [date]="message.date"
+                       [files]="message.files"
+                       [quote]="message.quote"
+                       [latitude]="message.latitude"
+                       [longitude]="message.longitude"
+                       [avatar]="message.user.avatar"></nb-chat-message>
+      <nb-chat-form (send)="sendMessage($event, 'You', 'https://cdn.dribbble.com/users/722835/screenshots/4082720/bot_icon.gif', true)" [showButton]="true" [dropFiles]="true">
+      </nb-chat-form>
+    </nb-chat>
+    </div>
+    <div class="col-md-9 ">
+    <nb-card size="giant">
+      <nb-card-header>
+        results
+      </nb-card-header>
+      <nb-card-body>
+
+      </nb-card-body>
+
+    </nb-card>
+  </div>
+</div>

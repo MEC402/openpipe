@@ -18,11 +18,6 @@ export const MENU_ITEMS: NbMenuItem[] = [
     home: true,
   },
   {
-    title: 'Meta-Data',
-    icon: 'bookmark-outline',
-    link: '/pages/settings',
-  },
-  {
     title: 'Faculty Templates',
     icon: 'edit-2',
     link: '/pages/layoutEditor',
@@ -36,6 +31,16 @@ export const MENU_ITEMS: NbMenuItem[] = [
     title: 'Reports',
     icon: 'clipboard-outline',
     link: '/pages/reports',
+  },
+  {
+    title: 'settings',
+    icon: 'settings-2-outline',
+    link: '/pages/settings',
+  },
+  {
+    title: 'ChatBot',
+    icon: 'message-circle-outline',
+    link: '/pages/chatbot',
   },
   {
     title: 'Docs',

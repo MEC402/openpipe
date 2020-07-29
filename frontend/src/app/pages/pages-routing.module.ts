@@ -9,8 +9,9 @@ import {SettingsComponent} from './settings/settings.component';
 import {UploaderComponent} from './uploader/uploader.component';
 import {AssetsComponent} from './assets/assets.component';
 import {ReportsComponent} from './reports/reports.component';
-import {DocsComponent} from "./docs/docs.component";
-import {LayoutEditorComponent} from "./layout-editor/layout-editor.component";
+import {DocsComponent} from './docs/docs.component';
+import {LayoutEditorComponent} from './layout-editor/layout-editor.component';
+import {ChatbotComponent} from './chatbot/chatbot.component';
 
 const routes: Routes = [{
   path: '',
@@ -43,6 +44,10 @@ const routes: Routes = [{
     {
       path: 'reports',
       component: ReportsComponent,
+    },
+    {
+      path: 'chatbot',
+      component: ChatbotComponent,
     },
     {
       path: 'docs',
