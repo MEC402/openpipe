@@ -22,7 +22,7 @@ import { ThemeModule } from '../@theme/theme.module';
 import { PagesComponent } from './pages.component';
 import { PagesRoutingModule } from './pages-routing.module';
 import { MiscellaneousModule } from './miscellaneous/miscellaneous.module';
-import { HomeComponent } from './home/home.component';
+import {ButtonViewComponent, HomeComponent} from './home/home.component';
 import { CollectionsComponent } from './collections/collections.component';
 import { SettingsComponent } from './settings/settings.component';
 import { CardComponent } from './util/card/card.component';
@@ -98,7 +98,9 @@ import { ChatbotComponent } from './chatbot/chatbot.component';
     NbSpinnerModule,
     NbChatModule,
   ],
+  entryComponents: [ButtonViewComponent],
   declarations: [
+    ButtonViewComponent,
     PagesComponent,
     HomeComponent,
     CollectionsComponent,

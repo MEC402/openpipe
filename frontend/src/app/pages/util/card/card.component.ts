@@ -12,8 +12,8 @@ export class CardComponent implements OnInit {
   @Input() asset;
   @Input() source;
   @Input() searchTerm;
-  chosenMetaData= {};
-  collections= [];
+  chosenMetaData = {};
+  collections = [];
   newCollectionName;
   chosenCollection;
   scope;
