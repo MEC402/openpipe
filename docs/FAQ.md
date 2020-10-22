@@ -4,6 +4,14 @@
 
 http://github.com/mec402/openpipe/docs/FAQ.md should be the latest version.
 
+## Where do I find Developer Documention about OpenPipe?
+
+* source code is in http://github.com/mec402/openpipe
+* papers are in http://github.com/mec402/openpipe
+* project planning materials as of Oct 21 2020 is in gdrive://MEC402/openpipe
+* basic developer documentation is in http://github.com/mec402/openpipe/docs
+* The location for diagram documents is not currently defined.
+
 ## What are the External Dependecies of OpenPipe? 
 
 * An SQL Database
