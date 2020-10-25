@@ -21,8 +21,8 @@ export class AssetsComponent implements OnInit, OnDestroy {
   pages = [2, 3, 4, 5, 6, 7, 8, 9, 10];
   private _destroyed$ = new Subject();
   loading = true;
+  currentTopics: any;
   constructor(private dataAccess: DataAccessService) {
-
   }
 
   ngOnDestroy(): void {
@@ -31,6 +31,9 @@ export class AssetsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.dataAccess.getCanonicalMetaTags().subscribe(d => {
+      this.dataAccess.changeMessage(d);
+    });
 
     // for (let i = 1; i < 5000; i += 1) {
     //   this.dataAccess.getAllAssets(i, 200).pipe(takeUntil(this._destroyed$)).subscribe(resp => {
