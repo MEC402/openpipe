@@ -1,6 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import {LocalDataSource} from "ng2-smart-table";
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {LocalDataSource, ViewCell} from "ng2-smart-table";
 import {DataAccessService} from '../../../services/data-access.service';
+import {ButtonViewComponent} from "../../home/home.component";
+import {scanForRouteEntryPoints} from "@angular/compiler-cli/src/ngtsc/routing/src/lazy";
+
+
+
 
 @Component({
   selector: 'ngx-asset-defects-report',
@@ -8,44 +13,30 @@ import {DataAccessService} from '../../../services/data-access.service';
   styleUrls: ['./asset-defects-report.component.scss']
 })
 export class AssetDefectsReportComponent implements OnInit {
+   currentAsset=[];
 
 
   ngOnInit() {
   }
 
   settings = {
+    pager: {
+      display: true,
+      perPage: 100,
+    },
     actions: {
       add: false,
       delete: false,
-    },
-    edit: {
-      editButtonContent: '<i class="nb-edit"></i>',
-      saveButtonContent: '<i class="nb-checkmark"></i>',
-      cancelButtonContent: '<i class="nb-close"></i>',
-      confirmSave : true,
+      edit:false,
     },
     columns: {
-      assetName: {
+      name: {
         title: 'Asset Name',
         type: 'string',
         editable: false,
       },
-      defectType: {
+      Note: {
         title: 'Defect Type',
-        type: 'string',
-        editable: false,
-      },
-      metaTagName: {
-        title: 'MetaTag Name',
-        type: 'string',
-        editable: false,
-      },
-      metaTagValue: {
-        title: 'MetaTag Value',
-        type: 'string',
-      },
-      sourceName: {
-        title: 'Source Museum',
         type: 'string',
         editable: false,
       },
@@ -53,13 +44,59 @@ export class AssetDefectsReportComponent implements OnInit {
   };
 
 
+  tagSettings = {
+    pager: {
+      display: true,
+      perPage: 100,
+    },
+    actions: {
+      add: false,
+      delete: false,
+      edit:false,
+    },
+    columns: {
+      tagName: {
+        title: 'Tag Name',
+        type: 'string',
+        editable: false,
+      },
+      value: {
+        title: 'Tag Value',
+        type: 'string',
+        editable: false,
+      },
+      note: {
+        title: 'note',
+        type: 'string',
+      },
+      verified: {
+        title: 'Verified',
+        type: 'custom',
+        renderComponent: ButtonViewComponent,
+        onComponentInitFunction(instance) {
+          instance.save.subscribe(row => {
+            row.verified=1;
+          });
+        },
+      }
+    },
+  };
 
+  map={};
   source: LocalDataSource = new LocalDataSource();
+  tagSource: LocalDataSource = new LocalDataSource();
+  loading=true;
+  currentAssetName: any;
 
   constructor(private dataAccess: DataAccessService) {
-    dataAccess.getAssetsReport().subscribe(res => {
+    dataAccess.getAssetsReport(47).subscribe(res => {
       console.log(res)
       this.source.load(res.data);
+      res.data.forEach(d => {
+        console.log(d);
+      });
+      this.loading=false;
+
     });
   }
 
@@ -70,5 +107,23 @@ export class AssetDefectsReportComponent implements OnInit {
     event.confirm.resolve();
   }
 
+  onClick(event) {
+    this.currentAsset = event.data;
+    // this.currentAssetName = this.currentAsset.name;
+    // const temp = [];
+    // for (const [key, value] of Object.entries(event.data)) {
+    //   if (key != 'id' && key != 'metaDataId')
+    //     temp.push({'tagName': key, 'value': value});
+    // }
+    // this.tagSource.load(this.currentAsset.tags);
+  }
 
+
+  Verify(d: any) {
+    console.log(d);
+  }
+
+  VerifyAll() {
+
+  }
 }

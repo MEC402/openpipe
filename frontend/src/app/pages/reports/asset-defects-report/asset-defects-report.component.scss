@@ -1,0 +1,8 @@
+@import '../../../@theme/styles/themes';
+
+@include nb-install-component() {
+
+  ::ng-deep tbody  tr.ng2-smart-row.selected
+  { background:lightblue !important; border:1px solid blue;}
+
+}
