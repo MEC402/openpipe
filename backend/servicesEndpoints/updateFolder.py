@@ -19,7 +19,7 @@ print("Content-Type: text/json\n")
 dict = cgiFieldStorageToDict(cgi.FieldStorage())
 
 
-if 'collectionId' not in dict.keys() or 'newName' not in dict.keys() or 'newImage' not in dict.keys():
+if 'collectionId' not in dict.keys() or 'newName' not in dict.keys() or 'newImage' not in dict.keys() or 'newVerified' not in dict.keys():
     print(json.dumps({"result" : "Fail"}))
 else:
-    print(json.dumps(BL().updateFolder(dict["collectionId"], dict["newName"], dict["newImage"]), default=str))
+    print(json.dumps(BL().updateFolder(dict["collectionId"], dict["newName"], dict["newImage"], dict["newVerified"]), default=str))

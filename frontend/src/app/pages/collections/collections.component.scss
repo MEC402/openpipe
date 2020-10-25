@@ -63,6 +63,33 @@
     align-items: center;
   }
 
+  .item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    > * {
+      flex: 1;
+    }
+
+    &:first-child {
+      border-top: none;
+    }
+  }
+
+  .delta {
+    display: flex;
+    align-items: center;
+
+    &.down {
+      color: nb-theme(color-danger-default);
+    }
+
+    &.up {
+      color: nb-theme(color-success-default);
+    }
+  }
+
 }
 
 //

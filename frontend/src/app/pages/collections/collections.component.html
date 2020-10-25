@@ -31,7 +31,7 @@
       <div class="camera" >
         <div class="lists row">
           <div class="col-md-4 ">
-            <nb-card size="large">
+            <nb-card>
               <nb-card-body>
                 <ng2-smart-table [settings]="assetsSettings" [source]="currentFolderAssets" (userRowSelect)="onClick($event)" (deleteConfirm)="onFolderMemberDeleteConfirm($event)"	>
                 </ng2-smart-table>
@@ -40,9 +40,13 @@
           </div>
 
           <div class="col-md-8 ">
-            <nb-card>
-              <nb-card-header>
+            <nb-card >
+              <nb-card-header class="item">
                 {{currentAssetName}} Meta-Tags
+                <span class="delta" [class.up]="currentAssetVerified" [class.down]="!currentAssetVerified">
+                    <nb-icon  [icon]="currentAssetVerified ? 'checkmark-circle-2' : 'minus-circle' " pack="eva"></nb-icon>
+                </span>
+                <button nbButton size="tiny" status="success" *ngIf="!currentAssetVerified">Mark as Verified</button>
               </nb-card-header>
 
               <nb-card-body>

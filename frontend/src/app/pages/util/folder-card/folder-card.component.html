@@ -1,11 +1,15 @@
 <nb-card size="small">
   <nb-card-header>
     {{collection.name}}
+    <span class="delta" [class.up]="newVerified" [class.down]="!newVerified">
+          <nb-icon  [icon]="newVerified ? 'checkmark-circle-2' : 'minus-circle' " pack="eva"></nb-icon>
+    </span>
   </nb-card-header>
   <nb-card-body>
     <img [src]="collection.image">
   </nb-card-body>
   <nb-card-footer>
+    {{collection.assetCount}} assets
     <button
       size="tiny"
       status="success"
@@ -27,7 +31,7 @@
 </nb-card>
 
 <ng-template #dialog let-data let-ref="dialogRef">
-  <nb-card size="medium">
+  <nb-card size="giant">
     <nb-card-header>
       <button nbButton (click)="saveFolderChanges()" size="tiny" status="success">Save</button>
       <button nbButton (click)="ref.close()" size="tiny" status="danger">Close</button>
@@ -40,6 +44,16 @@
       <label>Image URL:
         <input type="text" nbInput fullWidth  [placeholder]="collection.image[0]" [(ngModel)]="newImage">
       </label>
+      <br/>
+      <label>Verified:
+        <nb-checkbox [(checked)]="newVerified"></nb-checkbox>
+        <input type="text" nbInput fullWidth  [placeholder]="collection.verified" [(ngModel)]="newVerified">
+      </label>
+      <br/>
+      <ng2-smart-table #test [settings]="settings" [source]="source" (deleteConfirm)="onDeleteConfirm($event)"
+                       (editConfirm)="onEditConfirm($event)" (createConfirm)="onCreateConfirm($event)">
+      </ng2-smart-table>
+
     </nb-card-body>
   </nb-card>
 </ng-template>

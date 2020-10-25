@@ -18,6 +18,7 @@ dict = cgiFieldStorageToDict(cgi.FieldStorage())
 
 dict={"collectionId":"all"}
 
+
 if 'start' in dict.keys() and 'end' in dict.keys():
     print(json.dumps(BL().getRangeOfCollections(dict["start"],dict["end"]), default=str))
 else:

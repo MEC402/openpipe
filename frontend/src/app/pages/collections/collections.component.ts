@@ -30,6 +30,7 @@ export class CollectionsComponent implements OnInit {
   source: LocalDataSource = new LocalDataSource();
   currentAsset: any;
   currentAssetName: any;
+  currentAssetVerified = false;
 
   settings = {
     add: {
@@ -56,6 +57,10 @@ export class CollectionsComponent implements OnInit {
       },
       value: {
         title: 'Value',
+        type: 'string',
+      },
+      verified: {
+        title: 'Verif',
         type: 'string',
       },
     },
@@ -89,11 +94,15 @@ export class CollectionsComponent implements OnInit {
 
   constructor(private dataAccess: DataAccessService) {
     dataAccess.getCollections().subscribe(res => {
+      console.log(res.data)
       this.collections = res.data;
     });
   }
 
   ngOnInit() {
+    this.dataAccess.getCanonicalMetaTags().subscribe(d => {
+      this.dataAccess.changeMessage(d);
+    });
 
   }
 
@@ -137,6 +146,8 @@ export class CollectionsComponent implements OnInit {
   onClick(event) {
     this.currentAsset = event.data;
     this.currentAssetName = this.currentAsset.openpipe_canonical_title[0];
+    this.currentAssetVerified = this.currentAsset.assetVerified[0];
+    console.log(event.data)
     const temp = [];
     for (const [key, value] of Object.entries(event.data)) {
       if (key != 'id' && key != 'metaDataId')
@@ -173,6 +184,8 @@ export class CollectionsComponent implements OnInit {
     this.currentFolderAssets.empty();
     this.source.empty();
     this.folderPage = true;
+    this.currentAssetVerified = false;
+    this.currentAssetName = '';
   }
 
   onFolderDeleteClick(c) {
