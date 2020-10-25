@@ -1,0 +1,30 @@
+<nb-select placeholder="Select a Museum" [(selected)]="selectedMuseum" (selectedChange)="getMapping($event)">
+  <nb-option *ngFor="let c of museums" [value]="c">{{c}}</nb-option>
+</nb-select>
+
+<div class="lists row">
+  <div class="col-md-8 ">
+    <nb-card [nbSpinner]="loading"
+             nbSpinnerStatus="info"
+             nbSpinnerSize="giant"
+             nbSpinnerMessage="Loading">
+      <nb-card-body>
+        <ng2-smart-table [settings]="settings" [source]="source"
+                         (editConfirm)="onEditConfirm($event)" >
+        </ng2-smart-table>
+      </nb-card-body>
+    </nb-card>
+  </div>
+
+  <div class="col-md-4 ">
+    <nb-card>
+      <nb-card-header>
+        Sample Tags
+      </nb-card-header>
+
+      <nb-card-body>
+        <ngx-json-viewer [json]="museumSampleData" (click)="clicked($event)"></ngx-json-viewer>
+      </nb-card-body>
+    </nb-card>
+  </div>
+</div>
