@@ -1,6 +1,7 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {DataAccessService} from '../../../services/data-access.service';
 import {LocalDataSource} from 'ng2-smart-table';
+import {TopicDropDownComponent} from '../../util/topic-drop-down/topic-drop-down.component';
 
 @Component({
   selector: 'ngx-meta-tag-editor',
@@ -10,6 +11,10 @@ import {LocalDataSource} from 'ng2-smart-table';
 export class MetaTagEditorComponent implements OnInit {
   @Input() assetsSource;
   @Input() loading = false;
+  @Input() value;
+
+  @ViewChild('test', {static: false}) asdf;
+
   collections: any;
   settings = {
     add: {
@@ -32,7 +37,12 @@ export class MetaTagEditorComponent implements OnInit {
     columns: {
       tagName: {
         title: 'Tag Name',
-        type: 'string',
+        type: 'html',
+        editor: {
+          type: 'custom',
+          valuePrepareFunction: (cell, row) => row,
+          component: TopicDropDownComponent,
+        },
       },
       value: {
         title: 'Value',
@@ -66,23 +76,11 @@ export class MetaTagEditorComponent implements OnInit {
     },
   };
 
-// <button nbSuffix nbButton ghost (click)="toggleShowPassword()">
-// <nb-icon [icon]="showPassword ? 'eye-outline' : 'eye-off-2-outline'"
-//   pack="eva"
-//     [attr.aria-label]="showPassword ? 'hide password' : 'show password'">
-//     </nb-icon>
-//     </button>
-
   constructor(private dataAccess: DataAccessService) {
-    // this.dataAccess.getAllAssets().subscribe(res => {
-    //   console.log(res);
-    //   this.assetsSource.load(res.data);
-    //   this.assets = res;
-    // });
+
   }
 
   ngOnInit() {
-
   }
 
   onDeleteConfirm(event): void {

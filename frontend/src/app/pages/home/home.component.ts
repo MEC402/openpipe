@@ -4,9 +4,7 @@ import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 
 @Component({
   selector: 'button-view',
-  template: `
-    <button nbButton size="tiny" (click)="onClick()">Add to Folder</button>
-  `,
+  template: `<button nbButton size="tiny" (click)="onClick()">{{renderValue}}</button>`,
 })
 export class ButtonViewComponent implements ViewCell, OnInit {
   renderValue: string;
@@ -71,7 +69,6 @@ export class HomeComponent implements OnInit {
         renderComponent: ButtonViewComponent,
         onComponentInitFunction(instance) {
           instance.save.subscribe(row => {
-
           });
         },
       },

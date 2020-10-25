@@ -1,0 +1,10 @@
+<div class="form-group">
+  <select class="form-control" [(ngModel)]="selectedValue" (click)="selectChangeHandler($event)">
+    <option value="others">Custom- Please Specify Below</option>
+    <option [value]="item" *ngFor="let item of myValues">{{item}}</option>
+  </select>
+</div>
+<div class="form-group" *ngIf="selectedValue == 'others'">
+  <label for="name">Enter Tag Name:</label>
+  <input type="text" class="form-control" id="name" [(ngModel)]="customTagName" name="other_college_name" required (keyup)="onWrite($event)">
+</div>

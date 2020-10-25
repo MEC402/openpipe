@@ -54,6 +54,10 @@ import { FolderCardComponent } from './util/folder-card/folder-card.component';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import { DsAppSettingsComponent } from './settings/ds-app-settings/ds-app-settings.component';
 import { ChatbotComponent } from './chatbot/chatbot.component';
+import { TopicDropDownComponent } from './util/topic-drop-down/topic-drop-down.component';
+import { MuseumTagMappingComponent } from './settings/museum-tag-mapping/museum-tag-mapping.component';
+import {NgxJsonViewerModule} from "ngx-json-viewer";
+import { CellDropDownComponent } from './util/cell-drop-down/cell-drop-down.component';
 
 
 @NgModule({
@@ -97,8 +101,9 @@ import { ChatbotComponent } from './chatbot/chatbot.component';
     HttpClientModule,
     NbSpinnerModule,
     NbChatModule,
+    NgxJsonViewerModule,
   ],
-  entryComponents: [ButtonViewComponent],
+  entryComponents: [ButtonViewComponent, TopicDropDownComponent, CellDropDownComponent],
   declarations: [
     ButtonViewComponent,
     PagesComponent,
@@ -123,6 +128,9 @@ import { ChatbotComponent } from './chatbot/chatbot.component';
     FolderCardComponent,
     DsAppSettingsComponent,
     ChatbotComponent,
+    TopicDropDownComponent,
+    MuseumTagMappingComponent,
+    CellDropDownComponent,
   ],
 })
 export class PagesModule {
