@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams, HttpRequest, HttpEventType, HttpResponse} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import set = Reflect.set;
 
 
@@ -172,15 +172,16 @@ export class DataAccessService {
   }
 
   public getAllAssets(p, ps): Observable<Results> {
-    //const getAllAssetURL = this.webServerURL + 'dataAccess/getAllAssets.py';
+    // const getAllAssetURL = this.webServerURL + 'dataAccess/getAllAssets.py';
     const getAllAssetURL = 'http://mec402.boisestate.edu/wsgi/getAllAssets.wsgi';
     const getAssetParams = new HttpParams().set('p', p).set('ps', ps);
     return this.http.get<Results>(getAllAssetURL, {params: getAssetParams});
   }
 
-  public getAssetsReport(): Observable<Results> {
+  public getAssetsReport(id): Observable<Results> {
     const getAssetsReport = this.webServerURL + 'dataAccess/getAssetsReport.py';
-    return this.http.get<Results>(getAssetsReport);
+    const getParams = new HttpParams().set('folderid', id);
+    return this.http.get<Results>(getAssetsReport, {params: getParams});
   }
 
   public getAssetsMissingImageReport(): Observable<Results> {
@@ -242,13 +243,23 @@ export class DataAccessService {
     return this.http.get(insertMetaTagURL, {params: insertMetaTagParams});
   }
 
-  public updateFolder(folderId, newName, newImage) {
+  public updateFolder(folderId, newName, newImage, newVerified) {
     const updateFolderURL = this.webServerURL + 'dataAccess/updateFolder.py';
     const updateFolderParams = new HttpParams()
       .set('collectionId', folderId)
       .set('newName', newName)
-      .set('newImage', newImage);
+      .set('newImage', newImage)
+      .set('newVerified', newVerified ? '1' : '0');
     return this.http.get(updateFolderURL, {params: updateFolderParams});
+  }
+
+  updateTagMapping(mapId, tagMap) {
+    const updateTM = this.webServerURL + 'dataAccess/updateTagMap.py';
+    const params = new HttpParams()
+      .set('id', mapId)
+      .set('newTagMap', tagMap);
+    return this.http.get(updateTM, {params: params});
+
   }
 
   public getAssetsWithGUID(): Observable<Results> {
@@ -273,6 +284,42 @@ export class DataAccessService {
     });
     return this.http.post<InsertionResponse>(metaTagsURL, postBody);
   }
+
+
+  public getMuseumTagMapping(): Observable<Results> {
+    return this.http.get<Results>( this.webServerURL + 'dataAccess/getMuseumTagMapping.py');
+  }
+
+  private messageSource = new BehaviorSubject([]);
+  currentMessage = this.messageSource.asObservable();
+
+  changeMessage(message) {
+    this.messageSource.next(message);
+  }
+
+
+  private sampleTagSource = new BehaviorSubject([]);
+  currentSampleTags = this.sampleTagSource.asObservable();
+  changeSampleTags(message) {
+    this.sampleTagSource.next(message);
+  }
+
+  getSampleMetaData(m: number) {
+    if (m == 1) {
+      return this.http.get<Results>( 'https://collectionapi.metmuseum.org/public/collection/v1/'
+        + 'objects/' + '239154');
+    } else if (m == 2) {
+      const params = new HttpParams()
+        .set('key', 'qvMYRE87')
+        .set('format', 'json');
+      return this.http.get<Results>( 'https://www.rijksmuseum.nl/api/en/collection/' + 'en-SK-A-4122'
+        , {params: params});
+    } else if (m == 3) {
+      return this.http.get<Results>( 'https://openaccess-api.clevelandart.org/api/artworks/157235');
+    }
+
+  }
+
 
 }
 
