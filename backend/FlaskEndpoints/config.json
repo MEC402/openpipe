@@ -1,0 +1,27 @@
+{
+  "guidPrefix": "http://mec402.boisestate.edu/cgi-bin openpipe/data/",
+  "domainName": "",
+  "apiDomainPrefix": "/api/v1",
+  "databaseInfo": {
+      "production": {
+      "address": "artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
+      "schema": "artmaster",
+      "username": "artmaster",
+      "password": "ArtMaster51"
+    },
+    "dev": {
+      "address": "artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
+      "schema": "artmaster",
+      "username": "artmaster",
+      "password": "ArtMaster51"
+    },
+    "host": {
+      "address": "localhost",
+      "schema": "artmaster",
+      "username": "root",
+      "password": "artMaster51!"
+    }
+  }
+}
+
+
