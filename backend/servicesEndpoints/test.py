@@ -1,5 +1,5 @@
-from webdav3.client import WebDavXmlUtils
-from webdav3.urn import Urn
+# from webdav3.client import WebDavXmlUtils
+# from webdav3.urn import Urn
 
 
 # class TestApp(unittest.TestCase):
@@ -98,6 +98,9 @@ from webdav3.urn import Urn
 #     # def testInsertIntoImages(cls):
 #     #     assert (BL().insertIntoImages("aaa","aaa","")==3412)
 #
+from openpipeAPI.ORM.BL import BL
+
+
 def testWebdav():
     from webdav3.client import Client
 
@@ -134,7 +137,7 @@ def testWebdav():
         client.execute_request(action='upload', path="/user_assets/a.png", data=local_file)
 
 
-testWebdav()
+# testWebdav()
 
 # import time
 #
@@ -147,3 +150,9 @@ testWebdav()
 # print(total)
 #
 # print(res)
+
+# BL().saveUploadAsset()
+
+a="ABC"
+
+print(a.lower())
