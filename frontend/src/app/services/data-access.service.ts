@@ -10,8 +10,10 @@ import set = Reflect.set;
 })
 export class DataAccessService {
   webServerURL;
+  domainURL;
   constructor(private http: HttpClient) {
     this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/';
+    this.domainURL = 'http://mec402.boisestate.edu/';
    // this.webServerURL = 'http://localhost/cgi-bin/';
   }
 
@@ -49,38 +51,39 @@ export class DataAccessService {
     return this.http.get<CollectionResults>(url, {params: params});
   }
 
+
+  public getFolders(): Observable<CollectionResults> {
+    const url = this.domainURL + 'api/v1/folders';
+    return this.http.get<CollectionResults>(url);
+  }
+
+  public getFolderDetails(folderId): Observable<FolderDetails> {
+    const url = this.domainURL + 'api/v1/folder/' + folderId;
+    return this.http.get<FolderDetails>(url);
+  }
+
   public createCollection(name: string): Observable<InsertionResponse> {
     const url = this.webServerURL + 'dataAccess/createCollection.py';
     const params = new HttpParams().set('name', name);
     return this.http.get<InsertionResponse>(url, {params: params});
   }
 
-  public uploadImages(files: File[])  {
+  public uploadImages(file, folderId)  {
     const url = this.webServerURL + 'dataAccess/addUserAssets.py';
-    const postBody = { 'files': files };
 
-    files.forEach(file => {
-
+    // files.forEach(file => {
+      if (folderId == -1)
+        folderId = 130;
       const formData: FormData = new FormData();
       formData.append('file', file, file.name);
+      formData.append('fileName', file.name);
+      formData.append('folderId', folderId);
       const req = new HttpRequest('POST', url, formData, {
         reportProgress: true,
       });
 
-
-      this.http.request(req).subscribe(event => {
-        if (event.type === HttpEventType.UploadProgress) {
-
-          // calculate the progress percentage
-          const percentDone = Math.round(100 * event.loaded / event.total);
-          // pass the percentage into the progress-stream
-        } else if (event instanceof HttpResponse) {
-
-          // Close the progress-stream if we get an answer form the API
-          // The upload is complete
-        }
-      });
-    });
+      return this.http.request(req);
+    // });
   }
 
   public saveAssetIntoCollection(asset, metaTags, collection, searchTerm, source, scope):
@@ -320,6 +323,16 @@ export class DataAccessService {
 
   }
 
+  public saveFolderLayout(layout): Observable<InsertionResponse> {
+    const URL = this.webServerURL + 'dataAccess/saveFolderLayout.py';
+    const postBody = layout;
+    const headers = new HttpHeaders({
+      'Content-Type': 'text/json',
+      'Access-Control-Allow-Origin': '*',
+    });
+    return this.http.post<InsertionResponse>(URL, postBody);
+  }
+
 
 }
 
@@ -327,6 +340,12 @@ class Results {
   total;
   data: any[];
   assets: any[];
+}
+
+
+class FolderDetails {
+  folderInfo: any;
+  metaTags: any;
 }
 
 class CollectionResults {

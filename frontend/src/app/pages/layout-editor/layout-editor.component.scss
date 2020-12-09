@@ -1,26 +1,36 @@
-.scrolling-wrapper-flexbox {
-  display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
+@import '../../@theme/styles/themes';
+@import '~@nebular/theme/styles/global/breakpoints';
+@import '~bootstrap/scss/mixins/breakpoints';
 
-  .card {
-    flex: 0 0 auto;
-    width: 500px;
-    height: 600px;
-    background: #d9edf7;
+@include nb-install-component() {
+
+  .scrolling-wrapper-flexbox {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+
+    .card {
+      flex: 0 0 auto;
+      width: 500px;
+      height: 600px;
+      background: #d9edf7;
+    }
   }
+
+  ngx-preview-card {
+    padding: 1%;
+  }
+  .thumbnail {
+    display: flex;
+  }
+  .row{
+    margin-left: 1%;
+  }
+
+  .form-control {
+    width: 25%;
+  }
+
 }
 
-ngx-preview-card{
-  padding: 1%;
-}
-.thumbnail {
-  display: flex;
-}
-.row{
-  margin-left: 1%;
-}
 
-.form-control {
-  width: 25%;
-}

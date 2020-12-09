@@ -4,8 +4,8 @@ import Konva from 'konva';
 import {ShapeService} from '../../services/shape.service';
 import {LocalDataSource} from 'ng2-smart-table';
 import { DataAccessService } from 'app/services/data-access.service';
-import {NbDialogRef, NbDialogService} from "@nebular/theme";
-import {BehaviorSubject} from "rxjs";
+import {NbDialogRef, NbDialogService} from '@nebular/theme';
+import {BehaviorSubject} from 'rxjs';
 
 
 @Component({
@@ -14,10 +14,39 @@ import {BehaviorSubject} from "rxjs";
   styleUrls: ['./layout-editor.component.scss'],
 })
 export class LayoutEditorComponent implements OnInit {
-  shapes: any = [];
-  stage: Konva.Stage;
-  layer: Konva.Layer;
-  transformers: Konva.Transformer[] = [];
+
+  shapesLeft: any = [];
+  stageLeft: Konva.Stage;
+  layerLeft: Konva.Layer;
+  transformersLeft: Konva.Transformer[] = [];
+
+
+  shapesRight: any = [];
+  stageRight: Konva.Stage;
+  layerRight: Konva.Layer;
+  transformersRight: Konva.Transformer[] = [];
+
+
+  shapesCenter: any = [];
+  stageCenter: Konva.Stage;
+  layerCenter: Konva.Layer;
+  transformersCenter: Konva.Transformer[] = [];
+
+
+  selectedShape: any;
+  activeWall;
+
+  currentLayer;
+
+  width = 1000;
+  height = 800;
+
+  sbl = this.shapeService.rectangle(0, 0, this.width, this.height);
+  sbc = this.shapeService.rectangle(0, 0, this.width, this.height);
+  sbr = this.shapeService.rectangle(0, 0, this.width, this.height);
+
+  // width = window.innerWidth * 0.9;
+  // height = window.innerHeight;
 
   collections = [];
   chosenCollection: any;
@@ -42,238 +71,336 @@ export class LayoutEditorComponent implements OnInit {
   };
 
   constructor(
-    private dialogService: NbDialogService,
     private dataAccess: DataAccessService,
     private shapeService: ShapeService,
-    private textNodeService: TextNodeService,
-    protected dialogRefLoad: NbDialogRef<any>) {}
+    private textNodeService: TextNodeService) {
+  }
 
 
   ngOnInit() {
-    const width = window.innerWidth * 0.9;
-    const height = window.innerHeight;
-    this.stage = new Konva.Stage({
-      container: 'container',
-      width: width,
-      height: height,
+
+    this.dataAccess.getCollections().subscribe(res => {
+      this.collections = res.data;
     });
-    this.layer = new Konva.Layer();
-    this.stage.add(this.layer);
+  }
+
+  resetWalls() {
+    this.stageLeft = new Konva.Stage({
+      container: 'container1',
+      width: this.width,
+      height: this.height,
+      id: 'stl',
+    });
+    this.layerLeft = new Konva.Layer();
+    this.stageLeft.add(this.layerLeft);
+    this.layerLeft.add(this.sbl);
+    this.layerLeft.draw();
+    this.stageLeft.on('click', e => this.onStageClick(e));
+
+
+    this.stageCenter = new Konva.Stage({
+      container: 'container2',
+      width: this.width,
+      height: this.height,
+      id: 'stc',
+    });
+    this.layerCenter = new Konva.Layer();
+    this.stageCenter.add(this.layerCenter);
+    this.layerCenter.add(this.sbc);
+    this.layerCenter.draw();
+    this.stageCenter.on('click', e => this.onStageClick(e));
+
+    this.stageRight = new Konva.Stage({
+      container: 'container3',
+      width: this.width,
+      height: this.height,
+      id: 'str',
+    });
+    this.layerRight = new Konva.Layer();
+    this.stageRight.add(this.layerRight);
+    this.layerRight.add(this.sbr);
+    this.layerRight.draw();
+    this.stageRight.on('click', e => this.onStageClick(e));
+
+    window.addEventListener('keyup', e => this.onShapeDelete(e));
+
+    this.currentLayer = this.layerLeft;
+    this.activeWall = 'Left';
   }
 
 
   addText() {
-    const text = this.textNodeService.textNode(this.stage, this.layer);
-    this.shapes.push(text.textNode);
-    this.transformers.push(text.tr);
-  }
+    if (this.activeWall == 'Left') {
 
-  addImage(url) {
-    const image = this.shapeService.image(url);
-    this.layer.add(image);
-    this.shapes.push(image);
-    this.stage.add(this.layer);
-    this.addTransformerListeners();
-  }
+      const text = this.textNodeService.textNode(this.stageLeft, this.layerLeft);
+      this.shapesLeft.push(text.textNode);
+      this.transformersLeft.push(text.tr);
 
-  undo() {
-    const removedShape = this.shapes.pop();
-    this.transformers.forEach(t => {
-      t.detach();
-    });
-    if (removedShape) {
-      removedShape.remove();
+    } else if (this.activeWall == 'Center') {
+
+      const text = this.textNodeService.textNode(this.stageCenter, this.layerCenter);
+      this.shapesCenter.push(text.textNode);
+      this.transformersCenter.push(text.tr);
+
+    } else if (this.activeWall == 'Right') {
+
+      const text = this.textNodeService.textNode(this.stageRight, this.layerRight);
+      this.shapesRight.push(text.textNode);
+      this.transformersRight.push(text.tr);
     }
-    this.layer.draw();
-  }
-  addTransformerListeners() {
-    const component = this;
-    const tr = new Konva.Transformer({
-      keepRatio: true,
-    });
-    this.stage.on('click', function (e) {
-      if (!this.clickStartShape) {
-        return;
-      }
-      if (e.target._id == this.clickStartShape._id) {
-        component.addDeleteListener(e.target);
-        component.layer.add(tr);
-        tr.attachTo(e.target);
-        component.transformers.push(tr);
-        component.layer.draw();
-      } else {
-        tr.detach();
-        component.layer.draw();
-      }
-    });
   }
 
-  addDeleteListener(shape) {
-    const component = this;
-    window.addEventListener('keydown', function (e) {
-      if (e.keyCode === 46) {
-        shape.remove();
-        component.transformers.forEach(t => {
-          t.detach();
-        });
-        const selectedShape = component.shapes.find(s => s._id == shape._id);
-        selectedShape.remove();
-        e.preventDefault();
-      }
-      component.layer.batchDraw();
-    });
+  addImage(asset) {
+    const image = this.shapeService.image(asset.openpipe_canonical_smallImage, this.width, this.height);
+
+    image.on('click', e => this.onShapeClick(e));
+    image.on('keyup', e => this.onShapeDelete(e));
+
+    this.currentLayer.add(image);
+    this.currentLayer.draw();
+
+    if (this.activeWall == 'Left') {
+      this.shapesLeft.push({'assetImage' : image , 'assetData' : asset});
+    } else if (this.activeWall == 'Center') {
+      this.shapesCenter.push({'assetImage' : image , 'assetData' : asset});
+    } else if (this.activeWall == 'Right') {
+      this.shapesRight.push({'assetImage' : image , 'assetData' : asset});
+    }
+
+
   }
+
+  onShapeClick (e) {
+
+    if (this.activeWall == 'Left') {
+
+      const n = this.transformersLeft.length;
+      if (n > 0) {
+        this.transformersLeft[n - 1].detach();
+      }
+      this.selectedShape = e.target;
+      const tr = new Konva.Transformer({
+        keepRatio: true,
+      });
+      this.layerLeft.add(tr);
+      tr.attachTo(e.target);
+      this.transformersLeft.push(tr);
+      this.layerLeft.draw();
+
+    } else if (this.activeWall == 'Center') {
+
+      const n = this.transformersCenter.length;
+      if (n > 0) {
+        this.transformersCenter[n - 1].detach();
+      }
+      this.selectedShape = e.target;
+      const tr = new Konva.Transformer({
+        keepRatio: true,
+      });
+      this.layerCenter.add(tr);
+      tr.attachTo(e.target);
+      this.transformersCenter.push(tr);
+      this.layerCenter.draw();
+
+    } else if (this.activeWall == 'Right') {
+      const n = this.transformersRight.length;
+      if (n > 0) {
+        this.transformersRight[n - 1].detach();
+      }
+      this.selectedShape = e.target;
+      const tr = new Konva.Transformer({
+        keepRatio: true,
+      });
+      this.layerRight.add(tr);
+      tr.attachTo(e.target);
+      this.transformersRight.push(tr);
+      this.layerRight.draw();
+    }
+  }
+
+  onShapeDelete(e) {
+    if (e.keyCode === 46) {
+      if (this.activeWall == 'Left') {
+
+        let index = -1;
+        for (let i = 0; i < this.shapesLeft.length; i++) {
+          if (this.shapesLeft[i].assetImage == this.selectedShape) {
+            index = i;
+            break;
+          }
+        }
+        if (index > -1) {
+          this.shapesLeft.splice(index, 1);
+        }
+
+        this.selectedShape.remove();
+
+        const n = this.transformersLeft.length;
+        if (n > 0) {
+          this.transformersLeft[n - 1].detach();
+        }
+        this.layerLeft.batchDraw();
+
+      } else if (this.activeWall == 'Center') {
+
+        let index = -1;
+        for (let i = 0; i < this.shapesCenter.length; i++) {
+          if (this.shapesCenter[i].assetImage == this.selectedShape) {
+            index = i;
+            break;
+          }
+        }
+        if (index > -1) {
+          this.shapesCenter.splice(index, 1);
+        }
+
+        this.selectedShape.remove();
+
+        const n = this.transformersCenter.length;
+        if (n > 0) {
+          this.transformersCenter[n - 1].detach();
+        }
+        this.layerCenter.batchDraw();
+
+      } else if (this.activeWall == 'Right') {
+        let index = -1;
+        for (let i = 0; i < this.shapesRight.length; i++) {
+          if (this.shapesRight[i].assetImage == this.selectedShape) {
+            index = i;
+            break;
+          }
+        }
+        if (index > -1) {
+          this.shapesRight.splice(index, 1);
+        }
+
+        this.selectedShape.remove();
+
+        const n = this.transformersRight.length;
+        if (n > 0) {
+          this.transformersRight[n - 1].detach();
+        }
+        this.layerRight.batchDraw();
+      }
+    }
+  }
+
+  onStageClick(e) {
+    if (this.activeWall == 'Left') {
+
+      if (e.target.attrs.id == 'stl') {
+        this.selectedShape = null;
+        const n = this.transformersLeft.length;
+        if (n > 0) {
+          this.transformersLeft[n - 1].detach();
+        }
+      }
+      this.layerLeft.draw();
+
+    } else if (this.activeWall == 'Center') {
+
+      if (e.target.attrs.id == 'stl') {
+        this.selectedShape = null;
+        const n = this.transformersCenter.length;
+        if (n > 0) {
+          this.transformersCenter[n - 1].detach();
+        }
+      }
+      this.layerCenter.draw();
+
+    } else if (this.activeWall == 'Right') {
+
+      if (e.target.attrs.id == 'stl') {
+        this.selectedShape = null;
+        const n = this.transformersRight.length;
+        if (n > 0) {
+          this.transformersRight[n - 1].detach();
+        }
+      }
+      this.layerRight.draw();
+    }
+  }
+
+  // undo() {
+  //   const removedShape = this.shapes.pop();
+  //   this.transformers.forEach(t => {
+  //     t.detach();
+  //   });
+  //   if (removedShape) {
+  //     removedShape.remove();
+  //   }
+  //   this.layer.draw();
+  // }
 
   onSelect() {
-    this.dataAccess.getPublicAssetsInCollection(this.chosenCollection.id, 1, 10).subscribe(res => {
+    this.resetWalls();
+    this.dataAccess.getPublicAssetsInCollection(this.chosenCollection.id, 1, 100).subscribe(res => {
+      console.log(this.chosenCollection)
+      console.log(res);
       this.assetsSource.load(res.data);
     });
   }
 
   onRowSelect(event: any) {
-    event.selected.forEach(d => {
-      this.addImage(d.openpipe_canonical_smallImage);
-    });
+    if (event.isSelected) {
+      this.addImage(event.data);
+    } else {
+      event.selected.forEach(d => {
+        this.addImage(d);
+      });
+    }
   }
 
-  openLoadDialog(dialog: TemplateRef<any>) {
-    const data = [];
-    this.dataAccess.getCollections().subscribe(res => {
-      this.collections = res.data;
+  saveLayout() {
+    let resLayout = [];
+    resLayout = this.makeLayout(this.shapesLeft, 'left').concat(this.makeLayout(this.shapesCenter, 'center'));
+    resLayout = resLayout.concat(this.makeLayout(this.shapesRight, 'right'));
+    console.log(resLayout);
+    this.dataAccess.saveFolderLayout({"folderId": this.chosenCollection.id[0], "data": resLayout}).subscribe(r=>{
+      alert("Layout Saved!");
     });
-    this.dialogRefLoad = this.dialogService.open(dialog, {context: data});
+
+  }
+
+  makeLayout(shapes, wall) {
+    const res = [];
+    console.log(shapes)
+    shapes.forEach(d => {
+      const x = d.assetImage.attrs.x;
+      const y = d.assetImage.attrs.y;
+      const xs = Number(d.assetImage.attrs.scaleX);
+      const ys = Number(d.assetImage.attrs.scaleY);
+      const w = Number(d.assetImage.attrs.image.width) * xs;
+      const h = Number(d.assetImage.attrs.image.height) * ys;
+
+      console.log(d)
+
+      const e = {
+        "assetId": Number(d.assetData.id[0]),
+          "guid": 'http://mec402.boisestate.edu/cgi-bin/openpipe/data/asset/'
+          + d.assetData.id[0],
+        "geometry": w.toFixed(2) + ' x ' + h.toFixed(2) + ' + ' + x + ' + ' + y,
+        "wall": wall};
+      res.push(e);
+    });
+    return res;
+  }
+
+  onChangeTab(e) {
+    if (e.tabTitle == 'Left Wall') {
+      this.activeWall = 'Left';
+      console.log('Left');
+      this.currentLayer = this.layerLeft;
+    } else if (e.tabTitle == 'Right Wall') {
+      this.activeWall = 'Right';
+      this.currentLayer = this.layerRight;
+      console.log('Right');
+    } else if (e.tabTitle == 'Center Wall') {
+      this.activeWall = 'Center';
+      this.currentLayer = this.layerCenter;
+      console.log('Center');
+    }
+
   }
 }
 
-
-
-
-// @ViewChild('stage', {'static': false}) stage: KonvaComponent;
-// @ViewChild('layer', {'static': false}) layer: KonvaComponent;
-//
-// leftWallAssets = [];
-// centerWallAssets = [];
-// rightWallAssets = [];
-// wall = 1;
-// collections = [];
-// chosenCollection: any;
-//
-// assetsSource: LocalDataSource = new LocalDataSource();
-//
-// public configStage: Observable<any> = of({
-//   width: 800,
-//   height: 500,
-// });
-
-
-// assetsSettings = {
-//   selectMode: 'multi',
-//   actions: false,
-//   columns: {
-//     openpipe_canonical_smallImage: {
-//       filter: false,
-//       title: 'Picture',
-//       type: 'html',
-//       valuePrepareFunction: (openpipe_canonical_smallImage) => {
-//         return '<img width="50px" src="' + openpipe_canonical_smallImage[0] + '" />';
-//       },
-//     },
-//     openpipe_canonical_title: {
-//       title: 'Title',
-//       type: 'string',
-//     },
-//   },
-// };
-//
-// constructor(private dialogService: NbDialogService,
-//   protected dialogRef: NbDialogRef<any>,
-//   protected dialogRefLoad: NbDialogRef<any>,
-//   protected dialogRefSave: NbDialogRef<any>,
-//   private dataAccess: DataAccessService) {
-// }
-//
-// ngOnInit() {
-//
-// }
-//
-// offset(element, parent) {
-//   const parentPos = parent.getBoundingClientRect(),
-//     childPos = element.getBoundingClientRect(),
-//     relativePos = {'top': 0, 'right': 0, 'left': 0, 'bottom': 0};
-//
-//   relativePos.top = childPos.top - parentPos.top,
-//     relativePos.right = childPos.right - parentPos.right,
-//     relativePos.bottom = childPos.bottom - parentPos.bottom,
-//     relativePos.left = childPos.left - parentPos.left;
-//
-//   return relativePos;
-// }
-//
-// onClick(event: MouseEvent) {
-//   const leftElements = document.getElementById('leftWall').children;
-//   const centerElements = document.getElementById('centerWall').children;
-//   const rightElements = document.getElementById('rightWall').children;
-//
-//   const divOffset = this.offset(leftElements[0], document.getElementById('leftWall'));
-//   console.log(divOffset.left, divOffset.top);
-// }
-//
-// onSelect() {
-//   this.dataAccess.getPublicAssetsInCollection(this.chosenCollection.id, 1, 10).subscribe(res => {
-//     this.assetsSource.load(res.data);
-//   });
-// }
-// onRowSelect(event: any) {
-//   if (this.wall == 0) {
-//     this.leftWallAssets = (event.selected);
-//   } else if (this.wall == 1) {
-//     this.centerWallAssets = (event.selected);
-//     this.centerWallAssets.forEach(d => {
-//       d.config = new BehaviorSubject ({
-//         x: 0,
-//         y: 10,
-//         width: 50,
-//         image: d.openpipe_canonical_smallImage[0],
-//       });
-//     });
-//     console.log(this.centerWallAssets);
-//   } else if (this.wall == 2) {
-//     this.rightWallAssets = (event.selected);
-//   }
-//   this.layer.getStage().draw();
-// }
-//
-// openLoadDialog(dialog: TemplateRef<any>) {
-//   const data = [];
-//   this.dataAccess.getCollections().subscribe(res => {
-//     this.collections = res.data;
-//   });
-//   this.dialogRefLoad = this.dialogService.open(dialog, {context: data});
-// }
-//
-// openSaveDialog(dialog: TemplateRef<any>) {
-//   this.dialogRefSave = this.dialogService.open(dialog, {context: {}});
-// }
-//
-
-//
-// onRightClick(r: any, wallnumber) {
-//   if (wallnumber == 0) {
-//     this.leftWallAssets = this.arrayRemove(this.leftWallAssets, r);
-//   } else if (wallnumber == 1) {
-//     this.centerWallAssets = this.arrayRemove(this.centerWallAssets, r);
-//   } else if (wallnumber == 2) {
-//     this.rightWallAssets = this.arrayRemove(this.rightWallAssets, r);
-//   }
-//   return false;
-// }
-//
-// arrayRemove(arr, value) {
-//   return arr.filter(function (ele) {
-//     return ele != value;
-//   });
-// }
-//
-// drop(event: CdkDragDrop<any[], any>) {
-//   console.log(event);
-// }

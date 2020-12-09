@@ -13,7 +13,7 @@ import {scanForRouteEntryPoints} from "@angular/compiler-cli/src/ngtsc/routing/s
   styleUrls: ['./asset-defects-report.component.scss']
 })
 export class AssetDefectsReportComponent implements OnInit {
-   currentAsset=[];
+   currentAsset={'tags':[]};
 
 
   ngOnInit() {
