@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/python3
 import cgi
 import json
 
@@ -15,9 +15,9 @@ def cgiFieldStorageToDict(fieldStorage):
 print("Content-Type: text/json\n")
 
 dict = cgiFieldStorageToDict(cgi.FieldStorage())
-dict={"path":"artist/28"}
+#dict={"path":"artist/28"}
 guids=dict['path'].split("/")
 if len(guids)<2:
-    guids[1]=""
+    guids.append("")
 data = BL().getGUIDInfo(guids[0], guids[1])
 print(json.dumps(data, default=str))

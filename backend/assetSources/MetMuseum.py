@@ -1,24 +1,23 @@
 #!/bin/python3
 
+from MuseumsTM import MuseumsTM
+
 from multiprocessing.pool import ThreadPool
 
 import requests
 
-from assetSources.ImageUtil import ImageUtil
+from ImageUtil import ImageUtil
 
 
-class MetMuseum:
-    url = "https://collectionapi.metmuseum.org/public/collection/v1/"
-
-    def __init__(self, schema):
-        self.schema = schema
+class MetMuseum(MuseumsTM):
 
     def searchMetForAssets(self, term):
         serviceName = "search"
         params = {'q': term}
-        response = requests.get(url=self.url + serviceName, params=params)
+        response = requests.get(url=self.attributes['url'] + serviceName, params=params)
         data = response.json()
         return data
+
 
     def getMetaTagMapping(self, data):
         response = {}
@@ -58,7 +57,7 @@ class MetMuseum:
 
     def getAssetMetaData(self, assetOriginalID):
         serviceName = "objects/" + str(assetOriginalID)
-        response = requests.get(url=self.url + serviceName)
+        response = requests.get(url=self.attributes['url'] + serviceName)
         data = response.json()
         metaData = self.getMetaTagMapping(data)
         return metaData
@@ -66,6 +65,8 @@ class MetMuseum:
     def getData(self, q, page, pageSize):
         results = []
         retrievedAssets = self.searchMetForAssets(q)
+        if retrievedAssets['total'] == 0:
+            return {"data": [], "total": 0, "sourceName": "MET"}
 
         start = (page - 1) * pageSize
         step = pageSize

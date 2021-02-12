@@ -35,9 +35,12 @@ if 'changeEnd' not in dict.keys():
 if 'type' not in dict.keys():
     dict['type'] = 0
 
-data=BL().getAllAssets(int(dict["p"]), int(dict["ps"]), dict['changeStart'], dict['changeEnd'])
+if dict['p'].isnumeric() != True:
+ data={"total": 0, "data": [], "error": "page value must be a number"}
+else:
+ data=BL().getAllAssets(int(dict["p"]), int(dict["ps"]), dict['changeStart'], dict['changeEnd'])
 
-if(dict['type']==1):
+ if(dict['type']==1):
     dt=BL().getCanonicalTags().values()
     print(dt)
     for dd in data['data']:
