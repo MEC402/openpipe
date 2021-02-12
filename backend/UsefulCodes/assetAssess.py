@@ -15,13 +15,38 @@ from openpipeAPI.ORM.BL import BL
 from openpipeAPI.ORM.ORM import ORM
 from openpipeAPI.ORM.TO import TO
 
+import operator
 
 
+
+#get a complete list of all assets in the federation
 def getAssets(aorm):
-    tables = TO().getClasses()
-    MetaTag = tables["metaTag"]
+#    tables = TO().getClasses()
+#    MetaTag = tables["metaTag"]
     res =aorm.executeSelect("""SELECT * FROM asset;""")
     return res
+
+def get_tagName(atag):
+    print (atag)
+    return atag.get('tagName')
+
+#get the canonical topic names that must exist for each asset
+def getCanons(aorm):
+    res = aorm.executeSelect("""SELECT name FROM canonicalMetaTag where req='yes'""")
+    ares=[]
+    for an in res['data']:
+        ares.append(an['name'][0])
+    return ares
+
+#get the canonical topic names that must exist for each asset
+def getCanonTopics(aorm):
+    res = aorm.executeSelect("""SELECT tagName, status, value FROM metaTag where tagName like 'openpipe_canonical_%'""")
+    ares=[]
+    for an in res['data']:
+        ares.append(an)
+    ares.sort(key=operator.itemgetter('tagName','status'))
+#    print(ares)
+    return ares
 
 def getPhysical(aorm):
     tables = TO().getClasses()
@@ -64,7 +89,7 @@ def getDimensions(aorm,topic):
     defstring = defvalue['data'][0]['default'][0]
     print (defstring)
 
-    sqlsrc = """select t1.metaDataId, t2.value from metaTag t1 inner join metaTag t2 on t1.metaDataId=t2.metaDataId where t1.tagname='%s' and t2.tagName='dimensions';""" %topic
+    sqlsrc = """select t1.metaDataId, t2.value from metaTag t1 inner join metaTag t2 on t1.metaDataId=t2.metaDataId where t1.tagName='%s' and t1.value='%s' and t2.tagName='dimensions';""" %( topic, defstring)
     sqltext = sqlsrc 
     print(sqltext)
     res =aorm.executeSelect(sqltext)
@@ -105,7 +130,22 @@ def extractH3Sizes(sizelist):
     sizedict['height'] = "29.7"
     sizedict['width'] = "21.0"
     sizedict['depth'] = "1.0"
-    nums = re.compile('[0-9]+.[0-9]*')
+    nums = re.compile('[0-9]+\.?[0-9]*')
+
+    mysize = sizelist[0]
+    numlist = nums.findall(mysize)
+    if len(numlist) > 0: sizedict['width'] = numlist[0]
+    if len(numlist) > 1: sizedict['height'] = numlist[1]
+    if len(numlist) > 2: sizedict['depth'] = numlist[2]
+
+    return sizedict
+
+def extractH2Sizes(sizelist):
+    sizedict ={}
+    sizedict['height'] = "29.7"
+    sizedict['width'] = "21.0"
+    sizedict['depth'] = "1.0"
+    nums = re.compile('[0-9]+\.?[0-9]*')
 
     mysize = sizelist[0]
     numlist = nums.findall(mysize)
@@ -157,18 +197,23 @@ def correctDimensions(aorm,adimlist):
     ibsize = 0
     ibparse = 0
     totaldim = len(adimlist)
-    acount = [0,0,0,0,0,0,0,0,0]
+    acount = [0,0,0,0,0,0,0,0,0,0,0,0]
     onetime = 1
+    updlist =[]
 
 #first build our regular expression for some of the cases
     mysizes = re.compile('\'*width\'*\s*:\s*[0-9]+.[0-9]*|\'*height\'*\s*:\s*[0-9]+.[0-9]*|\'*depth\'*\s*:\s*[0-9]+.[0-9]*')
     myovr = re.compile('\([0-9]+.[0-9]*.*?cm.*?\)')
-    myhre = re.compile('\([0-9]+.[0-9]*\s*x\s*[0-9]+.[0-9]*\s*x\s*[0-9]+.[0-9]*\s*cm\)')
+    myhre = re.compile('\(\s*[0-9]+\.?[0-9]*\s*x\s*[0-9]+\.?[0-9]*\s*x\s*[0-9]+\.?[0-9]*\s*cm.*\)')
+    myhre2 = re.compile('\(\s*[0-9]+.[0-9]*\s*x\s*[0-9]+.[0-9]*\s*cm.*?\)')
+    myhre3 = re.compile('\(\s*[0-9]+\.*[0-9]*\s*cm.*?\)')
     for adim in adimlist:
         width = defwidth
         height = defheight
         depth = defdepth
         akv = {'height': "29.7", "width": "21.0", "depth": "1.0"}
+        ares = {'metadataid': adim['metaDataId'][0]}
+#        print(ares)
         matchstring = adim['value'][0]
         if (len(matchstring) < 1):
 #            print("No dimensions given")
@@ -181,27 +226,52 @@ def correctDimensions(aorm,adimlist):
 #                 print(dimlist)
                  if (len(dimlist) > 0):
                    akv = extractSizes(dimlist)
+                   ares['dims'] = akv
+                   updlist.append(ares)
                    iparsecount += 1
 #                 print(akv)
+#                 else:
+#                     print(matchstring)
 #                 print("++++++++++++++++++")
+                 acount[10] += 1
                  nummatch += 1
         elif (str.startswith(matchstring, "Overall")):
 #                 print(matchstring)
                  dimlist = myovr.findall(matchstring)
                  if (len(dimlist) > 0):
                    akv = extractOvrSizes(dimlist)
+                   ares['dims'] = akv
+                   updlist.append(ares)
                    iparseoverall += 1
                  else:
                      print(dimlist)
 #                 print(akv)
+                 acount[11] += 1
                  nummatch += 1
                  ioverall += 1
         elif (str.startswith(matchstring, "H.")):
-#                 print(matchstring)
+#                 print(ascii(matchstring))
+                 matchstring  = matchstring.replace("\xd7","x")
                  adimlist = myhre.findall(matchstring)
+                 adimlist2 = myhre2.findall(matchstring)
+                 adimlist3 = myhre3.findall(matchstring)
+#                 print("MOAT" + ascii(matchstring))
                  if (len(adimlist) > 0):
                      akv = extractH3Sizes(adimlist)
+                     ares['dims'] = akv
+                     updlist.append(ares)
+#                     print(akv)
+                 elif (len(adimlist2) > 0):
+                     akv = extractH2Sizes(adimlist2)
                      print(akv)
+                     ares['dims'] = akv
+                     updlist.append(ares)
+                 elif (len(adimlist3) > 0):
+                     akv = extractH3Sizes(adimlist3)
+                     ares['dims'] = akv
+                     updlist.append(ares)
+                 else:
+                     print(matchstring)
                  acount[0] += 1
                  nummatch += 1
         elif (str.startswith(matchstring, "h.")):
@@ -242,6 +312,8 @@ def correctDimensions(aorm,adimlist):
 #                 print(arp)
                  dimobj = hjson.loads(arp)
                  akv = extractBSizes(dimobj)
+                 ares['dims'] = akv
+                 updlist.append(ares)
                  ibparse += 1
 #                 print(dimdict)
                  acount[7] += 1
@@ -251,17 +323,28 @@ def correctDimensions(aorm,adimlist):
                  acount[8] += 1
                  nummatch += 1
         elif len(matchstring) > 0 and (matchstring[0].isdigit()):
-#                print(matchstring)
+#                 print(matchstring)
+                 matchstring  = matchstring.replace("\xd7","x")
+                 adimlist = myhre.findall(matchstring)
+                 adimlist2 = myhre2.findall(matchstring)
+#                 print("MOAT" + ascii(matchstring))
+                 if (len(adimlist) > 0):
+                     akv = extractH3Sizes(adimlist)
+                     ares['dims'] = akv
+                     updlist.append(ares)
+#                     print(akv)
+                 elif (len(adimlist2) > 0):
+                     akv = extractH2Sizes(adimlist2)
+#                     print(akv)
+                     ares['dims'] = akv
+                     updlist.append(ares)
+#                 else:
+#                     print(matchstring);
+                 acount[9] += 1
                  nummatch += 1
         else:
 #           print ("Unrecognized dimensions format: %s" % adim['value'][0])
            unknowndim += 1
-
-    #third ensure the string is in centimeters
-
-    #now we modify the canonical entry in the table
-
-    #finally we format a bulk update for changing all at once
 
     print("Total Unknown Dimension tags = %d out of %d" % (unknowndim,totaldim))
     print("Total Empty Dimension tags = %d out of %d" % (nodims,totaldim))
@@ -270,53 +353,72 @@ def correctDimensions(aorm,adimlist):
     print("for 'Overall' successfully parsed %d/%d" % (iparseoverall, ioverall))
     print("for '[{' successfully parsed %d/%d" % (ibparse, ibsize))
     print(acount)
+    return(updlist)
+
+def updateDimensions(aorm,dimlist):
+    #create a series of update strings with commands
+    sqlstring = "update metaTag set value=%s where metaDataId=%s and tagName='openpipe_canonical_physicalDimensions';" 
+    datalist = []
+    for adim in dimlist:
+      #step one generate the dimension string in: W,H,D format
+      whdstring = "%s, %s, %s" % (adim['dims']['width'],
+                                  adim['dims']['height'],
+                                  adim['dims']['depth'])
+#      print (adim)
+      atuple = (whdstring, adim['metadataid'])
+      datalist.append(atuple)
+
+#    print(datalist)
+    aorm.batchSql(datalist,sqlstring,False)
 
 
-
-#connect to the federation
-aorm =ORM()
-
-##here we are going to generate a report about the assets stored in the Table
-##the report will tell us how many assets there are.
-##How many are missing some tags
-##How many have incorrect values on their CanonicalTopic Tags
-
-#get the asset list
-ares = getAssets(aorm)
-
-#how many assets are there in the table:
-print("The Federated Asset Table Has %d assets." % len(ares['data']))
-
-#how many of those have physicalDimensions canonTopic?
-pres = getPhysical(aorm)
-print ("There are %d assets with Physical Dimensions." % len(pres['data']))
-
-if len(pres['data']) != len(ares['data']):
-    mres = getNotIn(aorm,'openpipe_canonical_physicalDimensions')
-    print ("The following %d assets do not have proper physical dimensions" % len(mres['data']))
-    for r in mres['data']:
-        print (r)
-
-#how many of these have default values
-dres = getDefault(aorm,'openpipe_canonical_physicalDimensions')
-print("The following %d assets have default physical Dimensions" % len(dres['data']))
-#for r in dres['data']:
-#     print (r)
-
-#now we will use the original source dimensions
-#it appears that all assets use 'dimensions' in the original museum list
-
-#get all canonical dimensions with museum data
-dres = getDimensions(aorm,'openpipe_canonical_physicalDimensions')
-print ("There are %d default dimension Assets to fix" % len(dres['data']))
-correctDimensions(aorm,dres['data'])
-
-#completed
-
-
-#output the asset list
-#for r in ares['data']:
-#    print(r)
-#    mid = r["id"][0]
-#    orm.insert(MetaTag(metaDataId=mid, tagName="openpipe_canonical_moment", value=0))
-#orm.commitClose()
+##connect to the federation
+#aorm =ORM()
+#
+###here we are going to generate a report about the assets stored in the Table
+###the report will tell us how many assets there are.
+###How many are missing some tags
+###How many have incorrect values on their CanonicalTopic Tags
+#
+##get the asset list
+#ares = getAssets(aorm)
+#
+##how many assets are there in the table:
+#print("The Federated Asset Table Has %d assets." % len(ares['data']))
+#
+##how many of those have physicalDimensions canonTopic?
+#pres = getPhysical(aorm)
+#print ("There are %d assets with Physical Dimensions." % len(pres['data']))
+#
+#if len(pres['data']) != len(ares['data']):
+#    mres = getNotIn(aorm,'openpipe_canonical_physicalDimensions')
+#    print ("The following %d assets do not have proper physical dimensions" % len(mres['data']))
+#    for r in mres['data']:
+#        print (r)
+#
+##how many of these have default values
+#dres = getDefault(aorm,'openpipe_canonical_physicalDimensions')
+#print("The following %d assets have default physical Dimensions" % len(dres['data']))
+##for r in dres['data']:
+##     print (r)
+#
+##now we will use the original source dimensions
+##it appears that all assets use 'dimensions' in the original museum list
+#
+##get all canonical dimensions with museum data
+#dres = getDimensions(aorm,'openpipe_canonical_physicalDimensions')
+#print ("There are %d default dimension Assets to fix" % len(dres['data']))
+#updlist = correctDimensions(aorm,dres['data'])
+#print(len(updlist))
+##print(updlist)
+#updateDimensions(aorm,updlist)
+#
+##completed
+#
+#
+##output the asset list
+##for r in ares['data']:
+##    print(r)
+##    mid = r["id"][0]
+##    orm.insert(MetaTag(metaDataId=mid, tagName="openpipe_canonical_moment", value=0))
+##orm.commitClose()
