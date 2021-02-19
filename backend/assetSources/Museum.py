@@ -46,3 +46,19 @@ class Museum(ABC):
         :return: JSON containing all the assets returned as the search result with the canonical tags in correct format.
         """
         pass
+
+    def getCanonTags(self, asset, aorm):
+        """
+        This function can be called to get the set of canonical topics
+        provided by this museum mapped from the Museum meta data
+        into OpenPipe meta data
+        """
+        pass
+
+
+
+
+
+
+
+

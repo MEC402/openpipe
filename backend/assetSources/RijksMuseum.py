@@ -1,6 +1,7 @@
 #!/bin/python3
 
 import requests
+import formatHelp
 from MuseumsTM import MuseumsTM
 from multiprocessing.pool import ThreadPool
 #    url = "https://www.rijksmuseum.nl/api/en/"
@@ -9,8 +10,34 @@ class RijksMuseum(MuseumsTM):
 
     url = "https://www.rijksmuseum.nl/api/en/"
 
+
     def __init__(self, schema):
-        self.schema = schema
+        self.schema= schema
+        self.name = "Rijks"
+#        self.canonmap = {
+#                "openpipe_canonical_id": "objectID",
+#                "openpipe_canonical_largeImage": "primaryImage",
+#                "openpipe_canonical_smallImage": "primaryImageSmall",
+#                "openpipe_canonical_title": "title",
+#                "openpipe_canonical_artist": "artistDisplayName",
+#                "openpipe_canonical_culture":  "culture",
+#                "openpipe_canonical_classification": "classification",
+#                "openpipe_canonical_nation":  "country",
+#                "openpipe_canonical_city":  "city",
+#                "openpipe_canonical_tags":  "tags"
+#                        }
+        self.fullcanonmap = {
+                "objectNumber": "openpipe_canonical_id",
+                "title": "openpipe_canonical_title",
+                "principalMakers": "openpipe_canonical_artist",
+                        }
+        self.canonmap = {
+                "title": "openpipe_canonical_title",
+                "principalMakers": "openpipe_canonical_artist",
+                "culture": "openpipe_canonical_culture"
+                        }
+
+
 
     def searchRijkForAssets(self, term, page, pageSize):
         serviceName = "collection"
@@ -98,3 +125,49 @@ class RijksMuseum(MuseumsTM):
                 imgHeight = d['height']
                 break
         return tileData, imgWidth, imgHeight
+
+    
+    def getMappedCanonTags(self, metadataid, aorm,alltags,curtag):
+        response = {}
+        # get all the tags for this asset from the table
+        response["openpipe_canonical_source"] = {'value': "Rijksmuseum Amstedam", "status": "unknown"}
+        tagcount = curtag
+#        print (alltags[tagcount]['metaDataId'][0], metadataid)
+        while tagcount < len(alltags) and alltags[tagcount]['metaDataId'][0] == metadataid:
+#          print(alltags[tagcount]['metaDataId'][0], tagcount, metadataid)
+
+          if alltags[tagcount]['tagName'][0] in self.canonmap:
+               atagname = alltags[tagcount]['tagName'][0]
+               cantag = self.canonmap[atagname]
+               print(cantag,atagname,alltags[tagcount]['value'])
+               if cantag not in response:
+                  response[cantag] = {}
+#properly format artist names for cleveland
+               if atagname=="principalMakers":
+                  ares = formatHelp.RijksArtist(alltags[tagcount]['value'])
+                  response[cantag]['value'] = formatHelp.cleanList(ares)
+               else:
+                  response[cantag]['value'] = formatHelp.cleanList(alltags[tagcount]['value'])
+
+
+
+          if alltags[tagcount]['tagName'][0] in self.canonmap.values():
+               atagname = alltags[tagcount]['tagName'][0]
+               print(atagname,alltags[tagcount]['value'])
+
+               if atagname not in response:
+                   response[atagname] = {}
+               response[atagname]['status'] = alltags[tagcount]['status'][0]
+
+
+        #handle tags that need processing, imaging
+
+
+        #handle dates that need to be calculated.
+
+        #handle special formatting cases: customized Museum formats
+          tagcount += 1
+
+
+        return response, tagcount
+

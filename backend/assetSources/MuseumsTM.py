@@ -17,6 +17,7 @@ class MuseumsTM(ABC):
         """
         self.schema = schema
         self.name = "somemuseum"
+        self.canonmap =[]
 
     def setName(self,aname):
         self.name = aname
@@ -56,5 +57,12 @@ class MuseumsTM(ABC):
         :param page: page number
         :param pageSize: page size
         :return: JSON containing all the assets returned as the search result with the canonical tags in correct format.
+        """
+        pass
+
+    def getMappedCanonTags(self, metadataid, aorm, alltags, curtag):
+        """
+        This function returns the canonical topic tags mapped from the museum
+        metatags for this individual museum
         """
         pass
