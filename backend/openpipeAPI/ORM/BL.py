@@ -4,6 +4,8 @@ import sys
 import requests
 import time
 
+from sqlalchemy import and_
+
 from openpipeAPI.ORM.ORM import ORM
 from openpipeAPI.ORM.TO import TO
 
@@ -379,7 +381,7 @@ class BL:
         rows = []
         for row in results['data']:
             metaDataId = row['metaDataId'][0]
-            rowInfo = {"id": row['assetId'], "metaDataId": row['metaDataId'],"assetVerified": row['assetVerified']}
+            rowInfo = {"id": row['assetId'], "metaDataId": row['metaDataId'], "assetVerified": row['assetVerified']}
             queryStatement = "select tagName,value from metaTag where metaDataId="
             if metaDataId:
                 queryStatement = queryStatement + str(metaDataId)
@@ -475,7 +477,8 @@ class BL:
     def updateFolder(self, folderId, newName, newImage, newVerified):
         orm = ORM()
         Collection = self.tables["collection"]
-        orm.session.query(Collection).filter(Collection.id == folderId).update({"name": newName, "image": newImage,"verified":newVerified})
+        orm.session.query(Collection).filter(Collection.id == folderId).update(
+            {"name": newName, "image": newImage, "verified": newVerified})
         orm.commitClose()
         return {"data": 1}
 
@@ -574,5 +577,153 @@ class BL:
             id = r['assetId'][0]
             rows.append(url + str(id))
         return {'total': len(rows), 'data': rows}
+
+    def saveFolderLayout(self, data):
+        orm = ORM()
+        FolderMembers = self.tables["collectionMember"]
+        fid = data['folderId']
+        assets = data['data']
+        for d in data:
+            orm.session.query(FolderMembers).filter(
+                and_(FolderMembers.collectionId == fid, FolderMembers.assetId == d['assetId'])).update(
+                {"geometry": d['geometry'], 'wall': d['wall']})
+        orm.commitClose()
+        return {"data": 1}
+
+    def saveUploadAsset(self, data):
+        orm = ORM()
+        FolderMembers = self.tables["collectionMember"]
+        Images = self.tables["images"]
+        Asset = self.tables["asset"]
+        MetaData = self.tables["metaData"]
+        MetaTag = self.tables["metaTag"]
+
+        videoIconURL = "http://mec402.boisestate.edu/assets/videoIcon.png"
+
+        shortName = data["shortName"]
+        uri = data["uri"]
+        folderId = data["folderId"]
+        assetType = data["assetType"]
+
+        videoTypes = ['.264', '.3g2', '.3gp', '.3gp2', '.3gpp', '.3gpp2', '.3mm', '.3p2', '.60d', '.787', '.89', '.aaf',
+                      '.aec', '.aep', '.aepx',
+                      '.aet', '.aetx', '.ajp', '.ale', '.am', '.amc', '.amv', '.amx', '.anim', '.aqt', '.arcut', '.arf',
+                      '.asf', '.asx', '.avb',
+                      '.avc', '.avd', '.avi', '.avp', '.avs', '.avs', '.avv', '.axm', '.bdm', '.bdmv', '.bdt2', '.bdt3',
+                      '.bik', '.bin', '.bix',
+                      '.bmk', '.bnp', '.box', '.bs4', '.bsf', '.bvr', '.byu', '.camproj', '.camrec', '.camv', '.ced',
+                      '.cel', '.cine', '.cip',
+                      '.clpi', '.cmmp', '.cmmtpl', '.cmproj', '.cmrec', '.cpi', '.cst', '.cvc', '.cx3', '.d2v', '.d3v',
+                      '.dat', '.dav', '.dce',
+                      '.dck', '.dcr', '.dcr', '.ddat', '.dif', '.dir', '.divx', '.dlx', '.dmb', '.dmsd', '.dmsd3d',
+                      '.dmsm', '.dmsm3d', '.dmss',
+                      '.dmx', '.dnc', '.dpa', '.dpg', '.dream', '.dsy', '.dv', '.dv-avi', '.dv4', '.dvdmedia', '.dvr',
+                      '.dvr-ms', '.dvx', '.dxr',
+                      '.dzm', '.dzp', '.dzt', '.edl', '.evo', '.eye', '.ezt', '.f4p', '.f4v', '.fbr', '.fbr', '.fbz',
+                      '.fcp', '.fcproject',
+                      '.ffd', '.flc', '.flh', '.fli', '.flv', '.flx', '.gfp', '.gl', '.gom', '.grasp', '.gts', '.gvi',
+                      '.gvp', '.h264', '.hdmov',
+                      '.hkm', '.ifo', '.imovieproj', '.imovieproject', '.ircp', '.irf', '.ism', '.ismc', '.ismv',
+                      '.iva', '.ivf', '.ivr', '.ivs',
+                      '.izz', '.izzy', '.jss', '.jts', '.jtv', '.k3g', '.kmv', '.ktn', '.lrec', '.lsf', '.lsx', '.m15',
+                      '.m1pg', '.m1v', '.m21',
+                      '.m21', '.m2a', '.m2p', '.m2t', '.m2ts', '.m2v', '.m4e', '.m4u', '.m4v', '.m75', '.mani', '.meta',
+                      '.mgv', '.mj2', '.mjp',
+                      '.mjpg', '.mk3d', '.mkv', '.mmv', '.mnv', '.mob', '.mod', '.modd', '.moff', '.moi', '.moov',
+                      '.mov', '.movie', '.mp21',
+                      '.mp21', '.mp2v', '.mp4', '.mp4v', '.mpe', '.mpeg', '.mpeg1', '.mpeg4', '.mpf', '.mpg', '.mpg2',
+                      '.mpgindex', '.mpl',
+                      '.mpl', '.mpls', '.mpsub', '.mpv', '.mpv2', '.mqv', '.msdvd', '.mse', '.msh', '.mswmm', '.mts',
+                      '.mtv', '.mvb', '.mvc',
+                      '.mvd', '.mve', '.mvex', '.mvp', '.mvp', '.mvy', '.mxf', '.mxv', '.mys', '.ncor', '.nsv', '.nut',
+                      '.nuv', '.nvc', '.ogm',
+                      '.ogv', '.ogx', '.osp', '.otrkey', '.pac', '.par', '.pds', '.pgi', '.photoshow', '.piv', '.pjs',
+                      '.playlist', '.plproj',
+                      '.pmf', '.pmv', '.pns', '.ppj', '.prel', '.pro', '.prproj', '.prtl', '.psb', '.psh', '.pssd',
+                      '.pva', '.pvr', '.pxv',
+                      '.qt', '.qtch', '.qtindex', '.qtl', '.qtm', '.qtz', '.r3d', '.rcd', '.rcproject', '.rdb', '.rec',
+                      '.rm', '.rmd', '.rmd',
+                      '.rmp', '.rms', '.rmv', '.rmvb', '.roq', '.rp', '.rsx', '.rts', '.rts', '.rum', '.rv', '.rvid',
+                      '.rvl', '.sbk', '.sbt',
+                      '.scc', '.scm', '.scm', '.scn', '.screenflow', '.sec', '.sedprj', '.seq', '.sfd', '.sfvidcap',
+                      '.siv', '.smi', '.smi',
+                      '.smil', '.smk', '.sml', '.smv', '.spl', '.sqz', '.srt', '.ssf', '.ssm', '.stl', '.str', '.stx',
+                      '.svi', '.swf', '.swi',
+                      '.swt', '.tda3mt', '.tdx', '.thp', '.tivo', '.tix', '.tod', '.tp', '.tp0', '.tpd', '.tpr', '.trp',
+                      '.ts', '.tsp', '.ttxt',
+                      '.tvs', '.usf', '.usm', '.vc1', '.vcpf', '.vcr', '.vcv', '.vdo', '.vdr', '.vdx', '.veg', '.vem',
+                      '.vep', '.vf', '.vft',
+                      '.vfw', '.vfz', '.vgz', '.vid', '.video', '.viewlet', '.viv', '.vivo', '.vlab', '.vob', '.vp3',
+                      '.vp6', '.vp7', '.vpj',
+                      '.vro', '.vs4', '.vse', '.vsp', '.w32', '.wcp', '.webm', '.wlmp', '.wm', '.wmd', '.wmmp', '.wmv',
+                      '.wmx', '.wot', '.wp3',
+                      '.wpl', '.wtv', '.wve', '.wvx', '.xej', '.xel', '.xesc', '.xfl', '.xlmv', '.xmv', '.xvid', '.y4m',
+                      '.yog', '.yuv', '.zeg',
+                      '.zm1', '.zm2', '.zm3', '.zmv']
+
+        imageTypes = ['.ras', '.xwd', '.bmp', '.jpe', '.jpg', '.jpeg', '.xpm', '.ief', '.pbm', '.tif', '.gif', '.ppm',
+                      '.xbm', '.tiff', '.rgb', '.pgm', '.png', '.pnm']
+
+        assetGroup = "Unknown"
+
+        if "." + str(assetType).lower() in videoTypes:
+            assetGroup = "video"
+        elif "." + str(assetType).lower() in imageTypes:
+            assetGroup = "image"
+
+        metaDataId = orm.insert(MetaData())
+
+        assetId = orm.insert(
+            Asset(shortName=shortName, uri=uri, sourceId=666, metaDataId=metaDataId, scope=0, type=assetGroup))
+
+        fileName = "Local_uploaded_asset_" + str(assetId) + "." + str(assetType)
+
+        imageId = orm.insert(Images(shortname=shortName, filename=fileName, uri=uri, type=assetGroup))
+
+        orm.session.query(MetaData).filter(MetaData.id == metaDataId).update({"tableName": "asset", "eid": assetId})
+
+        fmid = orm.insert(FolderMembers(assetId=assetId, collectionId=folderId, searchTerm="Local_Asset_Upload"))
+
+        canonTags = orm.executeSelect("""SELECT * FROM artmaster.canonicalMetaTag where req='yes';""")
+        tags = []
+        print(canonTags)
+        for d in canonTags["data"]:
+            if d["name"][0] == 'openpipe_canonical_title':
+                tags.append(MetaTag(metaDataId=metaDataId, tagName=str(d["name"][0]), value=str(shortName)))
+            elif d["name"][0] == 'openpipe_canonical_fullImage':
+                tags.append(MetaTag(metaDataId=metaDataId, tagName=str(d["name"][0]), value=str(uri + fileName)))
+            elif d["name"][0] == 'openpipe_canonical_smallImage':
+                if assetGroup == "image":
+                    tags.append(MetaTag(metaDataId=metaDataId, tagName=str(d["name"][0]), value=str(uri + fileName)))
+                elif assetGroup == "video":
+                    tags.append(MetaTag(metaDataId=metaDataId, tagName=str(d["name"][0]), value=str(videoIconURL)))
+                else:
+                    tags.append(MetaTag(metaDataId=metaDataId, tagName=str(d["name"][0]), value=str(d["default"][0])))
+            else:
+                tags.append(MetaTag(metaDataId=metaDataId, tagName=str(d["name"][0]), value=str(d["default"][0])))
+        orm.bulkInsert(tags)
+        orm.commitClose()
+        return fileName
+
+    def getFolderLayout(self, folderId):
+        orm = ORM()
+        stm = "select assetId, collectionId, asset.metaDataId, geometry, wall, type, value from (select * from collectionMember where collectionId=" + str(folderId) + ") as a join asset on a.assetId=asset.id join metaTag on metaTag.metaDataId=asset.metaDataId where tagName='openpipe_canonical_smallImage'"
+        res = orm.executeSelect(stm)
+        return res
+
+    def getTopics(self):
+        orm = ORM()
+        stm = "select type from topic group by type;"
+        allTopicTypes = orm.executeSelect(stm)
+
+        finalRes={"availableTopics":[]}
+        for t in allTopicTypes['data']:
+            topicType=t['type'][0]
+            finalRes['availableTopics'].append(topicType)
+            q="select * from topic where type='"+topicType+"'"
+            r=orm.executeSelect(q)
+            finalRes[topicType]=r
+
+        return finalRes
 
 # help(BL().getCanonicalTags())
