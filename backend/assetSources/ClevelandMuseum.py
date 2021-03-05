@@ -3,9 +3,39 @@
 import requests
 from MuseumsTM import MuseumsTM
 from multiprocessing.pool import ThreadPool
+import formatHelp
 
 
 class ClevelandMuseum(MuseumsTM):
+
+    def __init__(self, schema):
+        self.schema= schema
+        self.name = "Met"
+#        self.canonmap = {
+#                "openpipe_canonical_id": "objectID",
+#                "openpipe_canonical_largeImage": "primaryImage",
+#                "openpipe_canonical_smallImage": "primaryImageSmall",
+#                "openpipe_canonical_title": "title",
+#                "openpipe_canonical_artist": "artistDisplayName",
+#                "openpipe_canonical_culture":  "culture",
+#                "openpipe_canonical_classification": "classification",
+#                "openpipe_canonical_nation":  "country",
+#                "openpipe_canonical_city":  "city",
+#                "openpipe_canonical_tags":  "tags"
+#                        }
+        self.fullcanonmap = {
+                "id": "openpipe_canonical_id",
+                "title": "openpipe_canonical_title",
+                "creators": "openpipe_canonical_artist",
+                "culture": "openpipe_canonical_culture"
+                        }
+        self.canonmap = {
+                "title": "openpipe_canonical_title",
+                "creators": "openpipe_canonical_artist",
+                "culture": "openpipe_canonical_culture",
+                "medium": "openpipe_canonical_medium"
+                        }
+
 
     def searchForAssets(self, term):
         params = {'q': term}
@@ -96,3 +126,61 @@ class ClevelandMuseum(MuseumsTM):
         return {"data": results,
                 "total": total,
                 "sourceName": "Cleveland"}
+
+
+    def getMappedCanonTags(self, metadataid, aorm, alltags, curtag):
+        response = {}
+        # get all the tags for this asset from the table
+        #map them to openpipe_canonical
+        response["openpipe_canonical_source"] = {"value": "Cleveland",
+                                                 "status": "unknown"}
+        tagcount = curtag
+#        print (alltags[tagcount]['metaDataId'][0], metadataid)
+        while tagcount < len(alltags) and alltags[tagcount]['metaDataId'][0] == metadataid:
+#          print(alltags[tagcount]['metaDataId'][0], tagcount, metadataid)
+
+
+         if alltags[tagcount]['tagName'][0] in self.canonmap:
+               atagname = alltags[tagcount]['tagName'][0]
+               cantag = self.canonmap[atagname]
+               print(cantag,atagname,alltags[tagcount]['value'])
+               if cantag not in response:
+                   response[cantag] = {}
+#properly format artist names for cleveland
+               if atagname=="creators":
+                  ares = formatHelp.ClevelandArtist(alltags[tagcount]['value'])
+                  response[cantag]['value'] = formatHelp.cleanList(ares)
+               else:
+                    if atagname == 'culture':
+                        print("CULTURE:", alltags[tagcount]['value'])
+                        print("------")
+                    response[cantag]['value'] = formatHelp.cleanList(alltags[tagcount]['value'])
+                    if atagname == 'culture':
+                      holdme = response[cantag]['value']
+                      print("CULTMOD:", holdme, len(holdme))
+                      print("------")
+
+
+         if alltags[tagcount]['tagName'][0] in self.canonmap.values():
+               atagname = alltags[tagcount]['tagName'][0]
+               print(atagname,alltags[tagcount]['value'])
+
+               if atagname not in response:
+                   response[atagname] = {}
+               response[atagname]['status'] = alltags[tagcount]['status'][0]
+
+         tagcount += 1
+
+
+
+        #handle tags that need processing, imaging
+
+
+        #handle dates that need to be calculated.
+
+        #handle special formatting cases: customized Museum formats
+
+
+        return response,tagcount
+
+

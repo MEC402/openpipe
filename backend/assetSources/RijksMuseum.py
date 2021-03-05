@@ -34,6 +34,7 @@ class RijksMuseum(MuseumsTM):
         self.canonmap = {
                 "title": "openpipe_canonical_title",
                 "principalMakers": "openpipe_canonical_artist",
+                "medium": "openpipe_canonical_medium",
                 "culture": "openpipe_canonical_culture"
                         }
 
@@ -130,7 +131,7 @@ class RijksMuseum(MuseumsTM):
     def getMappedCanonTags(self, metadataid, aorm,alltags,curtag):
         response = {}
         # get all the tags for this asset from the table
-        response["openpipe_canonical_source"] = {'value': "Rijksmuseum Amstedam", "status": "unknown"}
+        response["openpipe_canonical_source"] = {'value': "Rijksmuseum Amsterdam", "status": "unknown"}
         tagcount = curtag
 #        print (alltags[tagcount]['metaDataId'][0], metadataid)
         while tagcount < len(alltags) and alltags[tagcount]['metaDataId'][0] == metadataid:

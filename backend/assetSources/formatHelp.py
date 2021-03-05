@@ -3,6 +3,7 @@ import ast
 
 def cleanList(stlist):
     reslist = []
+  
     if len(stlist) == 0:
         reslist.append("unknown")
         return reslist
@@ -11,7 +12,16 @@ def cleanList(stlist):
         if i is None or not i.strip():
            reslist.append("unknown")
         else:
-           reslist.append(i.strip())
+           resstring = i.strip()
+           if resstring.startswith('"') and resstring.endswith('"'):
+               resstring = resstring[1:-1]
+           if resstring.startswith('[') and resstring.endswith(']'):
+               resstring = resstring[1:-1]
+           if resstring.startswith("'") and resstring.endswith("'"):
+               resstring = resstring[1:-1]
+           if not resstring:
+               resstring = "unknown"
+           reslist.append(resstring)
         return reslist
 
 def ClevelandArtist(artistlist):

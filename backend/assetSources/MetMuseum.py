@@ -43,7 +43,10 @@ class MetMuseum(MuseumsTM):
         self.canonmap = {
                 "title": "openpipe_canonical_title",
                 "artistDisplayName": "openpipe_canonical_artist",
-                "culture": "openpipe_canonical_culture"
+                "culture": "openpipe_canonical_culture",
+                "city": "openpipe_canonical_city",
+                "medium": "openpipe_canonical_medium",
+                "country": "openpipe_canonical_nation"
                         }
 
 

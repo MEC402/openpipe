@@ -41,6 +41,31 @@ class ORM:
 
     def update(self, object):
         return
+    def updateSqlMulti(self, query):
+        try:
+            connection = mysql.connector.connect(
+                host=self.connection["address"],
+                user=self.connection["username"],
+                passwd=self.connection["password"],
+                database=self.connection["schema"]
+            )
+            cursor = connection.cursor()
+            for res in cursor.execute(query, multi=True ):
+              print("Number of Rows", res.statement, res.rowcount)
+
+            connection.commit()
+#            print(cursor.rowcount, "records affected")
+
+        except Error as e:
+            #            print("Error reading data from MySQL table", e)
+            pass
+
+        finally:
+            if (connection.is_connected()):
+                connection.close()
+                cursor.close()
+        
+        return
 
     def delete(self, obj):
         self.session.delete(obj)
@@ -143,6 +168,34 @@ class ORM:
             if (connection.is_connected()):
                 connection.close()
                 cursor.close()
+
+    def batchSql(self, data, query,commit=False):
+        try:
+            connection = mysql.connector.connect(
+                host=self.connection["address"],
+                user=self.connection["username"],
+                passwd=self.connection["password"],
+                database=self.connection["schema"]
+            )
+            cursor = connection.cursor()
+            cursor.executemany(query, data)
+            affected_rows = cursor.rowcount
+
+            if commit == False:
+             print("Number of rows affected : {}".format(affected_rows))
+            else:
+              print("commit!")
+              connection.commit()
+
+        except Error as e:
+            print("Error reading data from MySQL table", e)
+            pass
+
+        finally:
+            if (connection.is_connected()):
+                connection.close()
+                cursor.close()
+
 
 # to=TO()
 # orm=ORM()

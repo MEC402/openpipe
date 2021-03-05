@@ -4,6 +4,7 @@
 
 import json
 import MuseumsTM
+import os
 
 from CanonicalSchema import CanonicalSchema
 
@@ -14,7 +15,8 @@ class MuseumsR:
 
     def loadMuseums(self):
 #first we read in the jsonboject
-      f = open('museums.json')
+      apath = os.path.dirname(MuseumsTM.__file__)
+      f = open(apath+'/museums.json')
       museumjson = json.load(f)
       f.close()
 
@@ -32,6 +34,14 @@ class MuseumsR:
         self.sourceobjs.append(amuseum)
 #        print(i)
 #        print(i['source'])
+
+#get a list of 'sourceid' to museum object
+    def getSourceMap(self):
+        sourcedict = {}
+        for i in range(len(self.sources)):
+             sourcedict[str(i+1)]= self.sourceobjs[i]
+        return sourcedict
+
              
 
 #test of class

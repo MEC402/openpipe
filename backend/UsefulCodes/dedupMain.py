@@ -8,6 +8,7 @@ import hjson
 import sys
 from parse  import *
 import re
+import json
 
 import assetAssess
 
@@ -41,6 +42,8 @@ getalltags="select * from asset join metaTag on asset.metaDataId=metaTag.metaDat
 allassets = aorm.executeSelect(getalltags)
 alltags = allassets['data']
 print("number of all assets=%d" % (len(allassets['data'])))
+if len(allassets['data']) == 0:
+        sys.exit(-1)
 
 print("number of assets=%d" % (len(myassets['data'])))
 
@@ -116,8 +119,9 @@ for anasset in myassets['data']:
    metadataid = anasset['metaDataId'][0]
 
    if sourceid in asourcemap:
-#       print (sourceid)
+       print ("SOURCEID",sourceid)
        amuseum = asourcemap[sourceid]
+       print(amuseum, "sourceid",sourceid,metadataid)
 #       print(anasset)
 
        #this call returns a list of canonical tags for the given museum
@@ -128,13 +132,14 @@ for anasset in myassets['data']:
        if mytags == None:
            print("no tags")
        else:
-           print (mytags)
+           print ("BRICKME",mytags)
            for atag in mytags:
                mytags[atag]['metaDataId'] = metadataid
                if 'status' not in mytags[atag]:
-                   mytags[atag]['status'] = "unknown"
+                   mytags[atag]['status'] = 'unknown'
                if mytags[atag]['status'] == 'unknown':
                    canonresults.append({atag: mytags[atag]})
+           print ("BRICKME2",mytags)
    else:
      while curtagrow < len(alltags) and alltags[curtagrow]['metaDataId'][0] == metadataid:
 #       print (sourceid, alltags[curtagrow]['metaDataId'][0], metadataid,curtagrow)
@@ -162,18 +167,22 @@ for uprec in canonresults:
            if len(uprec[akey]['value']) == 1:
                avalue = uprec[akey]['value'][0]
 
-       sqlstmt ="update metaTag set value=\"%s\" , status='formatted' where metaDataId='%s' and tagName='%s';" % (avalue, uprec[akey]['metaDataId'],akey)
+       escstring = avalue.replace('"','')
+       midstring = escstring.encode("ascii","ignore")
+       escstring = midstring.decode()
+       sqlstmt ="update metaTag set value='%s' , status='formatted' where metaDataId='%s' and tagName='%s'; " % (escstring, uprec[akey]['metaDataId'],akey)
        print(sqlstmt)
-       oenres= aorm.updateSql(sqlstmt)
-#       fulstmt += sqlstmt
+       fulstmt += sqlstmt
 #       print(sqlstmt)
 #       print(oenres)
 #       if fullcount == 5:
 #           sys.exit(-1)
        fullcount += 1
-       if fullcount %100 == 0:
+       if fullcount %10 == 0:
            print("fullcount = ",fullcount)
-#updateres= aorm.executeSelect(fulstmt)
+           updateres= aorm.updateSqlMulti(fulstmt)
+           fulstmt = ""
+updateres= aorm.updateSqlMulti(fulstmt)
 #print(updateres)
 
 print("-----------------")
