@@ -6,7 +6,7 @@ lxml==4.6.2
 marshmallow==3.10.0
 marshmallow-sqlalchemy==0.24.1
 mysql-connector-python==8.0.19
-Pillow==8.1.0
+Pillow==8.1.1
 protobuf==3.6.1
 python-dateutil==2.8.1
 requests==2.23.0
