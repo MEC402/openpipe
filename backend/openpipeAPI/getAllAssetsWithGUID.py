@@ -4,8 +4,7 @@ import json
 import cgi
 import sys
 
-from openpipeAPI.ORM.BL import BL
-
+from backend.openpipeAPI.ORM.BL import BL
 
 def cgiFieldStorageToDict(fieldStorage):
     params = {}
@@ -15,11 +14,10 @@ def cgiFieldStorageToDict(fieldStorage):
 
 
 print("Content-Type: text/json\n")
-#sys.exit(0)
+# sys.exit(0)
 dict = cgiFieldStorageToDict(cgi.FieldStorage())
 
-
-dict={'p':1,'ps':3,'type':1}
+dict={'p':1,'ps':3,'type':0}
 
 if 'p' not in dict.keys():
     dict['p'] = 1
@@ -34,23 +32,12 @@ if 'changeEnd' not in dict.keys():
     dict['changeEnd'] = '5000-01-01'
 
 if 'type' not in dict.keys():
-    dict['type'] = 0
+    dict['type'] = 1
 
 # if dict['p'].isnumeric() != True:
 #  data={"total": 0, "data": [], "error": "page value must be a number"}
 # else:
-data=BL().getAllAssetsWithGUID(int(dict["p"]), int(dict["ps"]), dict['changeStart'], dict['changeEnd'])
-
-if(int(dict['type'])==1):
-    dt=BL().getCanonicalTags().values()
-#print(dt)
-for dd in data['data']:
-    for d in dd.keys():
-        if "openpipe_canonical_" in d:
-            for i in dd[d]:
-                if i in dt:
-                    #print(i)
-                    dd[d]=[""]
-                    break
+data = BL().getAllAssetsWithGUID(int(dict["p"]), int(dict["ps"]), dict['changeStart'], dict['changeEnd'],
+                                 int(dict['type']))
 
 print(json.dumps(data, default=str))

@@ -1,7 +1,7 @@
 from sqlalchemy import and_
 
-from openpipeAPI.ORM.ORM import ORM
-from openpipeAPI.ORM.TO import TO
+from backend.openpipeAPI.ORM.ORM import ORM
+from backend.openpipeAPI.ORM.TO import TO
 
 
 def fixAssetModifiedDates():
@@ -33,7 +33,9 @@ def fixFolderModifiedDates():
     # print(i,j,i+j)
     orm.commitClose()
 
-# fixAssetModifiedDates()
+
+
+fixAssetModifiedDates()
 
 
 fixFolderModifiedDates()

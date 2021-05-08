@@ -6,8 +6,8 @@ import time
 
 from sqlalchemy import and_
 
-from openpipeAPI.ORM.ORM import ORM
-from openpipeAPI.ORM.TO import TO
+from backend.openpipeAPI.ORM.ORM import ORM
+from backend.openpipeAPI.ORM.TO import TO
 
 
 class BL:
@@ -149,7 +149,68 @@ class BL:
         # print(t1-t0)
         return results
 
-    def getAllAssetsWithGUID(self, page, pageSize, changeStart, changeEnd):
+    def getAllAssetsWithGUID(self, page, pageSize, changeStart, changeEnd, none):
+        guidmap = {"city": "500", "classification": "600",
+                   "culture": "700", "genre": "800", "medium": "900", "nation": "a00",
+                   "artist": "400", "title": "000", "tags": "000"
+                   }
+        guidURL = "http://mec402.boisestate.edu/cgi-bin/openpipe/data/"
+        sguidURL = "http://mec402.boisestate.edu/"
+        if (page < 1):
+            page = 1
+        start = (page - 1) * pageSize
+        step = pageSize
+
+        results = {"total": 0, "data": []}
+
+        if int(page) < 0:
+            return results
+
+        orm = ORM()
+        queryStatement = "SELECT id,metaDataId,shortName FROM asset where lastModified between \'" + changeStart + "\' and \'" + changeEnd + "\' limit " + str(
+            start) + "," + str(step)
+        t0 = time.time()
+        newcon = orm.simpConnect()
+        results = orm.executeSelectPersist(queryStatement, newcon)
+        results['guidbase'] = sguidURL
+        sguidURL = ""
+        rows = []
+        for row in results['data']:
+            # rowInfo = {"id": row['id'], "metaDataId": row['metaDataId'], "name": row['shortName']}
+            rowInfo = {"metaDataId": row['metaDataId'], "name": row['shortName']}
+            metaDataId = row['metaDataId'][0]
+            queryStatement = "select id,tagName,value,topic_name,topic_id,topic_code from metaTag where metaDataId="
+            if metaDataId:
+                queryStatement = queryStatement + str(metaDataId)
+                tags = orm.executeSelectPersist(queryStatement, newcon)['data']
+                canonicalTagObj = {}
+                for metaTagRow in tags:
+                    print(metaTagRow)
+                    if "openpipe_canonical_" in metaTagRow['tagName'][0]:  # Only Canonical Tags have topics
+                        tagName = metaTagRow['tagName'][0].split("_")[2]
+                        if metaTagRow['topic_name'][0] is None:
+                            if none == 1:
+                                print("None value:", none)
+                                canonicalTagObj[tagName] = {
+                                    sguidURL + "ba0" + "/" + str(metaTagRow['id'][0]): metaTagRow['value'][0]}
+                            else:
+                                pass
+                        else:
+                            canonicalTagObj[tagName] = {
+                                guidURL + str(metaTagRow['topic_code'][0]) + "/" + str(metaTagRow['topic_id'][0]):
+                                    metaTagRow['value'][0]}
+
+                rowInfo["openpipe_canonical"] = canonicalTagObj
+                rowInfo["openpipe_canonical"]["id"] = sguidURL + "100/" + str(row['id'][0])
+                rows.append(rowInfo)
+        results["data"] = rows
+        newcon.close()
+        t1 = time.time()
+        # print("broken")
+        # print(t1-t0)
+        return results
+
+    def getAllAssetsWithGUID1(self, page, pageSize, changeStart, changeEnd):
         guidURL = "http://mec402.boisestate.edu/cgi-bin/openpipe/data/"
         if (page < 1):
             page = 1
@@ -196,6 +257,23 @@ class BL:
         # print("broken")
         # print(t1-t0)
         return results
+
+    def getAssetbyMetaData(self, assetMetaDataID):
+        orm = ORM()
+        queryStatement = "SELECT * FROM artmaster.asset join metaTag on metaTag.metaDataId=asset.metaDataId where asset.metaDataId=" + str(
+            int(assetMetaDataID))
+        results = orm.executeSelect(queryStatement)
+        if results['total'] > 0:
+            results['total'] = 1
+            rowInfo = {"id": results['data'][0]['id'], "metaDataId": results['data'][0]['metaDataId'],
+                       "name": results['data'][0]['shortName']}
+            for row in results['data']:
+                rowInfo[row['tagName'][0]] = [row['value'][0]]
+
+            results["data"] = [rowInfo]
+            return results
+        else:
+            return {"total": 0, "data": []}
 
     def getAsset(self, assetID):
         orm = ORM()
@@ -416,38 +494,75 @@ class BL:
         results['data'] = result
         return results
 
-    #     def getGUIDInfo(self, tableName, id):
-    #         orm = ORM()
-    #         if (tableName == "entities"):
-    #            return Topics().getCanonicalTagsJSON()
-    #         entities = Topics().getCanonicalTagsList()
-    #         entities.append("asset")
-    #         entities.append("folder")
-    # #        if (tableName not in ["asset", "folder","artist"]):
-    #         if (tableName not in entities):
-    #             return {"total" :0 , "data" :[], "error": "invalid topic"}
-    #         elif tableName == "asset":
-    #             if id is not None and id != "":
-    #                 return self.getAsset(id)
-    #             else:
-    #                 return self.getAllAssetIDs()
-    #         elif tableName == "folder":
-    #             if id is not None and id != "":
-    #                 return self.getCollectionByID(id)
-    #             else:
-    #                 return self.getAllFolderIDs()
-    #         elif tableName == "artist":
-    #             if id is not None and id != "":
-    #                 return self.getArtist(id)
-    #             else:
-    #                 return self.getAllArtistIDs()
-    #         else:
-    #             if id is not None and id != "":
-    #                 return self.getTopic(tableName,id)
-    #             else:
-    #                 return self.getAllTopicIDs(tableName)
-    #
-    #         return {"total" :0 , "data" :[], "error": "empty topic"}
+    def getAssetbyMetaData(self, assetMetaDataID):
+        orm = ORM()
+        queryStatement = "SELECT * FROM artmaster.asset join metaTag on metaTag.metaDataId=asset.metaDataId where asset.metaDataId=" + str(
+            int(assetMetaDataID))
+        results = orm.executeSelect(queryStatement)
+        if results['total'] > 0:
+            results['total'] = 1
+            rowInfo = {"id": results['data'][0]['id'], "metaDataId": results['data'][0]['metaDataId'],
+                       "name": results['data'][0]['shortName']}
+            for row in results['data']:
+                rowInfo[row['tagName'][0]] = [row['value'][0]]
+
+            results["data"] = [rowInfo]
+            return results
+        else:
+            return {"total": 0, "data": []}
+
+    def getAllTopicMembers(self, topicName, topicCode):
+        if topicName == 'asset':
+            return self.getAllAssetIDs()
+        elif topicName == 'folder':
+            return self.getAllFolderIDs()
+        else:
+            orm = ORM()
+            tables = TO().getClasses()
+            Topic = tables["topic"]
+            topicResultSet = orm.session.query(Topic).filter(Topic.type == topicName).all()
+            res={"total":0,"data":[]}
+            resArr=[]
+            for t in topicResultSet:
+                resArr.append(str(t.code)+"/"+str(t.id))
+            res["total"]=len(resArr)
+            res["data"]=resArr
+            return res
+
+    def getGUIDInfo(self, guidName, guidId):
+        orm = ORM()
+        tables = TO().getClasses()
+        GUIDType = tables["guidType"]
+        Topic = tables["topic"]
+        MetaTag = tables["metaTag"]
+        guidTypeResultSet = orm.session.query(GUIDType).all()
+
+        guidMap = {}
+        for gt in guidTypeResultSet:
+            guidMap[gt.name] = gt.code
+
+        if guidName not in guidMap.keys():
+            return {"total": 0, "data": [], "error": "invalid topic"}
+        elif guidId is None or guidId == "" or guidId == " ":
+            return self.getAllTopicMembers(guidName, guidMap[guidName])
+        else:
+            topicResultSet = orm.session.query(Topic).filter(Topic.id == guidId).all()
+            if guidName == 'asset':
+                return self.getAsset(guidId)
+            elif guidName == 'folder':
+                return self.getCollectionByID(guidId)
+            elif guidName == 'metaData':
+                return self.getAssetbyMetaData(guidId)
+            else:
+                metaTagResultSet = orm.session.query(MetaTag).filter(MetaTag.topic_id == guidId).all()
+                otherAliases = set([])
+                assetMetaDataIdWithTopic = set([])
+                for alias in metaTagResultSet:
+                    otherAliases.add(alias.value)
+                    assetMetaDataIdWithTopic.add(guidMap["metaData"] + "/" + str(alias.metaDataId))
+                    # print(alias.value,alias.id,alias.metaDataId)
+                return {"total": 1, "topicName": topicResultSet[0].name, "topicAliases": list(otherAliases),
+                        "topicAssets": list(assetMetaDataIdWithTopic)}
 
     def deleteMetaTag(self, metaDataId, tagName, value):
         orm = ORM()
@@ -707,22 +822,46 @@ class BL:
 
     def getFolderLayout(self, folderId):
         orm = ORM()
-        stm = "select assetId, collectionId, asset.metaDataId, geometry, wall, type, value from (select * from collectionMember where collectionId=" + str(folderId) + ") as a join asset on a.assetId=asset.id join metaTag on metaTag.metaDataId=asset.metaDataId where tagName='openpipe_canonical_smallImage'"
+        stm = "select assetId, collectionId, asset.metaDataId, geometry, wall, type, value from (select * from collectionMember where collectionId=" + str(
+            folderId) + ") as a join asset on a.assetId=asset.id join metaTag on metaTag.metaDataId=asset.metaDataId where tagName='openpipe_canonical_smallImage'"
         res = orm.executeSelect(stm)
         return res
 
-    def getTopics(self):
+    def getTopics(self, page, pageSize):
+
+        if (page < 1):
+            page = 1
+        start = (page - 1) * pageSize
+        step = pageSize
+
+        if int(page) < 0:
+            return []
+
         orm = ORM()
-        stm = "select type from topic group by type;"
+        stm = "select * from topic order by type limit " + str(start) + "," + str(step)
+
         allTopicTypes = orm.executeSelect(stm)
 
-        finalRes={"availableTopics":[]}
+        guidmap = {"city": "500", "classification": "600",
+                   "culture": "700", "genre": "800", "medium": "900", "nation": "a00",
+                   "artist": "400", "title": "000", "tags": "000","metaTag":"b00"
+                   }
+
+        finalRes = {"availableTopics": ["artist", "genre", "city", "classification", "culture", "medium", "nation","metaTag"]}
         for t in allTopicTypes['data']:
-            topicType=t['type'][0]
-            finalRes['availableTopics'].append(topicType)
-            q="select * from topic where type='"+topicType+"'"
-            r=orm.executeSelect(q)
-            finalRes[topicType]=r
+            topicType = t['type'][0]
+            topicId = t['id'][0]
+            topicInfo = {"id": topicId,
+                         "value": t['name'][0],
+                         "biography": t['description'][0],
+                         "guid": "http://mec402.boisestate.edu/" + guidmap[topicType] + "/" + str(topicId)}
+
+            if topicType in finalRes.keys():
+                finalRes[topicType]["data"].append(topicInfo)
+                finalRes[topicType]["total"] = finalRes[topicType]["total"] + 1
+            else:
+                finalRes[topicType] = {"total": 1, "data": [topicInfo]}
+                # finalRes["availableTopics"].append(topicType)
 
         return finalRes
 

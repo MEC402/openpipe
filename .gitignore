@@ -45,3 +45,6 @@ venv/
 /*/Thumbs.db
 
 backend/.coverage
+*.jpg
+*.jpeg
+*.h5

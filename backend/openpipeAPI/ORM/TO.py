@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import create_session
 
-from openpipeAPI.ORM.DBInfo import DBInfo
+from backend.openpipeAPI.ORM.DBInfo import DBInfo
 
 
 class TO:
