@@ -1,6 +1,6 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
-from openpipeAPI.ORM.TO import TO
+from backend.openpipeAPI.ORM.TO import TO
 
 
 class AssetSchema(SQLAlchemyAutoSchema):
@@ -40,15 +40,15 @@ class MetaTagSchema():
         res = {}
         res[d.tagName] = {
             "id": d.id,
-            "value": d.value,
+            "value": str(d.value),
             "verified": d.verified,
             "topic_name": d.topic_name,
             "topic_code": d.topic_code,
             "topic_id": d.topic_id,
-            "note": d.note,
+            "note": str(d.note),
             # "timestamp": d.timestamp,
             # "insertTime": d.insertTime,
             # "lastModified": d.lastModified,
-            "status": d.status
+            "status": str(d.status)
         }
         return res
