@@ -26,49 +26,70 @@ canonicalTagResultSet = orm.executeSelect(
 insertDataArray = []
 miscMetaTagData = set([])
 
+compressionCount=0
+
 for canonicalTag in canonicalTagResultSet["data"]:
     print("**********************************************")
-    print(canonicalTag)
     canonicalTagName = canonicalTag["name"][0]
-    topicMetaTagResultSet = orm.executeSelect(
-        "select distinct value from metaTag where tagName=\'" + canonicalTagName + "\'")
-    banCanonicals = ["openpipe_canonical_id", "openpipe_canonical_fullImage", "openpipe_canonical_smallImage",
-                     "openpipe_canonical_largeImage", "openpipe_canonical_biography",
-                     "openpipe_canonical_sourceLargeImage",
-                     "openpipe_canonical_sourceSmallImage", "openpipe_canonical_sourceFullImage",
-                     "openpipe_canonical_thumbnailImage", "openpipe_canonical_thumbnailImageDimensions",
-                     "openpipe_canonical_defaultImage", "openpipe_canonical_webImage",
-                     "openpipe_canonical_defaultImageDimensions", "openpipe_canonical_webImageDimensions",
-                     "openpipe_canonical_galleryImage", "openpipe_canonical_galleryImageDimensions"]
+    # banCanonicals = ["openpipe_canonical_id", "openpipe_canonical_fullImage", "openpipe_canonical_smallImage",
+    #                  "openpipe_canonical_largeImage", "openpipe_canonical_biography",
+    #                  "openpipe_canonical_sourceLargeImage",
+    #                  "openpipe_canonical_sourceSmallImage", "openpipe_canonical_sourceFullImage",
+    #                  "openpipe_canonical_thumbnailImage", "openpipe_canonical_thumbnailImageDimensions",
+    #                  "openpipe_canonical_defaultImage", "openpipe_canonical_webImage",
+    #                  "openpipe_canonical_defaultImageDimensions", "openpipe_canonical_webImageDimensions",
+    #                  "openpipe_canonical_galleryImage", "openpipe_canonical_galleryImageDimensions"]
 
     tagName = canonicalTagName.split("_")[2].lower()
 
     metaTagData=set()
 
     if tagName in guidCodeMap:
+        print(canonicalTag)
+
         guidCode = guidCodeMap[tagName]
         guidName = tagName
-    else:
-        guidCode = guidCodeMap["metaTag"]
-        guidName = "metaTag"
+        print(tagName, guidCode)
 
-    print(tagName, guidCode)
+        # canonicalTagName="openpipe_canonical_genre"
+        topicMetaTagResultSet = orm.executeSelect(
+            "select distinct value from metaTag where tagName=\'" + canonicalTagName + "\'")
 
-    for topicMetaTag in topicMetaTagResultSet["data"]:
-        topicValue = re.sub(r"\([^()]*\)", "", str(topicMetaTag["value"][0]).strip()).strip().lower()
-        if canonicalTag["name"][0] in banCanonicals:
-            pass
-        elif guidName == "metaTag":
-            if topicValue not in miscMetaTagData:
-                miscMetaTagData.add(topicValue)
-                insertDataArray.append(Topic(name=topicValue, type=guidName, code=guidCode))
-        else:
-            if topicValue not in metaTagData:
+        for topicMetaTag in topicMetaTagResultSet["data"]:
+            topicValue = re.sub(r"\([^()]*\)", "", str(topicMetaTag["value"][0]).strip()).strip().lower()
+            print(topicValue)
+            # topicValue = re.sub(r'[^\w]', ' ', topicValue) causes odd results
+            if len(metaTagData) == 0:
+                # print("its empty")
                 metaTagData.add(topicValue)
-                insertDataArray.append(Topic(name=topicValue, type=guidName, code=guidCode))
+                # print(topicValue)
+            else:
+                for mt in metaTagData.copy():
+                    # print(mt, topicValue)
+                    if topicValue.startswith(mt) or mt.startswith(topicValue):
+                        # print("in here")
+                        compressionCount+=1
+                        if len(topicValue)<len(mt) and len(topicValue)>0:
+                            print(topicValue+"___________"+mt)
+                            metaTagData.remove(mt)
+                            metaTagData.add(topicValue)
+                        elif len(mt)<=0:
+                            metaTagData.remove(mt)
+                            metaTagData.add(topicValue)
 
-    print(len(miscMetaTagData))
+                    elif topicValue not in metaTagData:
+                        # print("hi")
+                        metaTagData.add(topicValue)
 
-orm.bulkInsert(insertDataArray)
+        for m in metaTagData:
+            # print(m)
+            insertDataArray.append(Topic(name=m, type=guidName, code=guidCode))
+        print(metaTagData)
+        # print(insertDataArray)
 
-orm.commitClose()
+
+# orm.bulkInsert(insertDataArray)
+# print("insertSize = "+str(len(insertDataArray)))
+#
+# print("compressionCount = "+str(compressionCount))
+# orm.commitClose()

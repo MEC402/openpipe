@@ -51,22 +51,17 @@ banCanonicals = ["openpipe_canonical_id", "openpipe_canonical_fullImage", "openp
 i = 0
 mappings = []
 
-for tag in orm.session.query(MetaTag).filter(MetaTag.tagName.like("openpipe_canonical_%")).order_by(
-        MetaTag.metaDataId):
-    if tag.tagName in banCanonicals:
-        pass
-    else:
-        # print("**********************************************")
-        # print(tag)
+resultSet = orm.session.query(MetaTag).filter(MetaTag.tagName.like("openpipe_canonical_%")).order_by(
+        MetaTag.metaDataId)
 
-        tagName = tag.tagName.split("_")[2].lower()
+for tag in resultSet:
 
-        tagValue = re.sub(r"\([^()]*\)", "", str(tag.value).strip()).strip().lower()
+    tagName = tag.tagName.split("_")[2].lower()
 
-        if tagName in guidCodeMap:
-            guidCode = guidCodeMap[tagName]
-        else:
-            guidCode = guidCodeMap["metaTag"]
+    tagValue = re.sub(r"\([^()]*\)", "", str(tag.value).strip()).strip().lower()
+
+    if tagName in guidCodeMap:
+        guidCode = guidCodeMap[tagName]
 
         print(tagName, guidCode, tag.metaDataId)
 
@@ -76,13 +71,13 @@ for tag in orm.session.query(MetaTag).filter(MetaTag.tagName.like("openpipe_cano
             topicId = topicMetaTag["id"][0]
             topicType = topicMetaTag["type"][0]
             # print(topicName, tagValue)
-            if tagValue == topicName:
+            if tagValue == topicName or tagValue.startswith(topicName):
                 info = {'id': tag.id, "topic_name": topicType, "topic_id": topicId, "topic_code": topicCode,
                         "note": "tpu"}
                 mappings.append(info)
                 print(tag.metaDataId, tag.tagName)
                 break
-
+print(len(mappings))
 updateSize=len(mappings)
 biteSize=1000
 q=int(updateSize / biteSize)
