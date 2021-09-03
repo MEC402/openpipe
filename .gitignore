@@ -48,3 +48,4 @@ backend/.coverage
 *.jpg
 *.jpeg
 *.h5
+frontend/.firebaserc
