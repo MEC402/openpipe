@@ -6,5 +6,4 @@ from Schemas import AssetSchema, MetaTagSchema
 
 
 def getWallAppSettings():
-    
-
+    pass

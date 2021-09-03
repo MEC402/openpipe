@@ -8,6 +8,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import aliased
 
 from backend.openpipeAPI.ORM.ORM import ORM
+from backend.openpipeAPI.ORM.Schema import FolderSchema
 from backend.openpipeAPI.ORM.TO import TO
 
 
@@ -471,6 +472,15 @@ class BL:
         results["data"] = rows
         newcon.close()
         return results
+
+    def getAllFolders(self):
+        orm = ORM()
+        tables = TO().getClasses()
+        FolderTable = tables["collection"]
+        folders = orm.session.query(FolderTable).order_by(FolderTable.name).all()
+        folders_schema = FolderSchema(many=True)
+        folders = folders_schema.dump(folders)
+        return {"total": len(folders), "data": folders}
 
     def getCollectionByID(self, id):
         url = "http://mec402.boisestate.edu/cgi-bin/openpipe/data/asset/"

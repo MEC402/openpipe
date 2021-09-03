@@ -160,4 +160,4 @@ def update_test():
     session.commit()
     session.close()
 
-update_test()
+# update_test()
