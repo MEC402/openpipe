@@ -63,14 +63,14 @@ export class FolderCardComponent implements OnInit {
 
   ngOnInit() {
     const temp = [];
-    for (const [key, value] of Object.entries(this.collection.metaTags)) {
-      if (key != 'id' && key != 'metaDataId')
-        temp.push({'tagName': key, 'value': value});
-    }
+    // for (const [key, value] of Object.entries(this.collection.metaTags)) {
+    //   if (key != 'id' && key != 'metaDataId')
+    //     temp.push({'tagName': key, 'value': value});
+    // }
     this.source.load(temp);
-    this.newName = this.collection.name[0];
-    this.newImage = this.collection.image[0];
-    this.newVerified = !!this.collection.verified[0];
+    this.newName = this.collection.name;
+    this.newImage = this.collection.image;
+    this.newVerified = !!this.collection.verified;
   }
 
   onFolderOpenClick() {

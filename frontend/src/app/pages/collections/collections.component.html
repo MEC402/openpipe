@@ -1,71 +1,81 @@
-<button nbButton status="warning" [nbPopover]="form">New Folder</button>
 
 <div class="row" *ngIf="folderPage">
     <div  *ngFor="let c of collections" class="thumbnail">
       <ngx-folder-card [ngStyle]="{'width':'300' + 'px'}" [collection]="c" (folderDelete)="onFolderDeleteClick(c)" (folderOpen)="onFolderOpenClick(c)"></ngx-folder-card>
     </div>
 </div>
+
+
 <div *ngIf="!folderPage">
   <div class="topbar">
-    <button class="prev-button" (click)="backToFolders()" size="tiny" nbButton>Back to Folders</button>
-    <label class="single-view-button"><h5>{{currentFolder.name[0]}}</h5></label>
-    <button class="single-view-button"
-            nbButton
-            size="tiny"
-            [appearance]="isSingleView ? 'filled' : 'outline'"
-            (click)="isSingleView = true">
-      <i class="nb-square"></i>
-    </button>
-    <button class="grid-view-button"
-            nbButton
-            size="tiny"
-            [appearance]="isSingleView ? 'outline' : 'filled'"
-            (click)="isSingleView = false">
-      <nb-icon icon="grid" pack="eva"></nb-icon>
-    </button>
+    <button class="prev-button" (click)="backToFolders()" nbButton>Back to Folders</button>
+    <button nbButton status="warning" [nbPopover]="form">New Folder</button>
+    <label class="single-view-button"><h5>{{currentFolder.name}}</h5></label>
   </div>
 
 
   <div class="grid-container">
-    <div class="single-view" *ngIf="isSingleView">
-      <div class="camera" >
+    <div class="camera" >
         <div class="lists row">
           <div class="col-md-4 ">
-            <nb-card>
-              <nb-card-body>
-                <ng2-smart-table [settings]="assetsSettings" [source]="currentFolderAssets" (userRowSelect)="onClick($event)" (deleteConfirm)="onFolderMemberDeleteConfirm($event)"	>
-                </ng2-smart-table>
-              </nb-card-body>
-            </nb-card>
+            <nb-flip-card [flipped]="showImage">
+              <nb-card-front>
+                <nb-card>
+                  <nb-card-body>
+                    <ng2-smart-table [settings]="assetsSettings" [source]="currentFolderAssets" (userRowSelect)="onClick($event)" (deleteConfirm)="onFolderMemberDeleteConfirm($event)"	>
+                    </ng2-smart-table>
+                  </nb-card-body>
+                </nb-card>
+              </nb-card-front>
+              <nb-card-back>
+                <nb-card>
+                  <nb-card-body>
+                    <img [src]="currentAssetImage" (click)="onFlipCard()">
+                  </nb-card-body>
+                </nb-card>
+              </nb-card-back>
+            </nb-flip-card>
           </div>
 
           <div class="col-md-8 ">
-            <nb-card >
-              <nb-card-header class="item">
-                {{currentAssetName}} Meta-Tags
-                <span class="delta" [class.up]="currentAssetVerified" [class.down]="!currentAssetVerified">
-                    <nb-icon  [icon]="currentAssetVerified ? 'checkmark-circle-2' : 'minus-circle' " pack="eva"></nb-icon>
-                </span>
-                <button nbButton size="tiny" status="success" *ngIf="!currentAssetVerified">Mark as Verified</button>
+            <nb-card>
+              <nb-card-header>
+                <div class="row">
+                    <span class="delta" [class.up]="currentAssetVerified" [class.down]="!currentAssetVerified">
+                      <nb-icon  [icon]="currentAssetVerified ? 'checkmark-circle-2' : 'minus-circle' " pack="eva"></nb-icon>
+                    </span>
+                  {{currentAssetName}} Meta-Tags
+                </div>
+                <div class="row">
+                  <button nbButton size="tiny" status="success" *ngIf="!currentAssetVerified">Mark as Verified</button>
+                  <button nbButton size="tiny" nbButton status="primary" (click)="saveAssetChanges()">Save changes</button>
+                  <nb-toggle [(ngModel)]="currentAssetAccessStatus">{{currentAssetAccessStatus ? 'public' : 'private' }}</nb-toggle>
+                </div>
+                <div class="form-group">
+                  <label for="score" class="label">score</label>
+                  <input type="text" nbInput  id="score" [value]="currentAssetScore" (input)="sendTheNewValue($event)">
+                </div>
+                <a [href]="currentAssetLink"  target="_blank" rel="noopener noreferrer">{{this.currentAssetLink}}</a>
+ 
               </nb-card-header>
 
               <nb-card-body>
-                <ng2-smart-table [settings]="settings" [source]="source" (deleteConfirm)="onDeleteConfirm($event)"
-                                 (editConfirm)="onEditConfirm($event)" (createConfirm)="onCreateConfirm($event)">
-                </ng2-smart-table>
+                <form>
+                  <div class="row">
+                    <div class="col-sm-4" *ngFor="let i of selectedAssetMetaTag">
+                      <div class="form-group">
+                        <label [for]="i.tagName" class="label">{{i.tagName}}</label>
+                        <input type="text" nbInput fullWidth [id]="i.originalTagName" [value]="i.value" (input)="sendTheNewValue($event)">
+                      </div>
+                    </div>
+                  </div>
+                  <button nbButton (click)="showAllTags()" >Show All</button>
+                </form>
               </nb-card-body>
             </nb-card>
           </div>
         </div>
-      </div>
     </div>
-
-    <div class="row" *ngIf="!isSingleView">
-      <div  *ngFor="let asset of assets" class="thumbnail">
-        <ngx-preview-card [ngStyle]="{'width':'300' + 'px'}" [asset]="asset" (valueChange)="metaShow($event)"></ngx-preview-card>
-      </div>
-    </div>
-
   </div>
 </div>
 

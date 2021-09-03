@@ -11,10 +11,12 @@ import set = Reflect.set;
 export class DataAccessService {
   webServerURL;
   domainURL;
+  awsApiDomainName;
   constructor(private http: HttpClient) {
     this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/';
     this.domainURL = 'http://mec402.boisestate.edu/';
    // this.webServerURL = 'http://localhost/cgi-bin/';
+    this.awsApiDomainName = 'https://lmod9t47la.execute-api.us-west-2.amazonaws.com/v1/';
   }
 
   public getMuseumData(searchTerm: string, museumName  , page: number , pageSize: number): Observable<Results> {
@@ -51,10 +53,12 @@ export class DataAccessService {
     return this.http.get<CollectionResults>(url, {params: params});
   }
 
-
-  public getFolders(): Observable<CollectionResults> {
-    const url = this.domainURL + 'api/v1/folders';
-    return this.http.get<CollectionResults>(url);
+  public getFolders(p, ps): Observable<CollectionResults> {
+    const url = this.awsApiDomainName + 'folders';
+    const params = new HttpParams()
+      .set('p', p)
+      .set('ps', ps);
+    return this.http.get<CollectionResults>(url, {params: params});
   }
 
   public getFolderDetails(folderId): Observable<FolderDetails> {
@@ -139,6 +143,12 @@ export class DataAccessService {
   public getPublicAssetsInCollection(collectionId, p, ps): Observable<Assets> {
     const getAssetsInCollectionURL = this.webServerURL + 'dataAccess/getPublicAssetsInCollection.py';
     const assetsInCollectionParams = new HttpParams().set('collectionId', collectionId).set('p', p).set('ps', ps);
+    return this.http.get<Assets>(getAssetsInCollectionURL, {params: assetsInCollectionParams});
+  }
+
+  public getFolderAssets(collectionId, p, ps): Observable<Assets> {
+    const getAssetsInCollectionURL = this.awsApiDomainName + 'folderassets';
+    const assetsInCollectionParams = new HttpParams().set('folderId', collectionId).set('p', p).set('ps', ps);
     return this.http.get<Assets>(getAssetsInCollectionURL, {params: assetsInCollectionParams});
   }
 
@@ -333,6 +343,16 @@ export class DataAccessService {
     return this.http.post<InsertionResponse>(URL, postBody);
   }
 
+  public saveAssetChanges(mid, data) {
+    const URL = this.awsApiDomainName + 'metatags';
+    const postBody = {'metaDataId': mid, 'data': data};
+    const headers = new HttpHeaders({
+      'Content-Type': 'text/json',
+      'Access-Control-Allow-Origin': '*',
+    });
+    return this.http.post<InsertionResponse>(URL, postBody);
+  }
+
 
 }
 
@@ -353,9 +373,16 @@ class CollectionResults {
   data: Collection[];
 }
 class Collection {
+  note;
+  metaDataId;
   id;
+  insertTime;
+  verified;
+  lastModified;
   name;
-  timestamp;
+  layoutType;
+  image;
+  assetCount;
 }
 
 class InsertionResponse {

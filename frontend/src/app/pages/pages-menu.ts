@@ -47,4 +47,9 @@ export const MENU_ITEMS: NbMenuItem[] = [
     icon: 'question-mark-circle',
     link: '/pages/docs',
   },
+  {
+    title: 'Experimental',
+    icon: 'bulb-outline',
+    link: '/pages/fireassets',
+  },
 ];

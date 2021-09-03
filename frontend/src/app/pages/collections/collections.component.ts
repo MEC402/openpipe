@@ -1,19 +1,23 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DataAccessService} from '../../services/data-access.service';
 import {NbContextMenuDirective, NbPopoverDirective} from '@nebular/theme';
 import {LocalDataSource} from 'ng2-smart-table';
-import {Subject} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
+import {AngularFirestore} from '@angular/fire/firestore';
+import { ChangeDetectionStrategy } from '@angular/core';
+import {takeUntil} from 'rxjs/operators';
+
 
 @Component({
   selector: 'ngx-collections',
   templateUrl: './collections.component.html',
   styleUrls: ['./collections.component.scss'],
 })
-export class CollectionsComponent implements OnInit {
+export class CollectionsComponent implements OnInit, OnDestroy {
   protected destroy$ = new Subject<void>();
 
-  collections: any;
-  assets= [];
+  collections = [];
+  assets = [];
   currentFolder = {'name': ['test'], 'id': [-1]};
   metaTags: any;
   newCollectionName;
@@ -25,12 +29,21 @@ export class CollectionsComponent implements OnInit {
     {title: 'Delete'},
   ];
 
-  isSingleView= true;
+  isSingleView = true;
   currentFolderAssets: LocalDataSource = new LocalDataSource();
   source: LocalDataSource = new LocalDataSource();
   currentAsset: any;
   currentAssetName: any;
   currentAssetVerified = false;
+  currentAssetLink: string;
+  currentAssetScore: number;
+  selectedAssetMetaTag = [];
+  selectedAssetChanges = {};
+  selectTagNames = ['openpipe_canonical_artist', 'openpipe_canonical_title',  'openpipe_canonical_displayDate' , 'openpipe_canonical_date',
+    'openpipe_canonical_Moment', 'openpipe_canonical_medium', 'openpipe_canonical_Technique', 'openpipe_canonical_country'
+    , 'openpipe_canonical_culture', 'openpipe_canonical_period', 'openpipe_canonical_biography'
+    , 'openpipe_canonical_longitude', 'openpipe_canonical_latitude', 'openpipe_canonical_classification',
+    'openpipe_canonical_Object_Type', 'openpipe_canonical_Region', 'openpipe_canonical_largeImageDimensions'];
 
   settings = {
     add: {
@@ -70,11 +83,12 @@ export class CollectionsComponent implements OnInit {
     actions: {
       add: false,
       edit: false,
+      delete: false,
     },
-    delete: {
-      deleteButtonContent: '<i class="nb-trash"></i>',
-      confirmDelete: true,
-    },
+    // delete: {
+    //   deleteButtonContent: '<i class="nb-trash"></i>',
+    //   confirmDelete: true,
+    // },
     columns: {
       openpipe_canonical_smallImage: {
         filter: false,
@@ -91,12 +105,36 @@ export class CollectionsComponent implements OnInit {
     },
   };
   folderPage = true;
+  currentAssetImage: any;
+  showImage = false;
+  loading: boolean;
 
   constructor(private dataAccess: DataAccessService) {
-    dataAccess.getCollections().subscribe(res => {
-      console.log(res.data)
+    // this.db.collection('folders', ref => ref.orderBy('folderInfo.name')).get().subscribe(snap => {
+    //   snap.forEach(snap => {
+    //     this.collections.push(snap.data().folderInfo)
+    //     console.log(snap.id);
+    //     console.log(snap.data().folderInfo);
+    //   });
+    // });
+
+    this.loading = true;
+    dataAccess.getFolders(1, 200).subscribe(res => {
+      this.loading = false;
+      console.log(res.data);
       this.collections = res.data;
     });
+
+  }
+
+  private _destroyed$ = new Subject();
+  assetLink: any;
+  currentAssetAccessStatus=true;
+
+
+  ngOnDestroy(): void {
+    this._destroyed$.next();
+    this._destroyed$.complete();
   }
 
   ngOnInit() {
@@ -145,33 +183,56 @@ export class CollectionsComponent implements OnInit {
 
   onClick(event) {
     this.currentAsset = event.data;
+    console.log(this.currentAsset);
     this.currentAssetName = this.currentAsset.openpipe_canonical_title[0];
+    this.currentAssetImage = this.currentAsset.openpipe_canonical_smallImage[0];
     this.currentAssetVerified = this.currentAsset.assetVerified[0];
-    console.log(event.data)
+    this.currentAssetScore = this.currentAsset.assetScore;
+    this.currentAssetAccessStatus = true;
+    this.selectedAssetChanges = {};
+    const s = this.currentAsset.openpipe_canonical_source[0];
+
+    if (s.includes('Metropolitan')) {
+        this.currentAssetLink = 'https://www.metmuseum.org/art/collection/search/' + this.currentAsset.objectID;
+    } else if (s.includes('Cleveland')) {
+        this.currentAssetLink = 'https://www.clevelandart.org/art/' + this.currentAsset.accession_number;
+    } else {
+      this.currentAssetLink = 'Link not available';
+    }
+
+    console.log(event.data);
     const temp = [];
     for (const [key, value] of Object.entries(event.data)) {
-      if (key != 'id' && key != 'metaDataId')
-        temp.push({'tagName': key, 'value': value});
+      if (this.selectTagNames.includes(key))
+        temp.push({'tagName': key.split('_')[2], 'value': value, 'originalTagName': key});
     }
+    this.selectedAssetMetaTag = temp;
     this.source.load(temp);
+    this.onFlipCard();
   }
 
 
   onFolderOpenClick(element) {
     this.folderPage = false;
     this.currentFolder = element;
-    this.dataAccess.getGUID('http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/' +
-      this.currentFolder.id[0]).subscribe(res => {
-      for (let i = 1; i < (res.assets.length / 10) + 1; i += 1) {
-        this.dataAccess.getPublicAssetsInCollection(element.id, i, 10).subscribe(resp => {
-          // this.assets.concat(resp.data);
-          resp.data.forEach(d => {
-            this.assets.push(d);
-            this.currentFolderAssets.add(d);
-            this.currentFolderAssets.refresh();
+    const pageSize = 50;
+    let pages = [];
+
+    for (let i = 2; i < Math.ceil(element.assetCount / pageSize) ; i += 1) {
+      pages.push(i);
+    }
+
+    this.dataAccess.getFolderAssets(element.id, 1, pageSize).pipe(takeUntil(this._destroyed$)).subscribe(res => {
+      this.loading = false;
+      this.currentFolderAssets.load(res.data);
+      Observable.merge(pages.map( g => this.dataAccess.getFolderAssets(element.id, g, pageSize)))
+        .subscribe(ob => {
+          ob.pipe(takeUntil(this._destroyed$)).subscribe(resp => {
+            resp.data.forEach(d => {
+              this.currentFolderAssets.add(d).then(p => this.currentFolderAssets.refresh());
+            });
           });
         });
-      }
     });
   }
 
@@ -207,5 +268,26 @@ export class CollectionsComponent implements OnInit {
     });
   }
 
+  onFlipCard() {
+    this.showImage = !this.showImage;
+  }
+
+  showAllTags() {
+    const temp = [];
+    for (const [key, value] of Object.entries(this.currentAsset)) {
+        temp.push({'tagName': key, 'value': value, 'originalTagName': key});
+    }
+    this.selectedAssetMetaTag = temp;
+  }
+
+  saveAssetChanges() {
+    this.dataAccess.saveAssetChanges(this.currentAsset.metaDataId, this.selectedAssetChanges).subscribe(res => {
+      console.log(res);
+    });
+  }
+
+  sendTheNewValue(e) {
+    this.selectedAssetChanges[e.target.id] = e.target.value;
+  }
 }
 

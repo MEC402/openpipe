@@ -63,6 +63,10 @@
     align-items: center;
   }
 
+  img {
+    max-width: 100%;
+  }
+
   .item {
     display: flex;
     justify-content: space-between;
