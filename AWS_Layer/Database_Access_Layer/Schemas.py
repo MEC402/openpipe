@@ -10,6 +10,12 @@ class AssetSchema(SQLAlchemyAutoSchema):
         load_instance = True
 
 
+class FolderSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = TO().getClasses()["collection"]
+        include_relationships = True
+        load_instance = True
+
 class MetaTagSchema():
     def toJson(self, data):
         res = {}
