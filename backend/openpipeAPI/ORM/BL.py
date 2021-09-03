@@ -5,6 +5,7 @@ import requests
 import time
 
 from sqlalchemy import and_
+from sqlalchemy.orm import aliased
 
 from backend.openpipeAPI.ORM.ORM import ORM
 from backend.openpipeAPI.ORM.TO import TO
@@ -150,6 +151,10 @@ class BL:
         return results
 
     def getAllAssetsWithGUID(self, page, pageSize, changeStart, changeEnd, none):
+        tables = TO().getClasses()
+        MetaTag = tables["metaTag"]
+        Asset = tables["asset"]
+
         guidmap = {"city": "500", "classification": "600",
                    "culture": "700", "genre": "800", "medium": "900", "nation": "a00",
                    "artist": "400", "title": "000", "tags": "000"
@@ -161,54 +166,105 @@ class BL:
         start = (page - 1) * pageSize
         step = pageSize
 
-        results = {"total": 0, "data": []}
+        results = {"total": 0,
+                   "guidbase": "http://mec402.boisestate.edu/",
+                   "data": []}
 
         if int(page) < 0:
             return results
 
-        orm = ORM()
-        queryStatement = "SELECT id,metaDataId,shortName FROM asset where lastModified between \'" + changeStart + "\' and \'" + changeEnd + "\' limit " + str(
-            start) + "," + str(step)
         t0 = time.time()
-        newcon = orm.simpConnect()
-        results = orm.executeSelectPersist(queryStatement, newcon)
-        results['guidbase'] = sguidURL
-        sguidURL = ""
-        rows = []
-        for row in results['data']:
-            # rowInfo = {"id": row['id'], "metaDataId": row['metaDataId'], "name": row['shortName']}
-            rowInfo = {"metaDataId": row['metaDataId'], "name": row['shortName']}
-            metaDataId = row['metaDataId'][0]
-            queryStatement = "select id,tagName,value,topic_name,topic_id,topic_code from metaTag where metaDataId="
-            if metaDataId:
-                queryStatement = queryStatement + str(metaDataId)
-                tags = orm.executeSelectPersist(queryStatement, newcon)['data']
-                canonicalTagObj = {}
-                for metaTagRow in tags:
-                    print(metaTagRow)
-                    if "openpipe_canonical_" in metaTagRow['tagName'][0]:  # Only Canonical Tags have topics
-                        tagName = metaTagRow['tagName'][0].split("_")[2]
-                        if metaTagRow['topic_name'][0] is None:
-                            if none == 1:
-                                print("None value:", none)
-                                canonicalTagObj[tagName] = {
-                                    sguidURL + "ba0" + "/" + str(metaTagRow['id'][0]): metaTagRow['value'][0]}
-                            else:
-                                pass
-                        else:
-                            canonicalTagObj[tagName] = {
-                                guidURL + str(metaTagRow['topic_code'][0]) + "/" + str(metaTagRow['topic_id'][0]):
-                                    metaTagRow['value'][0]}
 
-                rowInfo["openpipe_canonical"] = canonicalTagObj
-                rowInfo["openpipe_canonical"]["id"] = sguidURL + "100/" + str(row['id'][0])
-                rows.append(rowInfo)
-        results["data"] = rows
-        newcon.close()
+        orm = ORM()
+        q1 = orm.session.query(Asset). \
+            filter(Asset.lastModified.between(changeStart, changeEnd)). \
+            offset(start). \
+            limit(step). \
+            subquery()
+
+        q1 = aliased(Asset, q1)
+
+        resultSet = orm.session.query(q1, MetaTag).join(MetaTag, q1.metaDataId == MetaTag.metaDataId). \
+            filter(MetaTag.tagName.like("%{}%".format("openpipe_canonical_"))). \
+            order_by(q1.metaDataId)
+
+        orm.executeSelect("""select * from metaTag join (select * from asset WHERE asset.`lastModified` BETWEEN '1900-1-1' AND '2030-1-1'LIMIT 1, 100) as a on a.metaDataId=metaTag.metadataId where tagName like '%openpipe_canonical%';""")
+
+        print(resultSet)
+
         t1 = time.time()
-        # print("broken")
-        # print(t1-t0)
+
+        # print(t1 - t0)
+
+        assetMetaDataMap = {}
+        print(len(resultSet))
+
+        for r in resultSet:
+            assetInfo = r[0]
+            metaTagInfo = r[1]
+            # print(assetInfo.metaDataId, metaTagInfo.metaDataId)
+            tagName = metaTagInfo.tagName.split("_")[2]
+
+            tagGuid = {str(metaTagInfo.topic_code) + "/" + str(metaTagInfo.topic_id):metaTagInfo.value}
+
+            if metaTagInfo.topic_name is None and none == 1:
+                if tagName == "id":
+                    tagGuid = "100" + "/" + str(assetInfo.id)
+                else:
+                    tagGuid = {"ba0" + "/" + str(metaTagInfo.id):metaTagInfo.value}
+
+
+            if assetInfo.metaDataId not in assetMetaDataMap:
+                assetMetaDataMap[assetInfo.metaDataId] = {"id": "100/" + str(assetInfo.id),
+                                                          "metaDataId": assetInfo.metaDataId,
+                                                          "name": assetInfo.shortName,
+                                                          "openpipe_canonical": {
+                                                              tagName: tagGuid
+                                                          }}
+            else:
+                assetMetaDataMap[assetInfo.metaDataId]["openpipe_canonical"][tagName] = tagGuid
+
+        results["data"] = list(assetMetaDataMap.values())
+        results["total"] = len(results["data"])
+
         return results
+        # results['guidbase'] = sguidURL
+        # sguidURL = ""
+        # rows = []
+        # for row in results['data']:
+        #     # rowInfo = {"id": row['id'], "metaDataId": row['metaDataId'], "name": row['shortName']}
+        #     rowInfo = {"metaDataId": row['metaDataId'], "name": row['shortName']}
+        #     metaDataId = row['metaDataId'][0]
+        #     queryStatement = "select id,tagName,value,topic_name,topic_id,topic_code from metaTag where metaDataId="
+        #     if metaDataId:
+        #         queryStatement = queryStatement + str(metaDataId)
+        #         tags = orm.executeSelectPersist(queryStatement, newcon)['data']
+        #         canonicalTagObj = {}
+        #         for metaTagRow in tags:
+        #             print(metaTagRow)
+        #             if "openpipe_canonical_" in metaTagRow['tagName'][0]:  # Only Canonical Tags have topics
+        #                 tagName = metaTagRow['tagName'][0].split("_")[2]
+        #                 if metaTagRow['topic_name'][0] is None:
+        #                     if none == 1:
+        #                         print("None value:", none)
+        #                         canonicalTagObj[tagName] = {
+        #                             sguidURL + "ba0" + "/" + str(metaTagRow['id'][0]): metaTagRow['value'][0]}
+        #                     else:
+        #                         pass
+        #                 else:
+        #                     canonicalTagObj[tagName] = {
+        #                         guidURL + str(metaTagRow['topic_code'][0]) + "/" + str(metaTagRow['topic_id'][0]):
+        #                             metaTagRow['value'][0]}
+        #
+        #         rowInfo["openpipe_canonical"] = canonicalTagObj
+        #         rowInfo["openpipe_canonical"]["id"] = sguidURL + "100/" + str(row['id'][0])
+        #         rows.append(rowInfo)
+        # results["data"] = rows
+        # newcon.close()
+        # t1 = time.time()
+        # # print("broken")
+        # # print(t1-t0)
+        # return results
 
     def getAllAssetsWithGUID1(self, page, pageSize, changeStart, changeEnd):
         guidURL = "http://mec402.boisestate.edu/cgi-bin/openpipe/data/"
@@ -521,12 +577,12 @@ class BL:
             tables = TO().getClasses()
             Topic = tables["topic"]
             topicResultSet = orm.session.query(Topic).filter(Topic.type == topicName).all()
-            res={"total":0,"data":[]}
-            resArr=[]
+            res = {"total": 0, "data": []}
+            resArr = []
             for t in topicResultSet:
-                resArr.append(str(t.code)+"/"+str(t.id))
-            res["total"]=len(resArr)
-            res["data"]=resArr
+                resArr.append(str(t.code) + "/" + str(t.id))
+            res["total"] = len(resArr)
+            res["data"] = resArr
             return res
 
     def getGUIDInfo(self, guidName, guidId):
@@ -838,23 +894,27 @@ class BL:
             return []
 
         orm = ORM()
-        stm = "select * from topic order by type limit " + str(start) + "," + str(step)
+        stm = "select * from topic where code!='b00' order by type limit " + str(start) + "," + str(step)
 
         allTopicTypes = orm.executeSelect(stm)
 
         guidmap = {"city": "500", "classification": "600",
                    "culture": "700", "genre": "800", "medium": "900", "nation": "a00",
-                   "artist": "400", "title": "000", "tags": "000","metaTag":"b00"
+                   "artist": "400", "title": "000", "tags": "000", "metaTag": "b00"
                    }
 
-        finalRes = {"availableTopics": ["artist", "genre", "city", "classification", "culture", "medium", "nation","metaTag"]}
+        repAssetId = 10
+
+        finalRes = {
+            "availableTopics": ["artist", "genre", "city", "classification", "culture", "medium", "nation", "metaTag"]}
         for t in allTopicTypes['data']:
             topicType = t['type'][0]
             topicId = t['id'][0]
             topicInfo = {"id": topicId,
                          "value": t['name'][0],
                          "biography": t['description'][0],
-                         "guid": "http://mec402.boisestate.edu/" + guidmap[topicType] + "/" + str(topicId)}
+                         "guid": "http://mec402.boisestate.edu/" + guidmap[topicType] + "/" + str(topicId),
+                         "representativeAssetId": "100/" + str(repAssetId)}
 
             if topicType in finalRes.keys():
                 finalRes[topicType]["data"].append(topicInfo)
