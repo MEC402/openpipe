@@ -3,8 +3,6 @@ import {DataAccessService} from '../../services/data-access.service';
 import {NbContextMenuDirective, NbPopoverDirective} from '@nebular/theme';
 import {LocalDataSource} from 'ng2-smart-table';
 import {Observable, Subject} from 'rxjs';
-import {AngularFirestore} from '@angular/fire/firestore';
-import { ChangeDetectionStrategy } from '@angular/core';
 import {takeUntil} from 'rxjs/operators';
 
 
@@ -129,7 +127,8 @@ export class CollectionsComponent implements OnInit, OnDestroy {
 
   private _destroyed$ = new Subject();
   assetLink: any;
-  currentAssetAccessStatus=true;
+  currentAssetAccessStatus = true;
+  allTagsView = false;
 
 
   ngOnDestroy(): void {
@@ -274,8 +273,17 @@ export class CollectionsComponent implements OnInit, OnDestroy {
 
   showAllTags() {
     const temp = [];
-    for (const [key, value] of Object.entries(this.currentAsset)) {
+    if (!this.allTagsView){
+      this.allTagsView = true;
+      for (const [key, value] of Object.entries(this.currentAsset)) {
         temp.push({'tagName': key, 'value': value, 'originalTagName': key});
+      }
+    } else {
+      this.allTagsView = false;
+      for (const [key, value] of Object.entries(this.currentAsset)) {
+        if (this.selectTagNames.includes(key))
+          temp.push({'tagName': key.split('_')[2], 'value': value, 'originalTagName': key});
+      }
     }
     this.selectedAssetMetaTag = temp;
   }

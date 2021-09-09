@@ -354,6 +354,22 @@ export class DataAccessService {
   }
 
 
+  public getAssetByMetaDataId(mid): Observable<Asset> {
+    const url = this.awsApiDomainName + 'asset';
+    const params = new HttpParams()
+      .set('mid', mid);
+    return this.http.get<Asset>(url, {params: params});
+  }
+
+  public getTopicByCode(code, page, pageSize): Observable<Results> {
+    const url = this.awsApiDomainName + 'topic';
+    const params = new HttpParams()
+      .set('code', code)
+      .set('p', page)
+      .set('ps', pageSize);
+    return this.http.get<Results>(url, {params: params});
+  }
+
 }
 
 class Results {
@@ -362,6 +378,10 @@ class Results {
   assets: any[];
 }
 
+class Asset {
+  total;
+  tagData;
+}
 
 class FolderDetails {
   folderInfo: any;

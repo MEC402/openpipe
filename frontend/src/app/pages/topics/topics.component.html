@@ -1,0 +1,6 @@
+<nb-tabset>
+  <nb-tab [tabTitle]=t.name *ngFor="let t of topicNames" >
+    <ngx-topic-info [topicCode]="t.code" ></ngx-topic-info>
+  </nb-tab>
+</nb-tabset>
+
