@@ -59,6 +59,9 @@ import { MuseumTagMappingComponent } from './settings/museum-tag-mapping/museum-
 import {NgxJsonViewerModule} from "ngx-json-viewer";
 import { CellDropDownComponent } from './util/cell-drop-down/cell-drop-down.component';
 import { CanvasEditorComponent } from './layout-editor/canvas-editor/canvas-editor.component';
+import { AssetComponent } from './asset/asset.component';
+import { TopicsComponent } from './topics/topics.component';
+import { TopicInfoComponent } from './topics/topic-info/topic-info.component';
 
 
 @NgModule({
@@ -133,6 +136,9 @@ import { CanvasEditorComponent } from './layout-editor/canvas-editor/canvas-edit
     MuseumTagMappingComponent,
     CellDropDownComponent,
     CanvasEditorComponent,
+    AssetComponent,
+    TopicsComponent,
+    TopicInfoComponent,
   ],
 })
 export class PagesModule {

@@ -1,0 +1,17 @@
+<div class="row">
+  <div class="col-6" >
+    <div class="form-group" *ngFor="let t of topicData">
+      <input type="text" nbInput [id]="t.topicId" [value]="t.topicName">
+      <button nbButton size="small" (click)="saveChanges()">save</button>
+      <button nbButton size="small" (click)="showAliases(t.aliases)">aliases</button>
+    </div>
+  </div>
+
+  <div class="col-6">
+      <ul>
+        <li *ngFor="let a of selectedTopicAliases">
+          <a [routerLink]="['/pages/asset',a.metaDataId ]" target="_blank" rel="noopener noreferrer">{{a.value}}</a>
+        </li>
+      </ul>
+  </div>
+</div>
