@@ -150,14 +150,13 @@ def getFolders(page, pageSize):
     return response
 
 
-def update_test():
-    tables = TO().getClasses()
-    MetaTag = tables["metaTag"]
+# def update_test():
+#     tables = TO().getClasses()
+#     MetaTag = tables["metaTag"]
+#
+#     session=da().session
+#     session.query(MetaTag).filter(and_(MetaTag.metaDataId==4,MetaTag.tagName=='reign')).update({"value":""})
+#     session.query(MetaTag).filter(and_(MetaTag.metaDataId == 4, MetaTag.tagName == 'region')).update({"value": ""})
+#     session.commit()
+#     session.close()
 
-    session=da().session
-    session.query(MetaTag).filter(and_(MetaTag.metaDataId==4,MetaTag.tagName=='reign')).update({"value":""})
-    session.query(MetaTag).filter(and_(MetaTag.metaDataId == 4, MetaTag.tagName == 'region')).update({"value": ""})
-    session.commit()
-    session.close()
-
-# update_test()
