@@ -49,11 +49,12 @@
 
                 <div class="row">
                   <label for="score" class="label">score</label>
-                  <input type="text"  id="score" [value]="currentAssetScore" (input)="sendTheNewValue($event)">
+                  <input type="text" nbInput id="score" [value]="currentAssetScore" (input)="sendTheNewValue($event)">
                   <nb-toggle [(ngModel)]="currentAssetAccessStatus">{{currentAssetAccessStatus ? 'public' : 'private' }}</nb-toggle>
                 </div>
 
                 <div class="row">
+                  <button nbButton size="tiny" (click)="showAllTags()"> {{allTagsView? 'Show less' : 'Show All'}} </button>
                   <button nbButton size="tiny" status="success" *ngIf="!currentAssetVerified">Mark as Verified</button>
                   <button nbButton size="tiny" nbButton status="primary" (click)="saveAssetChanges()">Save changes</button>
                 </div>
@@ -72,7 +73,6 @@
                       </div>
                     </div>
                   </div>
-                  <button nbButton (click)="showAllTags()" >Show All</button>
                 </form>
               </nb-card-body>
             </nb-card>
