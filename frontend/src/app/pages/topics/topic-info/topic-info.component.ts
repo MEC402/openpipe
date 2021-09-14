@@ -19,6 +19,7 @@ export class TopicInfoComponent implements OnInit, OnDestroy {
   aliasPage = 1;
   totalTopicPages = 1;
   totalAliasPages = 1;
+  selectedTopic;
 
   constructor(private dataAccess: DataAccessService) {
 
@@ -44,6 +45,7 @@ export class TopicInfoComponent implements OnInit, OnDestroy {
   }
 
   showAliases(topic) {
+    this.selectedTopic = topic;
     this.dataAccess.getTopicAliases(topic.topicId, this.aliasPage, this.pageSize).
     pipe(takeUntil(this._destroyed$)).subscribe(res => {
       this.totalAliasPages = Math.ceil(res.total / this.pageSize);
@@ -73,6 +75,26 @@ export class TopicInfoComponent implements OnInit, OnDestroy {
       this.totalTopicPages = Math.ceil(res.total / this.pageSize);
       this.topicData = res.data;
       console.log(this.topicData);
+    });
+  }
+
+  prevAliasPage() {
+    this.aliasPage--;
+    this.dataAccess.getTopicAliases(this.selectedTopic.topicId, this.aliasPage, this.pageSize).
+    pipe(takeUntil(this._destroyed$)).subscribe(res => {
+      this.totalAliasPages = Math.ceil(res.total / this.pageSize);
+      this.selectedTopicAliases = res.data;
+      console.log(this.selectedTopicAliases);
+    });
+  }
+
+  nextAliasPage() {
+    this.aliasPage++;
+    this.dataAccess.getTopicAliases(this.selectedTopic.topicId, this.aliasPage, this.pageSize).
+    pipe(takeUntil(this._destroyed$)).subscribe(res => {
+      this.totalAliasPages = Math.ceil(res.total / this.pageSize);
+      this.selectedTopicAliases = res.data;
+      console.log(this.selectedTopicAliases);
     });
   }
 }

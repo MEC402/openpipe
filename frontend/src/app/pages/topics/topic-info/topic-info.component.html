@@ -34,11 +34,11 @@
       <nb-card-header>
         <div>
           <label>Page:</label>
-          <button nbButton ghost status="primary"  size="tiny" (click)="prevTopicPage()" [disabled]="topicPage<=1">
+          <button nbButton ghost status="primary"  size="tiny" (click)="prevAliasPage()" [disabled]="aliasPage<=1">
             <nb-icon icon="arrow-ios-back-outline" status="basic"></nb-icon>
           </button>
-          <label>{{topicPage}} of {{totalTopicPages}}</label>
-          <button nbButton ghost status="primary"  size="tiny" (click)="nextTopicPage()" [disabled]="topicPage>=totalTopicPages">
+          <label>{{aliasPage}} of {{totalAliasPages}}</label>
+          <button nbButton ghost status="primary"  size="tiny" (click)="nextAliasPage()" [disabled]="aliasPage>=totalAliasPages">
             <nb-icon icon="arrow-ios-forward-outline" status="basic"></nb-icon>
           </button>
         </div>
