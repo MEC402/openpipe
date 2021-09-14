@@ -370,6 +370,15 @@ export class DataAccessService {
     return this.http.get<Results>(url, {params: params});
   }
 
+  public getTopicAliases(topicId, page, pageSize): Observable<Results> {
+    const url = this.awsApiDomainName + 'topicaliases';
+    const params = new HttpParams()
+      .set('topicId', topicId)
+      .set('p', page)
+      .set('ps', pageSize);
+    return this.http.get<Results>(url, {params: params});
+  }
+
 }
 
 class Results {

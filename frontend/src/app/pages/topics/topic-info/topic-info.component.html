@@ -1,17 +1,60 @@
 <div class="row">
   <div class="col-6" >
-    <div class="form-group" *ngFor="let t of topicData">
-      <input type="text" nbInput [id]="t.topicId" [value]="t.topicName">
-      <button nbButton size="small" (click)="saveChanges()">save</button>
-      <button nbButton size="small" (click)="showAliases(t.aliases)">aliases</button>
-    </div>
+    <nb-card>
+      <nb-card-header>
+        <div>
+          <label>Page:</label>
+          <button nbButton ghost status="primary"  size="tiny" (click)="prevTopicPage()" [disabled]="topicPage<=1">
+            <nb-icon icon="arrow-ios-back-outline" status="basic"></nb-icon>
+          </button>
+          <label>{{topicPage}} of {{totalTopicPages}}</label>
+          <button nbButton ghost status="primary"  size="tiny" (click)="nextTopicPage()" [disabled]="topicPage>=totalTopicPages">
+            <nb-icon icon="arrow-ios-forward-outline" status="basic"></nb-icon>
+          </button>
+        </div>
+      </nb-card-header>
+        <table>
+          <tr *ngFor="let t of topicData">
+            <th>
+              <input type="text" nbInput fullWidth [id]="t.topicId" [value]="t.topicName">
+            </th>
+            <th>
+              <button nbButton size="small" (click)="saveChanges()">save</button>
+            </th>
+            <th>
+              <button nbButton size="small" (click)="showAliases(t)">aliases</button>
+            </th>
+          </tr>
+        </table>
+    </nb-card>
   </div>
 
   <div class="col-6">
-      <ul>
-        <li *ngFor="let a of selectedTopicAliases">
-          <a [routerLink]="['/pages/asset',a.metaDataId ]" target="_blank" rel="noopener noreferrer">{{a.value}}</a>
-        </li>
-      </ul>
+    <nb-card>
+      <nb-card-header>
+        <div>
+          <label>Page:</label>
+          <button nbButton ghost status="primary"  size="tiny" (click)="prevTopicPage()" [disabled]="topicPage<=1">
+            <nb-icon icon="arrow-ios-back-outline" status="basic"></nb-icon>
+          </button>
+          <label>{{topicPage}} of {{totalTopicPages}}</label>
+          <button nbButton ghost status="primary"  size="tiny" (click)="nextTopicPage()" [disabled]="topicPage>=totalTopicPages">
+            <nb-icon icon="arrow-ios-forward-outline" status="basic"></nb-icon>
+          </button>
+        </div>
+      </nb-card-header>
+
+        <table>
+          <tr *ngFor="let a of selectedTopicAliases">
+            <th>
+              <a [routerLink]="['/pages/asset',a.metaDataId ]" target="_blank" rel="noopener noreferrer">{{a.value}}</a>
+            </th>
+            <th>
+              <button nbButton size="tiny" (click)="setAsTopicRepresentative(a.metaDataId)">set as representative</button>
+            </th>
+          </tr>
+        </table>
+
+    </nb-card>
   </div>
 </div>

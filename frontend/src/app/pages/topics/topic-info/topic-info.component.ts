@@ -14,6 +14,11 @@ export class TopicInfoComponent implements OnInit, OnDestroy {
   topicData;
   selectedTopicAliases;
   private _destroyed$ = new Subject();
+  aliasData = [];
+  topicPage = 1;
+  aliasPage = 1;
+  totalTopicPages = 1;
+  totalAliasPages = 1;
 
   constructor(private dataAccess: DataAccessService) {
 
@@ -26,19 +31,48 @@ export class TopicInfoComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.dataAccess.getTopicByCode(this.topicCode, 1, this.pageSize).
+    this.dataAccess.getTopicByCode(this.topicCode, this.topicPage, this.pageSize).
     pipe(takeUntil(this._destroyed$)).subscribe(res => {
-      const pages = Array.from(Array(Math.ceil(res.total / this.pageSize)).keys());
+      this.totalTopicPages = Math.ceil(res.total / this.pageSize);
       this.topicData = res.data;
       console.log(this.topicData);
     });
   }
 
   saveChanges() {
-    console.log("save")
+    console.log('save');
   }
 
-  showAliases(aliases) {
-    this.selectedTopicAliases=aliases;
+  showAliases(topic) {
+    this.dataAccess.getTopicAliases(topic.topicId, this.aliasPage, this.pageSize).
+    pipe(takeUntil(this._destroyed$)).subscribe(res => {
+      this.totalAliasPages = Math.ceil(res.total / this.pageSize);
+      this.selectedTopicAliases = res.data;
+      console.log(this.selectedTopicAliases);
+    });
+  }
+
+  setAsTopicRepresentative(metaDataId: any) {
+
+  }
+
+  prevTopicPage() {
+    this.topicPage--;
+    this.dataAccess.getTopicByCode(this.topicCode, this.topicPage, this.pageSize).
+    pipe(takeUntil(this._destroyed$)).subscribe(res => {
+      this.totalTopicPages = Math.ceil(res.total / this.pageSize);
+      this.topicData = res.data;
+      console.log(this.topicData);
+    });
+  }
+
+  nextTopicPage() {
+    this.topicPage++;
+    this.dataAccess.getTopicByCode(this.topicCode, this.topicPage, this.pageSize).
+    pipe(takeUntil(this._destroyed$)).subscribe(res => {
+      this.totalTopicPages = Math.ceil(res.total / this.pageSize);
+      this.topicData = res.data;
+      console.log(this.topicData);
+    });
   }
 }
