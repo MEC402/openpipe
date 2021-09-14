@@ -20,6 +20,7 @@ export class TopicInfoComponent implements OnInit, OnDestroy {
   totalTopicPages = 1;
   totalAliasPages = 1;
   selectedTopic;
+  topicMergeList = [];
 
   constructor(private dataAccess: DataAccessService) {
 
@@ -96,5 +97,9 @@ export class TopicInfoComponent implements OnInit, OnDestroy {
       this.selectedTopicAliases = res.data;
       console.log(this.selectedTopicAliases);
     });
+  }
+
+  addToMergeList(t) {
+    this.topicMergeList.push(t);
   }
 }
