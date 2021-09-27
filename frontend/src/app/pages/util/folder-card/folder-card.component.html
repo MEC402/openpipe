@@ -1,8 +1,8 @@
 <nb-card size="small">
   <nb-card-header>
     {{collection.name}}
-    <span class="delta" [class.up]="newVerified" [class.down]="!newVerified">
-          <nb-icon  [icon]="newVerified ? 'checkmark-circle-2' : 'minus-circle' " pack="eva"></nb-icon>
+    <span class="delta" [class.up]="collection.verified" [class.down]="!collection.verified">
+          <nb-icon  [icon]="collection.verified ? 'checkmark-circle-2' : 'minus-circle' " pack="eva"></nb-icon>
     </span>
   </nb-card-header>
   <nb-card-body>
@@ -37,19 +37,20 @@
       <button nbButton (click)="ref.close()" size="tiny" status="danger">Close</button>
     </nb-card-header>
     <nb-card-body>
-      <label>Folder Name:
-        <input type="text" nbInput [placeholder]="collection.name[0]" [(ngModel)]="newName">
-      </label>
-      <br/>
-      <label>Image URL:
-        <input type="text" nbInput fullWidth  [placeholder]="collection.image[0]" [(ngModel)]="newImage">
-      </label>
-      <br/>
-      <label>Verified:
-        <nb-checkbox [(checked)]="newVerified"></nb-checkbox>
-        <input type="text" nbInput fullWidth  [placeholder]="collection.verified" [(ngModel)]="newVerified">
-      </label>
-      <br/>
+      <div class="form-group">
+        <label class="label">Folder Name</label>
+        <input type="text" nbInput fullWidth [placeholder]="collection.name" [(ngModel)]="newName">
+        <label class="label">Image URL</label>
+        <input type="text" nbInput fullWidth  [placeholder]="collection.image" [(ngModel)]="newImage">
+        <nb-toggle [(ngModel)]="collection.verified">{{collection.verified ? 'verified' : 'not verified' }}</nb-toggle>
+
+      </div>
+
+<!--      <label>Verified:-->
+<!--        <nb-checkbox [(checked)]="newVerified"></nb-checkbox>-->
+<!--        <input type="text" nbInput fullWidth  [placeholder]="collection.verified" [(ngModel)]="newVerified">-->
+<!--      </label>-->
+<!--      <br/>-->
       <ng2-smart-table #test [settings]="settings" [source]="source" (deleteConfirm)="onDeleteConfirm($event)"
                        (editConfirm)="onEditConfirm($event)" (createConfirm)="onCreateConfirm($event)">
       </ng2-smart-table>

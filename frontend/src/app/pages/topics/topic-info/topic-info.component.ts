@@ -1,7 +1,8 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, TemplateRef} from '@angular/core';
 import {DataAccessService} from '../../../services/data-access.service';
 import {takeUntil} from 'rxjs/operators';
 import {Observable, Subject} from 'rxjs';
+import {NbDialogRef, NbDialogService} from "@nebular/theme";
 
 @Component({
   selector: 'ngx-topic-info',
@@ -21,8 +22,11 @@ export class TopicInfoComponent implements OnInit, OnDestroy {
   totalAliasPages = 1;
   selectedTopic;
   topicMergeList = [];
+  mergeName: any;
 
-  constructor(private dataAccess: DataAccessService) {
+  constructor(private dataAccess: DataAccessService,
+              private dialogService: NbDialogService,
+              protected dialogRef: NbDialogRef<any>) {
 
   }
 
@@ -41,8 +45,11 @@ export class TopicInfoComponent implements OnInit, OnDestroy {
     });
   }
 
-  saveChanges() {
-    console.log('save');
+  saveChanges(topicIn) {
+    console.log(topicIn);
+    this.dataAccess.updateTopic(topicIn.topicId, topicIn.topicName).subscribe(res => {
+      console.log(res);
+    });
   }
 
   showAliases(topic) {
@@ -101,5 +108,16 @@ export class TopicInfoComponent implements OnInit, OnDestroy {
 
   addToMergeList(t) {
     this.topicMergeList.push(t);
+  }
+
+  openDialog(dialog: TemplateRef<any>) {
+
+    this.dialogRef = this.dialogService.open(dialog, { context: this.topicMergeList });
+  }
+
+  toggle(topic,event) {
+    console.log(topic)
+    console.log(event)
+
   }
 }

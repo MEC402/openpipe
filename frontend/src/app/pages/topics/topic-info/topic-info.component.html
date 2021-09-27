@@ -12,14 +12,15 @@
             <nb-icon icon="arrow-ios-forward-outline" status="basic"></nb-icon>
           </button>
         </div>
+        <button nbButton size="tiny" (click)="openDialog(dialog)">Open Merge Stack</button>
       </nb-card-header>
         <table>
           <tr *ngFor="let t of topicData">
             <th>
-              <input type="text" nbInput fullWidth [id]="t.topicId" [value]="t.topicName">
+              <input type="text" nbInput fullWidth [id]="t.topicId" [value]="t.topicName" [(ngModel)]="t.topicName">
             </th>
             <th>
-              <button nbButton size="small" (click)="saveChanges()">save</button>
+              <button nbButton size="small" (click)="saveChanges(t)">save</button>
             </th>
             <th>
               <button nbButton size="small" (click)="showAliases(t)">aliases</button>
@@ -61,3 +62,22 @@
     </nb-card>
   </div>
 </div>
+
+
+
+<ng-template #dialog let-data let-ref="dialogRef">
+  <nb-card size="giant">
+    <nb-card-header>
+<!--      <button nbButton (click)="saveAsset()">Save</button>-->
+      <button nbButton (click)="ref.close()">Close</button>
+    </nb-card-header>
+    <nb-card-body>
+      <button nbButton status="warning">Merge</button>
+      <button nbButton status="success">Select All</button>
+      <input type="text" placeholder="Write the topic Name here" nbInput fullWidth [value]="mergeName">
+<!--      <ol><li *ngFor="let t of topicMergeList">{{t.topicName}}</li></ol>-->
+<!--      <label *ngFor="let t of topicMergeList">{{t.topicName}},</label>-->
+      <nb-checkbox (checkedChange)="toggle(t,$event)" [checked]="" *ngFor="let t of topicMergeList">{{t.topicName}}</nb-checkbox>
+    </nb-card-body>
+  </nb-card>
+</ng-template>

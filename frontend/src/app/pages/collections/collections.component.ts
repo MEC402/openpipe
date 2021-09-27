@@ -37,7 +37,7 @@ export class CollectionsComponent implements OnInit, OnDestroy {
   currentAssetScore: number;
   selectedAssetMetaTag = [];
   selectedAssetChanges = {};
-  selectTagNames = ['openpipe_canonical_artist', 'openpipe_canonical_title',  'openpipe_canonical_displayDate' , 'openpipe_canonical_date',
+  selectTagNames = ['openpipe_canonical_artist', 'openpipe_canonical_title',  'openpipe_canonical_displayDate' ,
     'openpipe_canonical_Moment', 'openpipe_canonical_medium', 'openpipe_canonical_Technique', 'openpipe_canonical_country'
     , 'openpipe_canonical_culture', 'openpipe_canonical_period', 'openpipe_canonical_biography'
     , 'openpipe_canonical_longitude', 'openpipe_canonical_latitude', 'openpipe_canonical_classification',

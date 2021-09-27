@@ -78,19 +78,21 @@ export class FolderCardComponent implements OnInit {
   }
 
   onFolderEditClick(dialog: TemplateRef<any>) {
-    this.newName = this.collection.name[0];
-    this.newImage = this.collection.image[0];
-    this.newVerified = !!this.collection.verified[0];
+    this.newName = this.collection.name;
+    this.newImage = this.collection.image;
+    this.newVerified = !!this.collection.verified;
     this.dialogRef = this.dialogService.open(dialog, { context: 'data' });
   }
 
   onFolderDeleteClick() {
-    this.dataAccess.deleteFolder(this.collection.id[0]);
+    this.dataAccess.deleteFolder(this.collection.id);
     this.folderDelete.emit(this.collection);
   }
 
   saveFolderChanges() {
-    this.dataAccess.updateFolder(this.collection.id[0], this.newName, this.newImage,this.newVerified).subscribe(res => {
+    this.dataAccess.updateFolder(this.collection.id, this.newName, this.newImage,this.collection.verified)
+      .subscribe(res => {
+        console.log(res)
     });
   }
 

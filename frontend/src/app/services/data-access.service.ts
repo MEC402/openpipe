@@ -257,13 +257,13 @@ export class DataAccessService {
   }
 
   public updateFolder(folderId, newName, newImage, newVerified) {
-    const updateFolderURL = this.webServerURL + 'dataAccess/updateFolder.py';
+    const updateFolderURL = this.awsApiDomainName + 'folder';
     const updateFolderParams = new HttpParams()
-      .set('collectionId', folderId)
+      .set('folderId', folderId)
       .set('newName', newName)
       .set('newImage', newImage)
       .set('newVerified', newVerified ? '1' : '0');
-    return this.http.get(updateFolderURL, {params: updateFolderParams});
+    return this.http.put(updateFolderURL, {params: updateFolderParams});
   }
 
   updateTagMapping(mapId, tagMap) {
@@ -377,6 +377,14 @@ export class DataAccessService {
       .set('p', page)
       .set('ps', pageSize);
     return this.http.get<Results>(url, {params: params});
+  }
+
+  public updateTopic(topicId, newName) {
+    const updateTopicURL = this.awsApiDomainName + 'topic';
+    const updateTopicParams = new HttpParams()
+      .set('topicId', topicId)
+      .set('newName', newName);
+    return this.http.put(updateTopicURL, {params: updateTopicParams});
   }
 
 }
