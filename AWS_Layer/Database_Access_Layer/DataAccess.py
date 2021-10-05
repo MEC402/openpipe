@@ -58,7 +58,7 @@ class DataAccess:
             cursor.close()
         return jsonRes
 
-    def executeSelect(self, query):
+    def executeSelect(self, query, params):
         try:
             connection = mysql.connector.connect(
                 host=self.connection["address"],
@@ -67,7 +67,7 @@ class DataAccess:
                 database=self.connection["schema"]
             )
             cursor = connection.cursor()
-            cursor.execute(query, )
+            cursor.execute(query, params)
             records = cursor.fetchall()
         except Error as e:
             #            print("Error reading data from MySQL table", e)
