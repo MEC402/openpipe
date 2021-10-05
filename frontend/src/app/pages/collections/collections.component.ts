@@ -217,7 +217,7 @@ export class CollectionsComponent implements OnInit, OnDestroy {
     const pageSize = 50;
     let pages = [];
 
-    for (let i = 2; i < Math.ceil(element.assetCount / pageSize) ; i += 1) {
+    for (let i = 2; i <= Math.ceil(element.assetCount / pageSize) ; i += 1) {
       pages.push(i);
     }
 
