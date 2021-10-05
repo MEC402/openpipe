@@ -2,7 +2,7 @@ import {Component, Input, OnDestroy, OnInit, TemplateRef} from '@angular/core';
 import {DataAccessService} from '../../../services/data-access.service';
 import {takeUntil} from 'rxjs/operators';
 import {Observable, Subject} from 'rxjs';
-import {NbDialogRef, NbDialogService} from "@nebular/theme";
+import {NbDialogRef, NbDialogService} from '@nebular/theme';
 
 @Component({
   selector: 'ngx-topic-info',
@@ -11,6 +11,7 @@ import {NbDialogRef, NbDialogService} from "@nebular/theme";
 })
 export class TopicInfoComponent implements OnInit, OnDestroy {
   @Input() topicCode;
+  @Input() topicType;
   pageSize = 25;
   topicData;
   selectedTopicAliases;
@@ -22,7 +23,11 @@ export class TopicInfoComponent implements OnInit, OnDestroy {
   totalAliasPages = 1;
   selectedTopic;
   topicMergeList = [];
-  mergeName: any;
+  selectedTopicList = [];
+  mergeName = '';
+  aliasToggleMerge = 0; // 0 is dont show - 1 is aliases - 2 is merge card
+  searchTerm = '';
+  searchMode = false;
 
   constructor(private dataAccess: DataAccessService,
               private dialogService: NbDialogService,
@@ -37,6 +42,9 @@ export class TopicInfoComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
+    this.aliasToggleMerge = 0;
+    this.topicPage = 1;
+    this.searchMode = false;
     this.dataAccess.getTopicByCode(this.topicCode, this.topicPage, this.pageSize).
     pipe(takeUntil(this._destroyed$)).subscribe(res => {
       this.totalTopicPages = Math.ceil(res.total / this.pageSize);
@@ -47,12 +55,14 @@ export class TopicInfoComponent implements OnInit, OnDestroy {
 
   saveChanges(topicIn) {
     console.log(topicIn);
-    this.dataAccess.updateTopic(topicIn.topicId, topicIn.topicName).subscribe(res => {
+    this.dataAccess.updateTopic(topicIn.topicId, {'name' : topicIn.topicName}).subscribe(res => {
       console.log(res);
     });
   }
 
   showAliases(topic) {
+    this.selectedTopicAliases = [];
+    this.aliasToggleMerge = 1;
     this.selectedTopic = topic;
     this.dataAccess.getTopicAliases(topic.topicId, this.aliasPage, this.pageSize).
     pipe(takeUntil(this._destroyed$)).subscribe(res => {
@@ -62,28 +72,50 @@ export class TopicInfoComponent implements OnInit, OnDestroy {
     });
   }
 
-  setAsTopicRepresentative(metaDataId: any) {
-
+  setAsTopicRepresentative(asset) {
+    this.dataAccess.updateTopic(this.selectedTopic.topicId, {'repMetaDataId' : asset.metaDataId}).subscribe(res => {
+      this.selectedTopic.repImage = asset.image;
+      console.log(res);
+    });
   }
 
   prevTopicPage() {
     this.topicPage--;
-    this.dataAccess.getTopicByCode(this.topicCode, this.topicPage, this.pageSize).
-    pipe(takeUntil(this._destroyed$)).subscribe(res => {
-      this.totalTopicPages = Math.ceil(res.total / this.pageSize);
-      this.topicData = res.data;
-      console.log(this.topicData);
-    });
+    if (this.searchMode) {
+      this.dataAccess.searchTopic(this.searchTerm, this.topicCode, this.topicPage, this.pageSize).
+      pipe(takeUntil(this._destroyed$)).subscribe(res => {
+        this.totalTopicPages = Math.ceil(res.total / this.pageSize);
+        this.topicData = res.data;
+        console.log(this.topicData);
+      });
+    } else {
+      this.dataAccess.getTopicByCode(this.topicCode, this.topicPage, this.pageSize).
+      pipe(takeUntil(this._destroyed$)).subscribe(res => {
+        this.totalTopicPages = Math.ceil(res.total / this.pageSize);
+        this.topicData = res.data;
+        console.log(this.topicData);
+      });
+    }
   }
 
   nextTopicPage() {
     this.topicPage++;
-    this.dataAccess.getTopicByCode(this.topicCode, this.topicPage, this.pageSize).
-    pipe(takeUntil(this._destroyed$)).subscribe(res => {
-      this.totalTopicPages = Math.ceil(res.total / this.pageSize);
-      this.topicData = res.data;
-      console.log(this.topicData);
-    });
+    if (this.searchMode) {
+      this.dataAccess.searchTopic(this.searchTerm, this.topicCode, this.topicPage, this.pageSize).
+      pipe(takeUntil(this._destroyed$)).subscribe(res => {
+        this.totalTopicPages = Math.ceil(res.total / this.pageSize);
+        this.topicData = res.data;
+        console.log(this.topicData);
+      });
+    } else {
+      this.dataAccess.getTopicByCode(this.topicCode, this.topicPage, this.pageSize).
+      pipe(takeUntil(this._destroyed$)).subscribe(res => {
+        this.totalTopicPages = Math.ceil(res.total / this.pageSize);
+        this.topicData = res.data;
+        console.log(this.topicData);
+      });
+    }
+
   }
 
   prevAliasPage() {
@@ -107,17 +139,94 @@ export class TopicInfoComponent implements OnInit, OnDestroy {
   }
 
   addToMergeList(t) {
-    this.topicMergeList.push(t);
+    if (!this.topicMergeList.includes(t)) {
+      t['selected'] = false;
+      this.topicMergeList.push(t);
+    }
   }
 
-  openDialog(dialog: TemplateRef<any>) {
-
-    this.dialogRef = this.dialogService.open(dialog, { context: this.topicMergeList });
+  openMerge() {
+    this.aliasToggleMerge = 2;
   }
 
-  toggle(topic,event) {
+  toggle(topic , checked) {
     console.log(topic)
-    console.log(event)
+    if ( checked ) {
+      this.selectedTopicList.push(topic.topicId);
+    } else {
+      const index = this.selectedTopicList.indexOf(topic.topicId);
+      if (index > -1) {
+        this.selectedTopicList.splice(index, 1);
+      }
+    }
+  }
 
+  close() {
+    this.aliasToggleMerge = 0;
+  }
+
+  mergeTopics() {
+    console.log(this.selectedTopicList);
+    console.log(this.topicMergeList);
+    this.topicMergeList =  this.topicMergeList.filter( ( d ) => !this.selectedTopicList.includes( d.topicId ) );
+    this.topicData =  this.topicData.filter( ( d ) => !this.selectedTopicList.includes( d.topicId ) );
+
+    const mergeData = {
+      'name': this.mergeName,
+      'code': this.topicCode,
+      'type': this.topicType,
+      'mergeTopicIds': this.selectedTopicList,
+    };
+
+    this.dataAccess.mergeTopics(mergeData).subscribe( res => {
+      console.log(res);
+      res['selected'] = false;
+      this.topicData.push(res);
+      this.selectedTopicList = [];
+      this.mergeName = '';
+    });
+
+
+  }
+
+  selectAll() {
+    this.topicMergeList.forEach(d => {
+      d.selected = true;
+      this.selectedTopicList.push(d.topicId);
+    });
+  }
+
+  deselectAll() {
+    this.topicMergeList.forEach(d => {
+      d.selected = false;
+    });
+    this.selectedTopicList = [];
+  }
+
+  searchTopicTerm() {
+    if (this.searchTerm.trim().length > 0) {
+      this.topicPage = 1;
+      this.aliasToggleMerge = 0;
+      this.searchMode = true;
+      this.dataAccess.searchTopic(this.searchTerm, this.topicCode, 1, 25).
+      pipe(takeUntil(this._destroyed$)).subscribe(res => {
+        this.totalTopicPages = Math.ceil(res.total / this.pageSize);
+        this.topicData = res.data;
+        console.log(this.topicData);
+      });
+    }
+  }
+
+  showAllResults() {
+    this.aliasToggleMerge = 0;
+    this.topicPage = 1;
+    this.searchMode = false;
+    this.dataAccess.getTopicByCode(this.topicCode, this.topicPage, this.pageSize).
+    pipe(takeUntil(this._destroyed$)).subscribe(res => {
+      this.totalTopicPages = Math.ceil(res.total / this.pageSize);
+      this.topicData = res.data;
+      console.log(this.topicData);
+    });
   }
 }
+

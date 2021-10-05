@@ -1,5 +1,13 @@
 <div class="row">
   <div class="col-6" >
+    <input type="text" nbInput fullWidth placeholder="Put the search term here" [(ngModel)]="searchTerm" >
+  </div>
+  <button nbButton hero status="primary" size="tiny" (click)="searchTopicTerm()"><nb-icon icon="search-outline"></nb-icon></button>
+  <button nbButton hero status="info" size="tiny" (click)="showAllResults()" [disabled]="!searchMode">Back to All Results</button>
+</div>
+
+<div class="row">
+  <div class="col-6" >
     <nb-card>
       <nb-card-header>
         <div>
@@ -12,21 +20,25 @@
             <nb-icon icon="arrow-ios-forward-outline" status="basic"></nb-icon>
           </button>
         </div>
-        <button nbButton size="tiny" (click)="openDialog(dialog)">Open Merge Stack</button>
+        <button nbButton size="tiny" (click)="openMerge()">Open Merge Stack</button>
       </nb-card-header>
         <table>
           <tr *ngFor="let t of topicData">
             <th>
+              <img width="100px" height="100px" [src]="t.repImage" *ngIf="t.repImage!=null">
+              <nb-icon icon="image-outline" *ngIf="t.repImage==null"></nb-icon>
+            </th>
+            <th>
               <input type="text" nbInput fullWidth [id]="t.topicId" [value]="t.topicName" [(ngModel)]="t.topicName">
             </th>
             <th>
-              <button nbButton size="small" (click)="saveChanges(t)">save</button>
+              <button nbButton size="tiny" (click)="saveChanges(t)"><nb-icon icon="save-outline"></nb-icon></button>
             </th>
             <th>
-              <button nbButton size="small" (click)="showAliases(t)">aliases</button>
+              <button nbButton size="tiny" status="info" (click)="showAliases(t)"><nb-icon icon="expand-outline"></nb-icon></button>
             </th>
             <th>
-              <button nbButton size="small" (click)="addToMergeList(t)">Add to merge stack</button>
+              <button nbButton size="tiny" status="success" (click)="addToMergeList(t)"><nb-icon icon="plus-outline"></nb-icon></button>
             </th>
           </tr>
         </table>
@@ -34,7 +46,7 @@
   </div>
 
   <div class="col-6">
-    <nb-card>
+    <nb-card *ngIf="aliasToggleMerge==1">
       <nb-card-header>
         <div>
           <label>Page:</label>
@@ -51,33 +63,40 @@
         <table>
           <tr *ngFor="let a of selectedTopicAliases">
             <th>
+              <img width="100px" height="100px" [src]="a.image" *ngIf="a.image!=null">
+              <nb-icon icon="image-outline" *ngIf="a.image==null"></nb-icon>
+            </th>
+            <th>
               <a [routerLink]="['/pages/asset',a.metaDataId ]" target="_blank" rel="noopener noreferrer">{{a.value}}</a>
             </th>
             <th>
-              <button nbButton size="tiny" (click)="setAsTopicRepresentative(a.metaDataId)">set as representative</button>
+              <button nbButton size="tiny" (click)="setAsTopicRepresentative(a)">set as representative</button>
             </th>
           </tr>
         </table>
+    </nb-card>
 
+
+    <nb-card size="giant" *ngIf="aliasToggleMerge==2">
+      <nb-card-header>
+        <!--      <button nbButton (click)="saveAsset()">Save</button>-->
+        <button nbButton size="tiny" status="danger" (click)="close()"><nb-icon icon="close-outline"></nb-icon></button>
+
+
+
+      </nb-card-header>
+      <nb-card-body>
+        <button nbButton size="tiny" status="success" (click)="selectAll()"><nb-icon icon="checkmark-square-outline"></nb-icon></button>
+        <button nbButton size="tiny" status="info" (click)="deselectAll()"><nb-icon icon="square-outline"></nb-icon></button>
+        <button nbButton size="small" status="warning" (click)="mergeTopics()">Merge
+          <nb-badge [text]="topicMergeList.length"  status="danger" position="top right"></nb-badge>
+        </button>
+
+        <input type="text" placeholder="Write the topic Name here" nbInput fullWidth [(ngModel)]="mergeName">
+
+        <nb-checkbox (checkedChange)="toggle(t,$event)" [(checked)]="t.selected" *ngFor="let t of topicMergeList">{{t.topicName}}</nb-checkbox>
+      </nb-card-body>
     </nb-card>
   </div>
 </div>
 
-
-
-<ng-template #dialog let-data let-ref="dialogRef">
-  <nb-card size="giant">
-    <nb-card-header>
-<!--      <button nbButton (click)="saveAsset()">Save</button>-->
-      <button nbButton (click)="ref.close()">Close</button>
-    </nb-card-header>
-    <nb-card-body>
-      <button nbButton status="warning">Merge</button>
-      <button nbButton status="success">Select All</button>
-      <input type="text" placeholder="Write the topic Name here" nbInput fullWidth [value]="mergeName">
-<!--      <ol><li *ngFor="let t of topicMergeList">{{t.topicName}}</li></ol>-->
-<!--      <label *ngFor="let t of topicMergeList">{{t.topicName}},</label>-->
-      <nb-checkbox (checkedChange)="toggle(t,$event)" [checked]="" *ngFor="let t of topicMergeList">{{t.topicName}}</nb-checkbox>
-    </nb-card-body>
-  </nb-card>
-</ng-template>

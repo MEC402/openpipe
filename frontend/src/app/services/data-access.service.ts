@@ -379,14 +379,31 @@ export class DataAccessService {
     return this.http.get<Results>(url, {params: params});
   }
 
-  public updateTopic(topicId, newName) {
+  public updateTopic(topicId, updateData) {
     const updateTopicURL = this.awsApiDomainName + 'topic';
-    const updateTopicParams = new HttpParams()
-      .set('topicId', topicId)
-      .set('newName', newName);
+    let updateTopicParams = new HttpParams();
+    updateTopicParams = updateTopicParams.set('id', topicId);
+    for (const [key, value] of Object.entries(updateData)) {
+      updateTopicParams = updateTopicParams.set(key, String(value));
+    }
     return this.http.put(updateTopicURL, {params: updateTopicParams});
   }
 
+
+  public searchTopic(term, code, page, pageSize) {
+    const searchTopicURL = this.awsApiDomainName + 'search/topic';
+    const params = new HttpParams()
+      .set('term', term)
+      .set('code', code)
+      .set('p', page)
+      .set('ps', pageSize);
+    return this.http.get<Results>(searchTopicURL, {params: params});
+  }
+
+  public mergeTopics(mergeData) {
+    const URL = this.awsApiDomainName + 'topic/merge';
+    return this.http.post<InsertionResponse>(URL, mergeData);
+  }
 }
 
 class Results {
