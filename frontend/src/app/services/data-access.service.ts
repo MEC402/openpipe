@@ -343,6 +343,13 @@ export class DataAccessService {
     return this.http.post<InsertionResponse>(URL, postBody);
   }
 
+  public loadFolderLayout(folderId): Observable<Results> {
+    const url = this.awsApiDomainName + 'folder/layout';
+    const params = new HttpParams()
+      .set('folderId', folderId);
+    return this.http.get<Results>(url, {params: params});
+  }
+
   public saveAssetChanges(mid, data) {
     const URL = this.awsApiDomainName + 'metatags';
     const postBody = {'metaDataId': mid, 'data': data};
@@ -404,6 +411,22 @@ export class DataAccessService {
     const URL = this.awsApiDomainName + 'topic/merge';
     return this.http.post<InsertionResponse>(URL, mergeData);
   }
+
+  public getUserInfo(token) {
+    const url = 'https://www.googleapis.com/oauth2/v3/userinfo';
+    const params = new HttpParams().set('access_token', token);
+    return this.http.get<UserInfo>(url, {params: params});
+  }
+}
+
+
+class UserInfo {
+  sub;
+  name;
+  given_name;
+  family_name;
+  picture;
+  locale;
 }
 
 class Results {
@@ -447,7 +470,6 @@ class Assets {
   total;
   data: AssetMainMetaData[];
 }
-
 class AssetMainMetaData {
   id;
   title;
