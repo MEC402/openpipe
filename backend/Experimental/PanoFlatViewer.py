@@ -20,28 +20,17 @@ def showPIL(pilImage):
     canvas = tkinter.Canvas(root, width=w, height=h)
     canvas.pack()
     canvas.configure(background='black')
-    imgWidth, imgHeight = img1.size
+    imgWidth, imgHeight = pilImage.size
     if imgWidth > w or imgHeight > h:
         ratio = min(w / imgWidth, h / imgHeight)
         imgWidth = int(imgWidth * ratio)
         imgHeight = int(imgHeight * ratio)
+        # pilImage = pilImage.resize((imgWidth, imgHeight), Image.ANTIALIAS)
         pilImage = pilImage.resize((w, h), Image.ANTIALIAS)
     image = ImageTk.PhotoImage(pilImage)
     imagesprite = canvas.create_image(w / 2, h / 2, image=image)
     root.mainloop()
 
-
-# PIL.Image.MAX_IMAGE_PIXELS = 933120000
-#
-# img1 = Image.open ('img.png')
-# # offset_im = ImageChops.offset(img1, 0, 0)
-# imgWidth, imgHeight = img1.size
-#
-# im1 = img1.crop((0, 0, imgWidth*0.3, imgHeight))
-#
-#
-#
-# showPIL(im1)
 
 
 def main(argv):
@@ -49,14 +38,15 @@ def main(argv):
     top = 0
     right = 0
     bottom = 0
+    imgPath=""
     try:
-        opts, args = getopt.getopt(argv, "hi:o:", ["left=", "top=", "right=", "bottom="])
+        opts, args = getopt.getopt(argv, "hl:t:r:b:i:", ["left=", "top=", "right=", "bottom=","image="])
     except getopt.GetoptError:
-        print('Usage: -l <left> -t <top> -r <right> -b <bottom>')
+        print('Usage: -l <left> -t <top> -r <right> -b <bottom> -i <image_path>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('Usage: -l <left> -t <top> -r <right> -b <bottom>')
+            print('Usage: -l <left> -t <top> -r <right> -b <bottom> -i <image_path>')
             sys.exit()
         elif opt in ("-l", "--left"):
             left = int(arg)
@@ -66,7 +56,18 @@ def main(argv):
             right = int(arg)
         elif opt in ("-b", "--bottom"):
             bottom = int(arg)
-    print(left,top,right,bottom)
+        elif opt in ("-i", "--image"):
+            imgPath = arg
+
+    PIL.Image.MAX_IMAGE_PIXELS = 933120000
+
+    img1 = Image.open(imgPath)
+    imgWidth, imgHeight = img1.size
+
+    im1 = img1.crop((left, top, right, imgHeight))
+
+
+    showPIL(im1)
 
 
 if __name__ == "__main__":
