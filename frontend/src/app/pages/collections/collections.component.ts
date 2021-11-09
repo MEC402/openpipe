@@ -171,6 +171,7 @@ export class CollectionsComponent implements OnInit, OnDestroy {
       .subscribe(res => {
         event.confirm.resolve();
     });
+    
   }
 
   onCreateConfirm(event) {
@@ -195,7 +196,9 @@ export class CollectionsComponent implements OnInit, OnDestroy {
         this.currentAssetLink = 'https://www.metmuseum.org/art/collection/search/' + this.currentAsset.objectID;
     } else if (s.includes('Cleveland')) {
         this.currentAssetLink = 'https://www.clevelandart.org/art/' + this.currentAsset.accession_number;
-    } else {
+    } else if (s.includes('Rijks')) {
+      this.currentAssetLink = 'https://www.rijksmuseum.nl/en/collection/' + this.currentAsset.objectNumber;
+    }else {
       this.currentAssetLink = 'Link not available';
     }
 
