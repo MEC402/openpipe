@@ -1,6 +1,7 @@
 import socket, threading
 import subprocess
 
+
 def handle_messages(connection: socket.socket):
     '''
         Receive messages sent by the server and display process it
@@ -10,10 +11,14 @@ def handle_messages(connection: socket.socket):
         try:
             msg = connection.recv(1024)
             if msg:
-                print(msg.decode())
-                if 'SageClient' in msg.decode():
+                msgVal = msg.decode()
+                print(msgVal)
+                if 'sg' in msgVal:
                     subprocess.call([r'C:\Users\rezva\OneDrive\Desktop\a.bat'])
-
+                # elif "cmd ###" in msgVal:
+                #     command = msgVal.split("###")
+                #     resp = subprocess.run([command[1]],stdout=subprocess.PIPE)
+                #     print(resp.stdout)
             else:
                 connection.close()
                 break
@@ -22,6 +27,7 @@ def handle_messages(connection: socket.socket):
             print(f'Error handling message from server: {e}')
             connection.close()
             break
+
 
 def client() -> None:
     '''
