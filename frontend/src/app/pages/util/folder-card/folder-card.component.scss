@@ -39,16 +39,23 @@
     align-items: center;
   }
 
-  img {
-    max-width: -webkit-fill-available;
-    max-height: -webkit-fill-available;
-  }
+  //img {
+  //  max-width: -webkit-fill-available;
+  //  max-height: -webkit-fill-available;
+  //}
 
-  nb-card-header {
-    display: flex;
+  .row {
+    margin-left: 1%;
     justify-content: space-between;
     align-items: center;
   }
+
+  nb-card-header {
+    //display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
 
 }
 

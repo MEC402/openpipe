@@ -1,0 +1,57 @@
+<div class="topbar">
+  <label class="single-view-button" *ngIf="folderInfo"><h5>{{folderInfo.name}}</h5></label>
+</div>
+
+
+<div class="grid-container">
+  <div class="camera" >
+    <div class="lists row">
+      <div class="col-md-4 ">
+        <nb-flip-card [flipped]="showImage">
+          <nb-card-front>
+            <nb-card>
+              <nb-card-body>
+                <ng2-smart-table [settings]="assetsSettings" [source]="currentFolderAssets" (userRowSelect)="onClick($event)" (deleteConfirm)="onFolderMemberDeleteConfirm($event)"	>
+                </ng2-smart-table>
+              </nb-card-body>
+            </nb-card>
+          </nb-card-front>
+          <nb-card-back>
+            <nb-card>
+              <nb-card-body (click)="onFlipCard()">
+                <video width="320" height="240" [src]="currentAssetFullImage" controls *ngIf="currentAssetType=='video'" ></video>
+                <div class="wrapper">
+                  <div class="box box1">
+                    <img [src]="currentAssetImage" *ngIf="currentAssetType!='video'">
+                  </div>
+                </div>
+              </nb-card-body>
+            </nb-card>
+          </nb-card-back>
+        </nb-flip-card>
+      </div>
+
+      <div class="col-md-8 ">
+        <ngx-asset-tag-card [asset]="currentAsset" ></ngx-asset-tag-card>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!--<nb-card-body (click)="onFlipCard()">-->
+<!--  <video width="320" height="240" [src]="currentAssetFullImage" controls *ngIf="currentAssetType=='video'" (click)="onFlipCard()"></video>-->
+<!--  <div class="wrapper"  *ngIf="currentAssetType!='video'">-->
+<!--    &lt;!&ndash;                  <nb-icon  icon="eye-off-outline" pack="eva"></nb-icon>&ndash;&gt;-->
+<!--    <div class="box box1"-->
+<!--         [style.background-image]="'url(' + currentAssetImage + ')'"-->
+<!--         [style.background-repeat]="'no-repeat'"-->
+<!--         [style.background-position]="'center'">-->
+<!--      <img src="https://akveo.github.io/eva-icons/outline/png/128/eye-off-outline.png"-->
+<!--           [style.opacity]="'0.2'"-->
+<!--           *ngIf="currentAssetAccessStatus">-->
+<!--      &lt;!&ndash;                    <img [src]="currentAssetImage"  (click)="onFlipCard()" *ngIf="currentAssetType!='video'">&ndash;&gt;-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</nb-card-body>-->

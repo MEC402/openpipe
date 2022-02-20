@@ -1,12 +1,27 @@
-<nb-card size="small">
+<!--<mat-paginator [length]="length"-->
+<!--               [pageSize]="pageSize"-->
+<!--               [pageSizeOptions]="pageSizeOptions"-->
+<!--               (page)="pageEvent = $event"-->
+<!--               aria-label="Select page">-->
+<!--</mat-paginator>-->
+
+<nb-card size="small" >
   <nb-card-header>
-    {{collection.name}}
-    <span class="delta" [class.up]="collection.verified" [class.down]="!collection.verified">
+
+    <div class="row">
+      {{collection.name}}
+      <span class="delta" [class.up]="collection.verified" [class.down]="!collection.verified">
           <nb-icon  [icon]="collection.verified ? 'checkmark-circle-2' : 'minus-circle' " pack="eva"></nb-icon>
-    </span>
+      </span>
+    </div>
+
+    <div class="row">
+      guid: 200/{{collection.id}}
+    </div>
+
   </nb-card-header>
-  <nb-card-body>
-    <img [src]="collection.image">
+  <nb-card-body [style.background-image]="'url('+collection.image+')'" [style.background-size]="'cover'" [style.background-position]="'center'" >
+<!--    <img [src]="collection.image">-->
   </nb-card-body>
   <nb-card-footer>
     {{collection.assetCount}} assets
