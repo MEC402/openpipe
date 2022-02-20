@@ -1,0 +1,39 @@
+<nb-card *ngIf="asset">
+  <nb-card-header>
+    <div class="row">
+      <div class="col-10">
+        <span class="delta" [class.up]="currentAssetVerified" [class.down]="!currentAssetVerified">
+          <nb-icon  [icon]="currentAssetVerified ? 'checkmark-circle-2' : 'minus-circle' " pack="eva"></nb-icon>
+        </span>
+        {{asset.openpipe_canonical_title[0]}} Meta-Tags | guid: 100/{{asset.assetId}}<br>
+        <a [href]="currentAssetLink"  target="_blank" rel="noopener noreferrer">{{this.currentAssetLink}}</a>
+      </div>
+      <div class="col-1">
+        <button nbButton size="tiny" nbButton status="primary" (click)="saveAssetChanges()">Save changes</button>
+      </div>
+    </div>
+  </nb-card-header>
+
+  <nb-card-body>
+    <nb-tabset (changeTab)="onTabChange()">
+      <nb-tab tabTitle="Tombstone">
+        <ngx-tag-viewer [tags]="tombstoneTags" (onTagChange)="sendTheNewValue($event)"></ngx-tag-viewer>
+      </nb-tab>
+      <nb-tab tabTitle="Canonical Tags">
+        <ngx-tag-viewer [tags]="canonicalTags" (onTagChange)="sendTheNewValue($event)"></ngx-tag-viewer>
+      </nb-tab>
+      <nb-tab tabTitle="Museum">
+        <ngx-tag-viewer [tags]="museumTags" (onTagChange)="sendTheNewValue($event)"></ngx-tag-viewer>
+      </nb-tab>
+      <nb-tab tabTitle="Settings">
+        <div class="or">
+          <button nbButton size="tiny" status="success" *ngIf="!currentAssetVerified">Mark as Verified</button>
+          <label for="score" class="label">score</label>
+          <input type="text" nbInput id="score" [value]="currentAssetScore" (input)="sendTheNewValue($event)">
+          <nb-toggle [(ngModel)]="currentAssetAccessStatus">{{currentAssetAccessStatus ? 'public' : 'private' }}</nb-toggle>
+        </div>
+      </nb-tab>
+    </nb-tabset>
+
+  </nb-card-body>
+</nb-card>

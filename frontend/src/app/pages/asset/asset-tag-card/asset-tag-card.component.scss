@@ -1,0 +1,15 @@
+.delta {
+  align-items: center;
+
+  &.down {
+    color: red;
+  }
+
+  &.up {
+    color: greenyellow;
+  }
+}
+
+.or {
+  display: inline-grid;
+}
