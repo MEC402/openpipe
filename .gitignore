@@ -51,3 +51,4 @@ backend/.coverage
 frontend/.firebaserc
 .idea/misc.xml
 .idea/openpipe.iml
+*.png

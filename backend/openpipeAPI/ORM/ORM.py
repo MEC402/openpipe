@@ -6,7 +6,6 @@ from mysql.connector import Error
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 
-
 import time
 
 from backend.openpipeAPI.ORM.DBInfo import DBInfo
@@ -144,6 +143,41 @@ class ORM:
                 connection.close()
                 cursor.close()
 
+    def executeSelectParam(self, query, params):
+        try:
+            connection = mysql.connector.connect(
+                host=self.connection["address"],
+                user=self.connection["username"],
+                passwd=self.connection["password"],
+                database=self.connection["schema"]
+            )
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            records = cursor.fetchall()
+        except Error as e:
+            #            print("Error reading data from MySQL table", e)
+            pass
+
+        finally:
+            if (connection.is_connected()):
+                connection.close()
+                cursor.close()
+        return records
+
+    def bulkUpdate(self, mappings, TableClass, batchSize):
+        updateSize = len(mappings)
+        biteSize = batchSize
+        q = int(updateSize / biteSize)
+        r = updateSize % biteSize
+
+        for i in range(0, q):
+            print("************** commiting to DB **************")
+            self.session.bulk_update_mappings(TableClass, mappings[i * biteSize:i * biteSize + biteSize])
+            self.session.flush()
+            self.session.commit()
+            print("************** Done commiting to DB **************")
+        self.session.bulk_update_mappings(TableClass, mappings[q * biteSize:q * biteSize + r])
+        self.commitClose()
 # to=TO()
 # orm=ORM()
 # print(to.getClasses())
