@@ -62,6 +62,12 @@ import { CanvasEditorComponent } from './layout-editor/canvas-editor/canvas-edit
 import { AssetComponent } from './asset/asset.component';
 import { TopicsComponent } from './topics/topics.component';
 import { TopicInfoComponent } from './topics/topic-info/topic-info.component';
+import { MoveAssetsComponent } from './collections/move-assets/move-assets.component';
+import { FolderContentComponent } from './collections/folder-content/folder-content.component';
+import { AssetTagCardComponent } from './asset/asset-tag-card/asset-tag-card.component';
+import { TagViewerComponent } from './asset/asset-tag-card/tag-viewer/tag-viewer.component';
+import {MatTableModule} from "@angular/material/table";
+import {TextFieldModule} from "@angular/cdk/text-field";
 
 
 @NgModule({
@@ -107,6 +113,8 @@ import { TopicInfoComponent } from './topics/topic-info/topic-info.component';
         NbChatModule,
         NgxJsonViewerModule,
         NbBadgeModule,
+        MatTableModule,
+        TextFieldModule,
     ],
   entryComponents: [ButtonViewComponent, TopicDropDownComponent, CellDropDownComponent],
   declarations: [
@@ -140,6 +148,10 @@ import { TopicInfoComponent } from './topics/topic-info/topic-info.component';
     AssetComponent,
     TopicsComponent,
     TopicInfoComponent,
+    MoveAssetsComponent,
+    FolderContentComponent,
+    AssetTagCardComponent,
+    TagViewerComponent,
   ],
 })
 export class PagesModule {

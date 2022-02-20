@@ -14,6 +14,8 @@ import {LayoutEditorComponent} from './layout-editor/layout-editor.component';
 import {ChatbotComponent} from './chatbot/chatbot.component';
 import {AssetComponent} from './asset/asset.component';
 import {TopicsComponent} from './topics/topics.component';
+import {MoveAssetsComponent} from "./collections/move-assets/move-assets.component";
+import {FolderContentComponent} from "./collections/folder-content/folder-content.component";
 
 const routes: Routes = [{
   path: '',
@@ -34,6 +36,10 @@ const routes: Routes = [{
     {
       path: 'collections',
       component: CollectionsComponent,
+    },
+    {
+      path: 'folder/:fid',
+      component: FolderContentComponent,
     },
     {
       path: 'assets',
@@ -62,6 +68,10 @@ const routes: Routes = [{
     {
       path: 'docs',
       component: DocsComponent,
+    },
+    {
+      path: 'moveAssets',
+      component: MoveAssetsComponent,
     },
     {
       path: 'miscellaneous',

@@ -1,0 +1,61 @@
+<div class="row">
+  <div class="col-md-5 ">
+    <nb-card>
+      <nb-card-header>
+        source folder
+        <nb-select placeholder="Select Folder" [(selected)]="sourceFolder" (selectedChange)="onSourceSelect()">
+          <nb-option *ngFor="let c of collections" [value]="c">{{c.name}}</nb-option>
+        </nb-select>
+        <div>
+          <label>Page:</label>
+          <button nbButton ghost status="primary"  size="tiny" (click)="prevSourceAssetsPage()" [disabled]="sourceAssetsPage<=1">
+            <nb-icon icon="arrow-ios-back-outline" status="basic"></nb-icon>
+          </button>
+          <label>{{sourceAssetsPage}} of {{totalSourcePages}}</label>
+          <button nbButton ghost status="primary"  size="tiny" (click)="nextSourceAssetsPage()" [disabled]="sourceAssetsPage>=totalSourcePages">
+            <nb-icon icon="arrow-ios-forward-outline" status="basic"></nb-icon>
+          </button>
+        </div>
+      </nb-card-header>
+      <nb-card-body>
+        <table>
+          <tr *ngFor="let t of sourceAssets">
+            <th>
+              <img width="100px" height="100px" [src]="t.openpipe_canonical_smallImage[0]">
+            </th>
+            <th>
+              {{t.openpipe_canonical_title[0]}}
+            </th>
+            <th>
+              <button nbButton size="tiny" (click)="moveAssetToDestFolder(t)">copy over</button>
+            </th>
+          </tr>
+        </table>
+      </nb-card-body>
+    </nb-card>
+  </div>
+
+  <div class="col-md-5 ">
+    <nb-card>
+      <nb-card-header>
+        destination folder
+        <nb-select placeholder="Select Folder" [(selected)]="destFolder" (selectedChange)="onDestSelect()">
+          <nb-option *ngFor="let c of collections" [value]="c">{{c.name}}</nb-option>
+        </nb-select>
+        <button nbButton size="tiny" (click)="saveChanges()">Add to folder</button>
+      </nb-card-header>
+      <nb-card-body>
+        <table>
+          <tr *ngFor="let d of destAssets">
+<!--            <th>-->
+<!--              <img width="100px" height="100px" [src]="d.openpipe_canonical_smallImage[0]">-->
+<!--            </th>-->
+            <th>
+              {{d.openpipe_canonical_title[0]}}
+            </th>
+          </tr>
+        </table>
+      </nb-card-body>
+    </nb-card>
+  </div>
+</div>
