@@ -20,7 +20,7 @@ export class OAuth2CallbackComponent implements OnDestroy {
       .subscribe((authResult: NbAuthResult) => {
         console.log(authResult)
         if (authResult.isSuccess() && authResult.getRedirect()) {
-          console.log(authResult)
+
           this.router.navigateByUrl('/pages/collections');
         }
       });
