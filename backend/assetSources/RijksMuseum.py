@@ -3,6 +3,8 @@
 import requests
 from multiprocessing.pool import ThreadPool
 
+from backend.assetSources.CanonicalSchema import CanonicalSchema
+
 
 class RijksMuseum:
     url = "https://www.rijksmuseum.nl/api/en/"
@@ -21,8 +23,11 @@ class RijksMuseum:
         serviceName = "collection/" + str(assetOriginalID) + "/"
         params = {'key': "qvMYRE87", 'format': "json"}
         response = requests.get(url=self.url + serviceName, params=params)
-        data = response.json()
-        return self.getRijkAssetMetaData(data["artObject"])
+        if response.status_code == 200:
+            data = response.json()
+            return self.getRijkAssetMetaData(data["artObject"])
+        else:
+            return None
 
     def getRijkAssetMetaData(self, data):
         response = {}
@@ -39,7 +44,7 @@ class RijksMuseum:
             response["openpipe_canonical_fullImage"] = [
                 "http://mec402.boisestate.edu/cgi-bin/assetSources/getRijksTiledImage.py?id=" + data["objectNumber"]]
             tileInfo = self.getTileImages(data["objectNumber"], 0)
-            response["openpipe_canonical_fullImageDimensions"] = [str(tileInfo[1])+","+str(tileInfo[2])]
+            response["openpipe_canonical_fullImageDimensions"] = [str(tileInfo[1]) + "," + str(tileInfo[2])]
 
         response["openpipe_canonical_title"] = [data["title"]]
         if (len(data["principalMakers"]) > 0):
@@ -48,11 +53,20 @@ class RijksMuseum:
                 response["openpipe_canonical_artist"].append(artist["name"])
 
         era = "CE"
-        year1 = abs(int(data["dating"]["yearEarly"]))
-        year2 = abs(int(data["dating"]["yearLate"]))
+        year1 = 0
+        year2 = 0
+
+        if data["dating"]["yearEarly"] is not None:
+            year1 = abs(int(data["dating"]["yearEarly"]))
+
+        if data["dating"]["yearLate"] is not None:
+            year2 = abs(int(data["dating"]["yearLate"]))
+
+
         if "B.C." in data["dating"]["presentingDate"]:
             era = "BC"
-        response["openpipe_canonical_firstDate"] = [era + " " + str(year1) + " " + "JAN" + " " + "01" + " " + "00:00:00"]
+        response["openpipe_canonical_firstDate"] = [
+            era + " " + str(year1) + " " + "JAN" + " " + "01" + " " + "00:00:00"]
         response["openpipe_canonical_lastDate"] = [era + " " + str(year2) + " " + "JAN" + " " + "01" + " " + "00:00:00"]
         response["openpipe_canonical_date"] = [response["openpipe_canonical_firstDate"][0],
                                                response["openpipe_canonical_lastDate"][0]]
@@ -78,13 +92,18 @@ class RijksMuseum:
             results.append(pool.apply_async(self.getRijkMetaTagMapping, args=[assetId["objectNumber"]]))
         pool.close()
         pool.join()
-        results = [r.get() for r in results]
-        return {"data": results, "total": retrievedAssets["count"], "sourceName": "Rijks"}
+
+        resRes=[]
+        for r in results:
+            if r.get() is not None:
+                resRes.append(r.get())
+
+        return {"data": resRes, "total": retrievedAssets["count"], "sourceName": "Rijks"}
 
     def getTileImages(self, objectId, z):
-        tileData=0
-        imgWidth=0
-        imgHeight=0
+        tileData = 0
+        imgWidth = 0
+        imgHeight = 0
         serviceName = "collection/" + objectId + "/tiles"
         params = {'key': "qvMYRE87"}
         response = requests.get(url=self.url + serviceName, params=params)
@@ -96,3 +115,6 @@ class RijksMuseum:
                 imgHeight = d['height']
                 break
         return tileData, imgWidth, imgHeight
+
+
+print(CanonicalSchema().getSchema(0))
