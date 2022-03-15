@@ -7,7 +7,7 @@
 /*/node_modules
 
 # IDEs and editors
-
+.idea
 /*/.idea
 /*/.project
 /*/.classpath
@@ -45,3 +45,9 @@ venv/
 /*/Thumbs.db
 
 backend/.coverage
+*.jpg
+*.jpeg
+*.h5
+frontend/.firebaserc
+.idea/misc.xml
+.idea/openpipe.iml

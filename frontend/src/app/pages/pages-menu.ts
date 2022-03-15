@@ -1,4 +1,5 @@
 import { NbMenuItem } from '@nebular/theme';
+import {AssetComponent} from "./asset/asset.component";
 
 export const MENU_ITEMS: NbMenuItem[] = [
   {
@@ -16,6 +17,11 @@ export const MENU_ITEMS: NbMenuItem[] = [
     icon: 'color-palette-outline',
     link: '/pages/assets',
     home: true,
+  },
+  {
+    title: 'Topics',
+    icon: 'code-outline',
+    link: '/pages/topics',
   },
   {
     title: 'Faculty Templates',
@@ -46,5 +52,10 @@ export const MENU_ITEMS: NbMenuItem[] = [
     title: 'Docs',
     icon: 'question-mark-circle',
     link: '/pages/docs',
+  },
+  {
+    title: 'Experimental',
+    icon: 'bulb-outline',
+    link: '/pages/fireassets',
   },
 ];

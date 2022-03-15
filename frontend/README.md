@@ -1,4 +1,5 @@
 ng build --prod  --base-href /ui/
+
 ng build --prod  --base-href /uidev/
 
 fixing refresh issue:

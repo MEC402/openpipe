@@ -210,7 +210,23 @@ import sqlalchemy as db
 #         outfile.write("source_url\tparsed_url\n")
 #
 #     asyncio.run(bulk_crawl_and_write(file=outpath, urls=urls))
-from assetSources.LocalSearch import LocalSearch
+# from assetSources.LocalSearch import LocalSearch
 
-local = LocalSearch()
-results = local.getData('cats',1, 1000)
+# local = LocalSearch()
+# results = local.getData('cats',1, 1000)
+
+insertSize=80480
+biteSize=1000
+q=int(insertSize/biteSize)
+r=insertSize%biteSize
+
+a=[]
+for i in range(0,80481):
+    a.append(i)
+
+print(q,r)
+
+for i in range(0,q):
+    print(a[i*biteSize:i*biteSize+biteSize])
+
+

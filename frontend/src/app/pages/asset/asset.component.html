@@ -1,0 +1,53 @@
+
+
+<div class="row">
+  <div class="col-md-4">
+
+    <div>
+      <label for="score" class="label">score      </label>
+      <input type="text" nbInput  id="score" [value]="assetScore" (input)="sendTheNewValue($event)">
+      <br>
+      <nb-toggle [(ngModel)]="assetAccessStatus">{{assetAccessStatus ? 'public' : 'private' }}</nb-toggle>
+      <br>
+      <nb-toggle [(ngModel)]="assetVerified">{{assetVerified ? 'verified' : 'not verified' }}</nb-toggle>
+    </div>
+
+
+    <img [src]="assetImage">
+  </div>
+
+  <div class="col-md-8">
+    <nb-card>
+      <nb-card-header>
+        <div class="row">
+          <div class="col-9">
+            {{assetName}}
+            <br>
+            <a [href]="assetLink"  target="_blank" rel="noopener noreferrer">{{this.assetLink}}</a>
+          </div>
+          <!--  <button nbButton size="tiny" status="success" *ngIf="!assetVerified">Mark as Verified</button>-->
+          <button nbButton (click)="showAllTags()"> {{allTagsView? 'Show less' : 'Show All'}} </button>
+          <button nbButton size="medium" nbButton status="danger" (click)="saveAssetChanges()">Save</button>
+        </div>
+
+      </nb-card-header>
+
+      <nb-card-body>
+        <form>
+
+          <div class="row">
+            <div class="col-sm-4" *ngFor="let i of selectedAssetMetaTag">
+              <div class="form-group">
+                <label [for]="i.tagName" class="label">{{i.tagName}}</label>
+                <input type="text" nbInput fullWidth [id]="i.originalTagName" [value]="i.value" (input)="sendTheNewValue($event)">
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </nb-card-body>
+    </nb-card>
+  </div>
+
+</div>
+

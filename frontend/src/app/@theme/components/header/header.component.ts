@@ -4,6 +4,8 @@ import { NbMediaBreakpointsService, NbMenuService, NbSidebarService, NbThemeServ
 
 import { map, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import {NbAuthOAuth2Token, NbAuthService} from '@nebular/auth';
+import {DataAccessService} from '../../../services/data-access.service';
 
 @Component({
   selector: 'ngx-header',
@@ -37,15 +39,36 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   currentTheme = 'default';
 
-  userMenu = [ { title: 'Profile' }, { title: 'Log out' } ];
+  userMenu = [{title: 'Profile'}, {title: 'Log out'}];
 
   constructor(private sidebarService: NbSidebarService,
               private menuService: NbMenuService,
               private themeService: NbThemeService,
-              private breakpointService: NbMediaBreakpointsService) {
+              private breakpointService: NbMediaBreakpointsService,
+              private authService: NbAuthService,
+              private dataAccessService: DataAccessService) {
+    this.authService.onTokenChange()
+      .subscribe((token: NbAuthOAuth2Token) => {
+
+        if (token.isValid()) {
+          console.log(token);
+          this.user = token;
+        }
+
+      });
   }
 
   ngOnInit() {
+
+    this.authService.getToken().subscribe(t => {
+      const pl = t.getPayload();
+      this.dataAccessService.getUserInfo(pl.access_token).subscribe(r => {
+        this.user.name = r.given_name + ' ' + r.family_name;
+        this.user.picture = r.picture;
+      });
+    });
+
+
     this.currentTheme = this.themeService.currentTheme;
 
 
@@ -83,5 +106,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   navigateHome() {
     this.menuService.navigateHome();
     return false;
+  }
+
+  getUserInfo() {
+    console.log(this.user);
   }
 }

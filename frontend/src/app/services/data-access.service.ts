@@ -11,10 +11,12 @@ import set = Reflect.set;
 export class DataAccessService {
   webServerURL;
   domainURL;
+  awsApiDomainName;
   constructor(private http: HttpClient) {
     this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/';
     this.domainURL = 'http://mec402.boisestate.edu/';
    // this.webServerURL = 'http://localhost/cgi-bin/';
+    this.awsApiDomainName = 'https://lmod9t47la.execute-api.us-west-2.amazonaws.com/v1/';
   }
 
   public getMuseumData(searchTerm: string, museumName  , page: number , pageSize: number): Observable<Results> {
@@ -51,10 +53,12 @@ export class DataAccessService {
     return this.http.get<CollectionResults>(url, {params: params});
   }
 
-
-  public getFolders(): Observable<CollectionResults> {
-    const url = this.domainURL + 'api/v1/folders';
-    return this.http.get<CollectionResults>(url);
+  public getFolders(p, ps): Observable<CollectionResults> {
+    const url = this.awsApiDomainName + 'folders';
+    const params = new HttpParams()
+      .set('p', p)
+      .set('ps', ps);
+    return this.http.get<CollectionResults>(url, {params: params});
   }
 
   public getFolderDetails(folderId): Observable<FolderDetails> {
@@ -139,6 +143,12 @@ export class DataAccessService {
   public getPublicAssetsInCollection(collectionId, p, ps): Observable<Assets> {
     const getAssetsInCollectionURL = this.webServerURL + 'dataAccess/getPublicAssetsInCollection.py';
     const assetsInCollectionParams = new HttpParams().set('collectionId', collectionId).set('p', p).set('ps', ps);
+    return this.http.get<Assets>(getAssetsInCollectionURL, {params: assetsInCollectionParams});
+  }
+
+  public getFolderAssets(collectionId, p, ps): Observable<Assets> {
+    const getAssetsInCollectionURL = this.awsApiDomainName + 'folderassets';
+    const assetsInCollectionParams = new HttpParams().set('folderId', collectionId).set('p', p).set('ps', ps);
     return this.http.get<Assets>(getAssetsInCollectionURL, {params: assetsInCollectionParams});
   }
 
@@ -247,13 +257,13 @@ export class DataAccessService {
   }
 
   public updateFolder(folderId, newName, newImage, newVerified) {
-    const updateFolderURL = this.webServerURL + 'dataAccess/updateFolder.py';
+    const updateFolderURL = this.awsApiDomainName + 'folder';
     const updateFolderParams = new HttpParams()
-      .set('collectionId', folderId)
+      .set('folderId', folderId)
       .set('newName', newName)
       .set('newImage', newImage)
       .set('newVerified', newVerified ? '1' : '0');
-    return this.http.get(updateFolderURL, {params: updateFolderParams});
+    return this.http.put(updateFolderURL, {params: updateFolderParams});
   }
 
   updateTagMapping(mapId, tagMap) {
@@ -333,7 +343,90 @@ export class DataAccessService {
     return this.http.post<InsertionResponse>(URL, postBody);
   }
 
+  public loadFolderLayout(folderId): Observable<Results> {
+    const url = this.awsApiDomainName + 'folder/layout';
+    const params = new HttpParams()
+      .set('folderId', folderId);
+    return this.http.get<Results>(url, {params: params});
+  }
 
+  public saveAssetChanges(mid, data) {
+    const URL = this.awsApiDomainName + 'metatags';
+    const postBody = {'metaDataId': mid, 'data': data};
+    const headers = new HttpHeaders({
+      'Content-Type': 'text/json',
+      'Access-Control-Allow-Origin': '*',
+    });
+    return this.http.post<InsertionResponse>(URL, postBody);
+  }
+
+
+  public getAssetByMetaDataId(mid): Observable<Asset> {
+    const url = this.awsApiDomainName + 'asset';
+    const params = new HttpParams()
+      .set('mid', mid);
+    return this.http.get<Asset>(url, {params: params});
+  }
+
+  public getTopicByCode(code, page, pageSize): Observable<Results> {
+    const url = this.awsApiDomainName + 'topic';
+    const params = new HttpParams()
+      .set('code', code)
+      .set('p', page)
+      .set('ps', pageSize);
+    return this.http.get<Results>(url, {params: params});
+  }
+
+  public getTopicAliases(topicId, page, pageSize): Observable<Results> {
+    const url = this.awsApiDomainName + 'topicaliases';
+    const params = new HttpParams()
+      .set('topicId', topicId)
+      .set('p', page)
+      .set('ps', pageSize);
+    return this.http.get<Results>(url, {params: params});
+  }
+
+  public updateTopic(topicId, updateData) {
+    const updateTopicURL = this.awsApiDomainName + 'topic';
+    let updateTopicParams = new HttpParams();
+    updateTopicParams = updateTopicParams.set('id', topicId);
+    for (const [key, value] of Object.entries(updateData)) {
+      updateTopicParams = updateTopicParams.set(key, String(value));
+    }
+    return this.http.put(updateTopicURL, {params: updateTopicParams});
+  }
+
+
+  public searchTopic(term, code, page, pageSize) {
+    const searchTopicURL = this.awsApiDomainName + 'search/topic';
+    const params = new HttpParams()
+      .set('term', term)
+      .set('code', code)
+      .set('p', page)
+      .set('ps', pageSize);
+    return this.http.get<Results>(searchTopicURL, {params: params});
+  }
+
+  public mergeTopics(mergeData) {
+    const URL = this.awsApiDomainName + 'topic/merge';
+    return this.http.post<InsertionResponse>(URL, mergeData);
+  }
+
+  public getUserInfo(token) {
+    const url = 'https://www.googleapis.com/oauth2/v3/userinfo';
+    const params = new HttpParams().set('access_token', token);
+    return this.http.get<UserInfo>(url, {params: params});
+  }
+}
+
+
+class UserInfo {
+  sub;
+  name;
+  given_name;
+  family_name;
+  picture;
+  locale;
 }
 
 class Results {
@@ -342,6 +435,10 @@ class Results {
   assets: any[];
 }
 
+class Asset {
+  total;
+  tagData;
+}
 
 class FolderDetails {
   folderInfo: any;
@@ -353,9 +450,16 @@ class CollectionResults {
   data: Collection[];
 }
 class Collection {
+  note;
+  metaDataId;
   id;
+  insertTime;
+  verified;
+  lastModified;
   name;
-  timestamp;
+  layoutType;
+  image;
+  assetCount;
 }
 
 class InsertionResponse {
@@ -366,7 +470,6 @@ class Assets {
   total;
   data: AssetMainMetaData[];
 }
-
 class AssetMainMetaData {
   id;
   title;

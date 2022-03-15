@@ -4,8 +4,12 @@ import sys
 import requests
 import time
 
-from openpipeAPI.ORM.ORM import ORM
-from openpipeAPI.ORM.TO import TO
+from sqlalchemy import and_
+from sqlalchemy.orm import aliased
+
+from backend.openpipeAPI.ORM.ORM import ORM
+from backend.openpipeAPI.ORM.Schema import FolderSchema
+from backend.openpipeAPI.ORM.TO import TO
 
 
 class BL:
@@ -147,7 +151,123 @@ class BL:
         # print(t1-t0)
         return results
 
-    def getAllAssetsWithGUID(self, page, pageSize, changeStart, changeEnd):
+    def getAllAssetsWithGUID(self, page, pageSize, changeStart, changeEnd, none):
+        tables = TO().getClasses()
+        MetaTag = tables["metaTag"]
+        Asset = tables["asset"]
+
+        guidmap = {"city": "500", "classification": "600",
+                   "culture": "700", "genre": "800", "medium": "900", "nation": "a00",
+                   "artist": "400", "title": "000", "tags": "000"
+                   }
+        guidURL = "http://mec402.boisestate.edu/cgi-bin/openpipe/data/"
+        sguidURL = "http://mec402.boisestate.edu/"
+        if (page < 1):
+            page = 1
+        start = (page - 1) * pageSize
+        step = pageSize
+
+        results = {"total": 0,
+                   "guidbase": "http://mec402.boisestate.edu/",
+                   "data": []}
+
+        if int(page) < 0:
+            return results
+
+        t0 = time.time()
+
+        orm = ORM()
+        q1 = orm.session.query(Asset). \
+            filter(Asset.lastModified.between(changeStart, changeEnd)). \
+            offset(start). \
+            limit(step). \
+            subquery()
+
+        q1 = aliased(Asset, q1)
+
+        resultSet = orm.session.query(q1, MetaTag).join(MetaTag, q1.metaDataId == MetaTag.metaDataId). \
+            filter(MetaTag.tagName.like("%{}%".format("openpipe_canonical_"))). \
+            order_by(q1.metaDataId)
+
+        orm.executeSelect("""select * from metaTag join (select * from asset WHERE asset.`lastModified` BETWEEN '1900-1-1' AND '2030-1-1'LIMIT 1, 100) as a on a.metaDataId=metaTag.metadataId where tagName like '%openpipe_canonical%';""")
+
+        print(resultSet)
+
+        t1 = time.time()
+
+        # print(t1 - t0)
+
+        assetMetaDataMap = {}
+        print(len(resultSet))
+
+        for r in resultSet:
+            assetInfo = r[0]
+            metaTagInfo = r[1]
+            # print(assetInfo.metaDataId, metaTagInfo.metaDataId)
+            tagName = metaTagInfo.tagName.split("_")[2]
+
+            tagGuid = {str(metaTagInfo.topic_code) + "/" + str(metaTagInfo.topic_id):metaTagInfo.value}
+
+            if metaTagInfo.topic_name is None and none == 1:
+                if tagName == "id":
+                    tagGuid = "100" + "/" + str(assetInfo.id)
+                else:
+                    tagGuid = {"ba0" + "/" + str(metaTagInfo.id):metaTagInfo.value}
+
+
+            if assetInfo.metaDataId not in assetMetaDataMap:
+                assetMetaDataMap[assetInfo.metaDataId] = {"id": "100/" + str(assetInfo.id),
+                                                          "metaDataId": assetInfo.metaDataId,
+                                                          "name": assetInfo.shortName,
+                                                          "openpipe_canonical": {
+                                                              tagName: tagGuid
+                                                          }}
+            else:
+                assetMetaDataMap[assetInfo.metaDataId]["openpipe_canonical"][tagName] = tagGuid
+
+        results["data"] = list(assetMetaDataMap.values())
+        results["total"] = len(results["data"])
+
+        return results
+        # results['guidbase'] = sguidURL
+        # sguidURL = ""
+        # rows = []
+        # for row in results['data']:
+        #     # rowInfo = {"id": row['id'], "metaDataId": row['metaDataId'], "name": row['shortName']}
+        #     rowInfo = {"metaDataId": row['metaDataId'], "name": row['shortName']}
+        #     metaDataId = row['metaDataId'][0]
+        #     queryStatement = "select id,tagName,value,topic_name,topic_id,topic_code from metaTag where metaDataId="
+        #     if metaDataId:
+        #         queryStatement = queryStatement + str(metaDataId)
+        #         tags = orm.executeSelectPersist(queryStatement, newcon)['data']
+        #         canonicalTagObj = {}
+        #         for metaTagRow in tags:
+        #             print(metaTagRow)
+        #             if "openpipe_canonical_" in metaTagRow['tagName'][0]:  # Only Canonical Tags have topics
+        #                 tagName = metaTagRow['tagName'][0].split("_")[2]
+        #                 if metaTagRow['topic_name'][0] is None:
+        #                     if none == 1:
+        #                         print("None value:", none)
+        #                         canonicalTagObj[tagName] = {
+        #                             sguidURL + "ba0" + "/" + str(metaTagRow['id'][0]): metaTagRow['value'][0]}
+        #                     else:
+        #                         pass
+        #                 else:
+        #                     canonicalTagObj[tagName] = {
+        #                         guidURL + str(metaTagRow['topic_code'][0]) + "/" + str(metaTagRow['topic_id'][0]):
+        #                             metaTagRow['value'][0]}
+        #
+        #         rowInfo["openpipe_canonical"] = canonicalTagObj
+        #         rowInfo["openpipe_canonical"]["id"] = sguidURL + "100/" + str(row['id'][0])
+        #         rows.append(rowInfo)
+        # results["data"] = rows
+        # newcon.close()
+        # t1 = time.time()
+        # # print("broken")
+        # # print(t1-t0)
+        # return results
+
+    def getAllAssetsWithGUID1(self, page, pageSize, changeStart, changeEnd):
         guidURL = "http://mec402.boisestate.edu/cgi-bin/openpipe/data/"
         if (page < 1):
             page = 1
@@ -194,6 +314,23 @@ class BL:
         # print("broken")
         # print(t1-t0)
         return results
+
+    def getAssetbyMetaData(self, assetMetaDataID):
+        orm = ORM()
+        queryStatement = "SELECT * FROM artmaster.asset join metaTag on metaTag.metaDataId=asset.metaDataId where asset.metaDataId=" + str(
+            int(assetMetaDataID))
+        results = orm.executeSelect(queryStatement)
+        if results['total'] > 0:
+            results['total'] = 1
+            rowInfo = {"id": results['data'][0]['id'], "metaDataId": results['data'][0]['metaDataId'],
+                       "name": results['data'][0]['shortName']}
+            for row in results['data']:
+                rowInfo[row['tagName'][0]] = [row['value'][0]]
+
+            results["data"] = [rowInfo]
+            return results
+        else:
+            return {"total": 0, "data": []}
 
     def getAsset(self, assetID):
         orm = ORM()
@@ -336,6 +473,15 @@ class BL:
         newcon.close()
         return results
 
+    def getAllFolders(self):
+        orm = ORM()
+        tables = TO().getClasses()
+        FolderTable = tables["collection"]
+        folders = orm.session.query(FolderTable).order_by(FolderTable.name).all()
+        folders_schema = FolderSchema(many=True)
+        folders = folders_schema.dump(folders)
+        return {"total": len(folders), "data": folders}
+
     def getCollectionByID(self, id):
         url = "http://mec402.boisestate.edu/cgi-bin/openpipe/data/asset/"
         result = {}
@@ -379,7 +525,7 @@ class BL:
         rows = []
         for row in results['data']:
             metaDataId = row['metaDataId'][0]
-            rowInfo = {"id": row['assetId'], "metaDataId": row['metaDataId'],"assetVerified": row['assetVerified']}
+            rowInfo = {"id": row['assetId'], "metaDataId": row['metaDataId'], "assetVerified": row['assetVerified']}
             queryStatement = "select tagName,value from metaTag where metaDataId="
             if metaDataId:
                 queryStatement = queryStatement + str(metaDataId)
@@ -414,38 +560,75 @@ class BL:
         results['data'] = result
         return results
 
-    #     def getGUIDInfo(self, tableName, id):
-    #         orm = ORM()
-    #         if (tableName == "entities"):
-    #            return Topics().getCanonicalTagsJSON()
-    #         entities = Topics().getCanonicalTagsList()
-    #         entities.append("asset")
-    #         entities.append("folder")
-    # #        if (tableName not in ["asset", "folder","artist"]):
-    #         if (tableName not in entities):
-    #             return {"total" :0 , "data" :[], "error": "invalid topic"}
-    #         elif tableName == "asset":
-    #             if id is not None and id != "":
-    #                 return self.getAsset(id)
-    #             else:
-    #                 return self.getAllAssetIDs()
-    #         elif tableName == "folder":
-    #             if id is not None and id != "":
-    #                 return self.getCollectionByID(id)
-    #             else:
-    #                 return self.getAllFolderIDs()
-    #         elif tableName == "artist":
-    #             if id is not None and id != "":
-    #                 return self.getArtist(id)
-    #             else:
-    #                 return self.getAllArtistIDs()
-    #         else:
-    #             if id is not None and id != "":
-    #                 return self.getTopic(tableName,id)
-    #             else:
-    #                 return self.getAllTopicIDs(tableName)
-    #
-    #         return {"total" :0 , "data" :[], "error": "empty topic"}
+    def getAssetbyMetaData(self, assetMetaDataID):
+        orm = ORM()
+        queryStatement = "SELECT * FROM artmaster.asset join metaTag on metaTag.metaDataId=asset.metaDataId where asset.metaDataId=" + str(
+            int(assetMetaDataID))
+        results = orm.executeSelect(queryStatement)
+        if results['total'] > 0:
+            results['total'] = 1
+            rowInfo = {"id": results['data'][0]['id'], "metaDataId": results['data'][0]['metaDataId'],
+                       "name": results['data'][0]['shortName']}
+            for row in results['data']:
+                rowInfo[row['tagName'][0]] = [row['value'][0]]
+
+            results["data"] = [rowInfo]
+            return results
+        else:
+            return {"total": 0, "data": []}
+
+    def getAllTopicMembers(self, topicName, topicCode):
+        if topicName == 'asset':
+            return self.getAllAssetIDs()
+        elif topicName == 'folder':
+            return self.getAllFolderIDs()
+        else:
+            orm = ORM()
+            tables = TO().getClasses()
+            Topic = tables["topic"]
+            topicResultSet = orm.session.query(Topic).filter(Topic.type == topicName).all()
+            res = {"total": 0, "data": []}
+            resArr = []
+            for t in topicResultSet:
+                resArr.append(str(t.code) + "/" + str(t.id))
+            res["total"] = len(resArr)
+            res["data"] = resArr
+            return res
+
+    def getGUIDInfo(self, guidName, guidId):
+        orm = ORM()
+        tables = TO().getClasses()
+        GUIDType = tables["guidType"]
+        Topic = tables["topic"]
+        MetaTag = tables["metaTag"]
+        guidTypeResultSet = orm.session.query(GUIDType).all()
+
+        guidMap = {}
+        for gt in guidTypeResultSet:
+            guidMap[gt.name] = gt.code
+
+        if guidName not in guidMap.keys():
+            return {"total": 0, "data": [], "error": "invalid topic"}
+        elif guidId is None or guidId == "" or guidId == " ":
+            return self.getAllTopicMembers(guidName, guidMap[guidName])
+        else:
+            topicResultSet = orm.session.query(Topic).filter(Topic.id == guidId).all()
+            if guidName == 'asset':
+                return self.getAsset(guidId)
+            elif guidName == 'folder':
+                return self.getCollectionByID(guidId)
+            elif guidName == 'metaData':
+                return self.getAssetbyMetaData(guidId)
+            else:
+                metaTagResultSet = orm.session.query(MetaTag).filter(MetaTag.topic_id == guidId).all()
+                otherAliases = set([])
+                assetMetaDataIdWithTopic = set([])
+                for alias in metaTagResultSet:
+                    otherAliases.add(alias.value)
+                    assetMetaDataIdWithTopic.add(guidMap["metaData"] + "/" + str(alias.metaDataId))
+                    # print(alias.value,alias.id,alias.metaDataId)
+                return {"total": 1, "topicName": topicResultSet[0].name, "topicAliases": list(otherAliases),
+                        "topicAssets": list(assetMetaDataIdWithTopic)}
 
     def deleteMetaTag(self, metaDataId, tagName, value):
         orm = ORM()
@@ -475,7 +658,8 @@ class BL:
     def updateFolder(self, folderId, newName, newImage, newVerified):
         orm = ORM()
         Collection = self.tables["collection"]
-        orm.session.query(Collection).filter(Collection.id == folderId).update({"name": newName, "image": newImage,"verified":newVerified})
+        orm.session.query(Collection).filter(Collection.id == folderId).update(
+            {"name": newName, "image": newImage, "verified": newVerified})
         orm.commitClose()
         return {"data": 1}
 
@@ -574,5 +758,181 @@ class BL:
             id = r['assetId'][0]
             rows.append(url + str(id))
         return {'total': len(rows), 'data': rows}
+
+    def saveFolderLayout(self, data):
+        orm = ORM()
+        FolderMembers = self.tables["collectionMember"]
+        fid = data['folderId']
+        assets = data['data']
+        for d in data:
+            orm.session.query(FolderMembers).filter(
+                and_(FolderMembers.collectionId == fid, FolderMembers.assetId == d['assetId'])).update(
+                {"geometry": d['geometry'], 'wall': d['wall']})
+        orm.commitClose()
+        return {"data": 1}
+
+    def saveUploadAsset(self, data):
+        orm = ORM()
+        FolderMembers = self.tables["collectionMember"]
+        Images = self.tables["images"]
+        Asset = self.tables["asset"]
+        MetaData = self.tables["metaData"]
+        MetaTag = self.tables["metaTag"]
+
+        videoIconURL = "http://mec402.boisestate.edu/assets/videoIcon.png"
+
+        shortName = data["shortName"]
+        uri = data["uri"]
+        folderId = data["folderId"]
+        assetType = data["assetType"]
+
+        videoTypes = ['.264', '.3g2', '.3gp', '.3gp2', '.3gpp', '.3gpp2', '.3mm', '.3p2', '.60d', '.787', '.89', '.aaf',
+                      '.aec', '.aep', '.aepx',
+                      '.aet', '.aetx', '.ajp', '.ale', '.am', '.amc', '.amv', '.amx', '.anim', '.aqt', '.arcut', '.arf',
+                      '.asf', '.asx', '.avb',
+                      '.avc', '.avd', '.avi', '.avp', '.avs', '.avs', '.avv', '.axm', '.bdm', '.bdmv', '.bdt2', '.bdt3',
+                      '.bik', '.bin', '.bix',
+                      '.bmk', '.bnp', '.box', '.bs4', '.bsf', '.bvr', '.byu', '.camproj', '.camrec', '.camv', '.ced',
+                      '.cel', '.cine', '.cip',
+                      '.clpi', '.cmmp', '.cmmtpl', '.cmproj', '.cmrec', '.cpi', '.cst', '.cvc', '.cx3', '.d2v', '.d3v',
+                      '.dat', '.dav', '.dce',
+                      '.dck', '.dcr', '.dcr', '.ddat', '.dif', '.dir', '.divx', '.dlx', '.dmb', '.dmsd', '.dmsd3d',
+                      '.dmsm', '.dmsm3d', '.dmss',
+                      '.dmx', '.dnc', '.dpa', '.dpg', '.dream', '.dsy', '.dv', '.dv-avi', '.dv4', '.dvdmedia', '.dvr',
+                      '.dvr-ms', '.dvx', '.dxr',
+                      '.dzm', '.dzp', '.dzt', '.edl', '.evo', '.eye', '.ezt', '.f4p', '.f4v', '.fbr', '.fbr', '.fbz',
+                      '.fcp', '.fcproject',
+                      '.ffd', '.flc', '.flh', '.fli', '.flv', '.flx', '.gfp', '.gl', '.gom', '.grasp', '.gts', '.gvi',
+                      '.gvp', '.h264', '.hdmov',
+                      '.hkm', '.ifo', '.imovieproj', '.imovieproject', '.ircp', '.irf', '.ism', '.ismc', '.ismv',
+                      '.iva', '.ivf', '.ivr', '.ivs',
+                      '.izz', '.izzy', '.jss', '.jts', '.jtv', '.k3g', '.kmv', '.ktn', '.lrec', '.lsf', '.lsx', '.m15',
+                      '.m1pg', '.m1v', '.m21',
+                      '.m21', '.m2a', '.m2p', '.m2t', '.m2ts', '.m2v', '.m4e', '.m4u', '.m4v', '.m75', '.mani', '.meta',
+                      '.mgv', '.mj2', '.mjp',
+                      '.mjpg', '.mk3d', '.mkv', '.mmv', '.mnv', '.mob', '.mod', '.modd', '.moff', '.moi', '.moov',
+                      '.mov', '.movie', '.mp21',
+                      '.mp21', '.mp2v', '.mp4', '.mp4v', '.mpe', '.mpeg', '.mpeg1', '.mpeg4', '.mpf', '.mpg', '.mpg2',
+                      '.mpgindex', '.mpl',
+                      '.mpl', '.mpls', '.mpsub', '.mpv', '.mpv2', '.mqv', '.msdvd', '.mse', '.msh', '.mswmm', '.mts',
+                      '.mtv', '.mvb', '.mvc',
+                      '.mvd', '.mve', '.mvex', '.mvp', '.mvp', '.mvy', '.mxf', '.mxv', '.mys', '.ncor', '.nsv', '.nut',
+                      '.nuv', '.nvc', '.ogm',
+                      '.ogv', '.ogx', '.osp', '.otrkey', '.pac', '.par', '.pds', '.pgi', '.photoshow', '.piv', '.pjs',
+                      '.playlist', '.plproj',
+                      '.pmf', '.pmv', '.pns', '.ppj', '.prel', '.pro', '.prproj', '.prtl', '.psb', '.psh', '.pssd',
+                      '.pva', '.pvr', '.pxv',
+                      '.qt', '.qtch', '.qtindex', '.qtl', '.qtm', '.qtz', '.r3d', '.rcd', '.rcproject', '.rdb', '.rec',
+                      '.rm', '.rmd', '.rmd',
+                      '.rmp', '.rms', '.rmv', '.rmvb', '.roq', '.rp', '.rsx', '.rts', '.rts', '.rum', '.rv', '.rvid',
+                      '.rvl', '.sbk', '.sbt',
+                      '.scc', '.scm', '.scm', '.scn', '.screenflow', '.sec', '.sedprj', '.seq', '.sfd', '.sfvidcap',
+                      '.siv', '.smi', '.smi',
+                      '.smil', '.smk', '.sml', '.smv', '.spl', '.sqz', '.srt', '.ssf', '.ssm', '.stl', '.str', '.stx',
+                      '.svi', '.swf', '.swi',
+                      '.swt', '.tda3mt', '.tdx', '.thp', '.tivo', '.tix', '.tod', '.tp', '.tp0', '.tpd', '.tpr', '.trp',
+                      '.ts', '.tsp', '.ttxt',
+                      '.tvs', '.usf', '.usm', '.vc1', '.vcpf', '.vcr', '.vcv', '.vdo', '.vdr', '.vdx', '.veg', '.vem',
+                      '.vep', '.vf', '.vft',
+                      '.vfw', '.vfz', '.vgz', '.vid', '.video', '.viewlet', '.viv', '.vivo', '.vlab', '.vob', '.vp3',
+                      '.vp6', '.vp7', '.vpj',
+                      '.vro', '.vs4', '.vse', '.vsp', '.w32', '.wcp', '.webm', '.wlmp', '.wm', '.wmd', '.wmmp', '.wmv',
+                      '.wmx', '.wot', '.wp3',
+                      '.wpl', '.wtv', '.wve', '.wvx', '.xej', '.xel', '.xesc', '.xfl', '.xlmv', '.xmv', '.xvid', '.y4m',
+                      '.yog', '.yuv', '.zeg',
+                      '.zm1', '.zm2', '.zm3', '.zmv']
+
+        imageTypes = ['.ras', '.xwd', '.bmp', '.jpe', '.jpg', '.jpeg', '.xpm', '.ief', '.pbm', '.tif', '.gif', '.ppm',
+                      '.xbm', '.tiff', '.rgb', '.pgm', '.png', '.pnm']
+
+        assetGroup = "Unknown"
+
+        if "." + str(assetType).lower() in videoTypes:
+            assetGroup = "video"
+        elif "." + str(assetType).lower() in imageTypes:
+            assetGroup = "image"
+
+        metaDataId = orm.insert(MetaData())
+
+        assetId = orm.insert(
+            Asset(shortName=shortName, uri=uri, sourceId=666, metaDataId=metaDataId, scope=0, type=assetGroup))
+
+        fileName = "Local_uploaded_asset_" + str(assetId) + "." + str(assetType)
+
+        imageId = orm.insert(Images(shortname=shortName, filename=fileName, uri=uri, type=assetGroup))
+
+        orm.session.query(MetaData).filter(MetaData.id == metaDataId).update({"tableName": "asset", "eid": assetId})
+
+        fmid = orm.insert(FolderMembers(assetId=assetId, collectionId=folderId, searchTerm="Local_Asset_Upload"))
+
+        canonTags = orm.executeSelect("""SELECT * FROM artmaster.canonicalMetaTag where req='yes';""")
+        tags = []
+        print(canonTags)
+        for d in canonTags["data"]:
+            if d["name"][0] == 'openpipe_canonical_title':
+                tags.append(MetaTag(metaDataId=metaDataId, tagName=str(d["name"][0]), value=str(shortName)))
+            elif d["name"][0] == 'openpipe_canonical_fullImage':
+                tags.append(MetaTag(metaDataId=metaDataId, tagName=str(d["name"][0]), value=str(uri + fileName)))
+            elif d["name"][0] == 'openpipe_canonical_smallImage':
+                if assetGroup == "image":
+                    tags.append(MetaTag(metaDataId=metaDataId, tagName=str(d["name"][0]), value=str(uri + fileName)))
+                elif assetGroup == "video":
+                    tags.append(MetaTag(metaDataId=metaDataId, tagName=str(d["name"][0]), value=str(videoIconURL)))
+                else:
+                    tags.append(MetaTag(metaDataId=metaDataId, tagName=str(d["name"][0]), value=str(d["default"][0])))
+            else:
+                tags.append(MetaTag(metaDataId=metaDataId, tagName=str(d["name"][0]), value=str(d["default"][0])))
+        orm.bulkInsert(tags)
+        orm.commitClose()
+        return fileName
+
+    def getFolderLayout(self, folderId):
+        orm = ORM()
+        stm = "select assetId, collectionId, asset.metaDataId, geometry, wall, type, value from (select * from collectionMember where collectionId=" + str(
+            folderId) + ") as a join asset on a.assetId=asset.id join metaTag on metaTag.metaDataId=asset.metaDataId where tagName='openpipe_canonical_smallImage'"
+        res = orm.executeSelect(stm)
+        return res
+
+    def getTopics(self, page, pageSize):
+
+        if (page < 1):
+            page = 1
+        start = (page - 1) * pageSize
+        step = pageSize
+
+        if int(page) < 0:
+            return []
+
+        orm = ORM()
+        stm = "select * from topic where code!='b00' order by type limit " + str(start) + "," + str(step)
+
+        allTopicTypes = orm.executeSelect(stm)
+
+        guidmap = {"city": "500", "classification": "600",
+                   "culture": "700", "genre": "800", "medium": "900", "nation": "a00",
+                   "artist": "400", "title": "000", "tags": "000", "metaTag": "b00"
+                   }
+
+        repAssetId = 10
+
+        finalRes = {
+            "availableTopics": ["artist", "genre", "city", "classification", "culture", "medium", "nation", "metaTag"]}
+        for t in allTopicTypes['data']:
+            topicType = t['type'][0]
+            topicId = t['id'][0]
+            topicInfo = {"id": topicId,
+                         "value": t['name'][0],
+                         "biography": t['description'][0],
+                         "guid": "http://mec402.boisestate.edu/" + guidmap[topicType] + "/" + str(topicId),
+                         "representativeAssetId": "100/" + str(repAssetId)}
+
+            if topicType in finalRes.keys():
+                finalRes[topicType]["data"].append(topicInfo)
+                finalRes[topicType]["total"] = finalRes[topicType]["total"] + 1
+            else:
+                finalRes[topicType] = {"total": 1, "data": [topicInfo]}
+                # finalRes["availableTopics"].append(topicType)
+
+        return finalRes
 
 # help(BL().getCanonicalTags())

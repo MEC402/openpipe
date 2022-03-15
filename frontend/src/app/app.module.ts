@@ -11,17 +11,22 @@ import { ThemeModule } from './@theme/theme.module';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import {
+  NbButtonModule,
+  NbCardModule,
   NbChatModule,
   NbDatepickerModule,
-  NbDialogModule,
+  NbDialogModule, NbLayoutModule,
   NbMenuModule,
   NbSidebarModule,
   NbToastrModule,
   NbWindowModule,
 } from '@nebular/theme';
+import {NbAuthModule, NbOAuth2AuthStrategy, NbOAuth2ResponseType} from '@nebular/auth';
+import { OAuth2LoginComponent } from './oauth2-login/oauth2-login.component';
+import { OAuth2CallbackComponent } from './oauth2-callback/oauth2-callback.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, OAuth2LoginComponent, OAuth2CallbackComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -39,6 +44,23 @@ import {
     NbChatModule.forRoot({
       messageGoogleMapKey: 'AIzaSyA_wNuCzia92MAmdLRzmqitRGvCF7wCZPY',
     }),
+    NbAuthModule.forRoot({
+      strategies: [
+        NbOAuth2AuthStrategy.setup({
+          clientId: 'Add_Client_ID_HERE',
+          name: 'google',
+          authorize: {
+            endpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
+            responseType: NbOAuth2ResponseType.TOKEN,
+            scope: 'https://www.googleapis.com/auth/userinfo.profile',
+            redirectUri: 'http://localhost:4200/auth/callback',
+          },
+        }),
+      ],
+    }),
+    NbLayoutModule,
+    NbCardModule,
+    NbButtonModule,
   ],
   bootstrap: [AppComponent],
 })

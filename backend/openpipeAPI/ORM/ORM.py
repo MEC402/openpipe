@@ -9,7 +9,7 @@ from sqlalchemy.pool import NullPool
 
 import time
 
-from openpipeAPI.ORM.DBInfo import DBInfo
+from backend.openpipeAPI.ORM.DBInfo import DBInfo
 
 
 class ORM:

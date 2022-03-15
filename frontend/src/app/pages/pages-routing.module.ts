@@ -12,6 +12,8 @@ import {ReportsComponent} from './reports/reports.component';
 import {DocsComponent} from './docs/docs.component';
 import {LayoutEditorComponent} from './layout-editor/layout-editor.component';
 import {ChatbotComponent} from './chatbot/chatbot.component';
+import {AssetComponent} from './asset/asset.component';
+import {TopicsComponent} from './topics/topics.component';
 
 const routes: Routes = [{
   path: '',
@@ -20,6 +22,14 @@ const routes: Routes = [{
     {
       path: 'home',
       component: HomeComponent,
+    },
+    {
+      path: 'asset/:mid',
+      component: AssetComponent,
+    },
+    {
+      path: 'topics',
+      component: TopicsComponent,
     },
     {
       path: 'collections',
