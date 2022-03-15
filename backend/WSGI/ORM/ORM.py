@@ -2,21 +2,19 @@ import mysql
 import sqlalchemy as db
 from mysql.connector import Error
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
 
 from openpipeAPI.ORM.DBInfo import DBInfo
 
 
 class ORM:
-    connection = DBInfo().getConnectionInfo()
+
+    connection=DBInfo().getConnectionInfo()
     engine = db.create_engine(
         'mysql+mysqlconnector://' + connection["username"] + ':' + connection["password"] + '@' +
         connection["address"] + '/' + connection["schema"])
     Session = sessionmaker(bind=engine)
-    session = Session();
-
-    fetchTime = 0
-    forTime = 0
-
+    session=Session();
     # TODO: Password Manger
 
     def getSession(self):
@@ -48,11 +46,38 @@ class ORM:
         self.session.commit()
         self.session.close()
 
-    def executeSelect(self, query, param):
-        import time
+    def simpConnect(self):
+        acon = mysql.connector.connect(
+               host=self.connection["address"],
+               user=self.connection["username"],
+              passwd=self.connection["password"],
+               database=self.connection["schema"]
+            )
+        return acon
 
-        t0 = time.time()
+    def executeSelectPersist(self, query,acon):
+        jsonRes = { "total": 0, "data": [], "error": "executeSelect"}
+        try:
+            cursor = acon.cursor()
+            cursor.execute(query, )
+            records = cursor.fetchall()
+            fieldNames = [i[0] for i in cursor.description]
 
+            jsonRes = {'total': len(records), 'data': []}
+            for r in records:
+                row = {}
+                for i in range(len(fieldNames)):
+                    row[fieldNames[i]] = [r[i]]
+                jsonRes['data'].append(row)
+
+        except Error as e:
+            print("Error reading data from MySQL table", e)
+        finally:
+                cursor.close()
+        return jsonRes
+        
+    def executeSelect(self, query):
+        jsonRes = { "total": 0, "data": [], "error": "executeSelect"}
         try:
             connection = mysql.connector.connect(
                 host=self.connection["address"],
@@ -61,15 +86,10 @@ class ORM:
                 database=self.connection["schema"]
             )
             cursor = connection.cursor()
-            cursor.execute(query, param)
+            cursor.execute(query, )
             records = cursor.fetchall()
             fieldNames = [i[0] for i in cursor.description]
 
-            t1 = time.time()
-
-            self.fetchTime = t1 - t0
-
-            t0 = time.time()
             jsonRes = {'total': len(records), 'data': []}
             for r in records:
                 row = {}
@@ -90,7 +110,7 @@ class ORM:
                 cursor.close()
         return jsonRes
 
-    def batchInsert(self, data, query):
+    def batchInsert(self,data,query):
         try:
             connection = mysql.connector.connect(
                 host=self.connection["address"],
@@ -112,3 +132,10 @@ class ORM:
                 connection.close()
                 cursor.close()
 
+
+# to=TO()
+# orm=ORM()
+# print(to.getClasses())
+# r=orm.selectAll(to.getClasses()['canonicalMetaTag'])
+# for a in r:
+#     print(a.default)

@@ -1,9 +1,14 @@
+
 from abc import ABC, abstractmethod
 
 
-class Museum(ABC):
+class MuseumsTM(ABC):
+# all museum classes must have
+# name a string name
+# attributes the Dictionary of museum specific attributes like URL, apiKey
+
     """
-        The abstract class for museums. All new museum classes should inharit this class and override the methods below
+        The abstract class for museums. All new museum classes should inherit this class and override the methods below
     """
     def __init__(self, schema):
         """
@@ -11,6 +16,14 @@ class Museum(ABC):
         :param schema: The proper canonical schema to make sure that the each search has all the canonicals
         """
         self.schema = schema
+        self.name = "somemuseum"
+        self.canonmap =[]
+
+    def setName(self,aname):
+        self.name = aname
+
+    def setAttr(self,attr):
+        self.attributes = attr
 
     def searchForAssets(self, term):
         """
@@ -47,18 +60,9 @@ class Museum(ABC):
         """
         pass
 
-    def getCanonTags(self, asset, aorm):
+    def getMappedCanonTags(self, metadataid, aorm, alltags, curtag):
         """
-        This function can be called to get the set of canonical topics
-        provided by this museum mapped from the Museum meta data
-        into OpenPipe meta data
+        This function returns the canonical topic tags mapped from the museum
+        metatags for this individual museum
         """
         pass
-
-
-
-
-
-
-
-
