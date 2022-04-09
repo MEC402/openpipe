@@ -6,7 +6,7 @@ from multiprocessing.pool import ThreadPool
 from PIL import Image
 from requests import get
 
-import Slack
+#import Slack
 
 
 class ImageUtil:
@@ -32,13 +32,13 @@ class ImageUtil:
         if url is not None and url != "":
             try:
                 url = url.replace(" ", "%20")
-                print(url)
+#                print(url)
                 file = get(url)
                 im = Image.open(BytesIO(file.content))
                 width, height = im.size
             except Exception as e:
                 track = traceback.format_exc()
-                Slack.sendMessage(track)
+#                Slack.sendMessage(track)
         return width, height
 
     def concatTiles(self, tilesData, imageWidth, imageHeight):
