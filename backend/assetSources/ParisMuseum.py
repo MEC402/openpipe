@@ -50,7 +50,7 @@ class ParisMuseum(MuseumsTM):
             "auth-token": "323ac194-f611-4583-9620-b5e9351f56ad"
         }
         body = '''{
-  nodeQuery(filter: {conditions: {field: "title", value: "%''' +term+ '''%", operator: LIKE}}) {
+ nodeQuery(limit: 140, filter: {conditions: {field: "title", value: "%''' +term+ '''%", operator: LIKE}}) {
     count
     entities {
       entityUuid
@@ -78,7 +78,7 @@ class ParisMuseum(MuseumsTM):
     def getMetaTagMapping(self, data):
         # total=len(data['data']['nodeQuery']["entities"])
         # data = data['data']['nodeQuery']["entities"][0]
-        data = data['data']['nodeById']
+        data = data['data']['nodeById'] #......................................................................................??? change?................
         response = {"openpipe_canonical_title":""}
         # response = self.schema.copy()
         # response["openpipe_canonical_source"] = ["Cleveland"]
