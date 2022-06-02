@@ -6,6 +6,7 @@ from multiprocessing.pool import ThreadPool
 
 import requests
 import formatHelp
+import FormatConvert
 
 from ImageUtil import ImageUtil
 
@@ -15,18 +16,7 @@ class MetMuseum(MuseumsTM):
     def __init__(self, schema):
         self.schema= schema
         self.name = "Met"
-#        self.canonmap = {
-#                "openpipe_canonical_id": "objectID",
-#                "openpipe_canonical_largeImage": "primaryImage",
-#                "openpipe_canonical_smallImage": "primaryImageSmall",
-#                "openpipe_canonical_title": "title",
-#                "openpipe_canonical_artist": "artistDisplayName",
-#                "openpipe_canonical_culture":  "culture",
-#                "openpipe_canonical_classification": "classification",
-#                "openpipe_canonical_nation":  "country",
-#                "openpipe_canonical_city":  "city",
-#                "openpipe_canonical_tags":  "tags"
-#                        }
+
         self.fullcanonmap = {
                 "objectID": "openpipe_canonical_id",
                 "primaryImage": "openpipe_canonical_largeImage",
@@ -62,36 +52,40 @@ class MetMuseum(MuseumsTM):
         response = {}
         response = self.schema.copy()
         response["openpipe_canonical_source"] = ["MET"]
-        response["openpipe_canonical_id"] = [data["objectID"]]
-        response["openpipe_canonical_largeImage"] = [data["primaryImage"]]
+        response["openpipe_canonical_id"] = FormatConvert.ConvertString(data,"objectID")
+        response["openpipe_canonical_largeImage"] = FormatConvert.ConvertString(data,"primaryImage")
+
         imageInfo = ImageUtil()
         dimentions = imageInfo.getPixelDimentions(response["openpipe_canonical_largeImage"][0])
         response["openpipe_canonical_largeImageDimensions"] = [str(dimentions[0]) + "," + str(dimentions[1])]
+
         response["openpipe_canonical_smallImage"] = [data["primaryImageSmall"]]
+        response["openpipe_canonical_smallImage"] = FormatConvert.ConvertString(data,"primaryImageSmall")
         dimentions = imageInfo.getPixelDimentions(response["openpipe_canonical_smallImage"][0])
         response["openpipe_canonical_smallImageDimensions"] = [str(dimentions[0]) + "," + str(dimentions[1])]
-        response["openpipe_canonical_title"] = [data["title"]]
-        response["openpipe_canonical_artist"] = [data["artistDisplayName"]]
-        response["openpipe_canonical_culture"] = [data["culture"]]
-        response["openpipe_canonical_classification"] = [data["classification"]]
+
+        response["openpipe_canonical_title"] = FormatConvert.ConvertSring[data["title"]]
+        response["openpipe_canonical_artist"] = FormatConvert.ConvertSring[data["artistDisplayName"]]
+        response["openpipe_canonical_culture"] = FormatConvert.ConvertSring[data["culture"]]
+        response["openpipe_canonical_classification"] = FormatConvert.ConvertSring[data["classification"]]
         # self.schema.genre.push(data["city"])
         # self.schema.medium.push(data["city"])
-        response["openpipe_canonical_nation"] = [data["country"]]
-        response["openpipe_canonical_city"] = [data["city"]]
-        if 'tags' in data.keys() and data["tags"] is not None:
-            if len(data["tags"]) > 0:
-                response["openpipe_canonical_tags"] = data["tags"]
-        era = "CE"
-        year1 = abs(int(data["objectBeginDate"]))
-        year2 = abs(int(data["objectEndDate"]))
-        if "B.C." in data["objectDate"]:
-            era = "BC"
-        response["openpipe_canonical_firstDate"] = [
-            era + " " + str(year1) + " " + "JAN" + " " + "01" + " " + "00:00:00"]
-        response["openpipe_canonical_lastDate"] = [era + " " + str(year2) + " " + "JAN" + " " + "01" + " " + "00:00:00"]
-        response["openpipe_canonical_date"] = [response["openpipe_canonical_firstDate"][0],
-                                               response["openpipe_canonical_lastDate"][0]]
+        response["openpipe_canonical_nation"] = FormatConvert.ConvertSring[data["country"]]
+        response["openpipe_canonical_city"] = FormatConvert.ConvertSring[data["city"]]
+
+        #tags are outdated and should not be canonical
+        #if 'tags' in data.keys() and data["tags"] is not None:
+        #    if len(data["tags"]) > 0:
+        #        response["openpipe_canonical_tags"] = data["tags"]
+
+
+        #process the data information
+        dateset = FormatConvert.getMetDate(data)
+        response["openpipe_canonical_firstDate"] = dateset["openpipe_canonical_firstdate"]
+        response["openpipe_canonical_lastDate"] = dateset["openpipe_canonical_lastdate"]
+        response["openpipe_canonical_date"] = dateset["openpipe_canonical_date"]
         response.update(data)
+
         return response
 
     def getAssetMetaData(self, assetOriginalID):
