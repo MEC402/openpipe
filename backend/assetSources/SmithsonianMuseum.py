@@ -91,13 +91,13 @@ class SmithsonianMuseum(MuseumsTM):
         metaData = self.getMetaTagMapping(data)
         return metaData
 
-def getData(self, q, page, pageSize):
+    def getData(self, q, page, pageSize):
         results = []
         retrievedAssets = self.searchForAssets(q)
 
         start = (page - 1) * pageSize
         step = pageSize
-        total = len(retrievedAssets)
+        total = len([retrievedAssets])
         if total == 0:
             return {"data": [], "total": 0, "sourceName": "Smithsonian Museum"}
 
@@ -106,15 +106,15 @@ def getData(self, q, page, pageSize):
         if int(start) + int(step) > total:
             step = total - int(start) - 1
 
-        assets = retrievedAssets[int(start):int(start) + int(step)]
-
+        assets = retrievedAssets[int(start):int(start) + int(step)] 
+        print('---------------------------------------------------')
         print(assets)
 
         pool = ThreadPool(len(assets))
         for asset in assets:
           if asset != None:
             results.append(pool.apply_async(self.getMetaTagMapping, args=[asset]))
-        #     results.append(pool.apply_async(self.getAssetMetaData, args=[asset["entityId"]]))
+        #     results.append(pool.apply_async(self.getAssetMetaData, args=[asset["id"]]))
         pool.close()
         pool.join()
         results = [r.get() for r in results]
@@ -129,14 +129,14 @@ if __name__=='__main__':
 
         sm=SmithsonianMuseum("") 
         
-        # search=sm.searchForAssets(" cat ")
-        # print(search)
+        search=sm.searchForAssets(" cat ")
+        print(search)
 
         # map = sm.getMetaTagMapping(data['response']['rows'])
         # print(map)
         
-        getdata = sm.getData(q=" cat ", page=1, pageSize= 20) 
-        print(getdata)
+        # getdata = sm.getData(q=" cat ", page=1, pageSize= 20) 
+        # print(getdata)
         
-        print("End search")
+        print("************************** End search ***************************")
         
