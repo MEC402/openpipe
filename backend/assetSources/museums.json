@@ -1,5 +1,6 @@
 {
- "museum1": [ {"source": "MET",
+ "museum1": [ 
+   {"source": "MET",
              "url": "https://collectionapi.metmuseum.org/public/collection/v1/",
              "class": "MetMuseum", "key": "none" },
   {"source": "Rijsk",
@@ -19,6 +20,9 @@
              "class": "EuropeMuseum", "key": "ixzop5MkY", "dataprovider": "Wienbibliothek+im+Rathaus" },
   {"source": "University of Graz",
              "url": "https://api.europeana.eu/api/v2/",
-             "class": "EuropeMuseum", "key": "ixzop5MkY", "dataprovider": "University of Graz, Institute of Plant Sciences - Herbarium GZU" }
+             "class": "EuropeMuseum", "key": "ixzop5MkY", "dataprovider": "University of Graz, Institute of Plant Sciences - Herbarium GZU" },
+ {"source": "Smithsonian",
+              "url": "https://api.si.edu/openaccess/api/v1.0/search",
+              "class": "SmithsonianMuseum", "key": "imQAjl1QkgYj0EiPybG1lKaz4dp0AZSauYCgPi3B"} 
   ]
 }
