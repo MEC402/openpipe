@@ -82,7 +82,7 @@ class ParisMuseum(MuseumsTM):
         size_ = data1['data']['nodeQuery']['count']
         print(size_)
 
-        for offset in range(limit,size_,limit):
+        for offset in range(0,size_,limit):
           # print(offset)
 
           variables = {'limit':limit,'offset':offset}
@@ -103,10 +103,7 @@ class ParisMuseum(MuseumsTM):
         
 
     def getMetaTagMapping(self, data):
-        #total=len(data['data']['nodeQuery']["entities"])
-        #data = data['data']['nodeQuery']["entities"][0]..???
-        # data = data['data']['nodeById'] #......................................................................................??? change?................
-  
+      
         self.canonmap["openpipe_canonical_id"]=data["entityUuid"]
         self.canonmap["openpipe_canonical_title"]=data["title"]
 
@@ -117,70 +114,12 @@ class ParisMuseum(MuseumsTM):
           self.canonmap["openpipe_canonical_date"] = self.canonmap["openpipe_canonical_lastDate"][0]
 
 
-
-        # if start_date != None:
-        #   self.canonmap["openpipe_canonical_firstDate"]=start_date
-        # if end_date is not None:
-        #   self.canonmap["openpipe_canonical_lastDate"]=end_date
-
         self.canonmap["openpipe_canonical_artist"]=data["fieldOeuvreAuteurs"][0]["entity"]["fieldAuteurAuteur"]["entity"]["name"]
         if "fieldVisuels" in data and len(data["fieldVisuels"])>0:
           if data["fieldVisuels"][0]["entity"]["vignette"] != None:
             self.canonmap["openpipe_canonical_fullImage"] = data["fieldVisuels"][0]["entity"]["vignette"]
 
-        ########
-        # vin = []; pub = []
-        # vig = data["fieldVisuels"][0]["entity"]["vignette"]
-        # publ = data["fieldVisuels"][0]["entity"]["publicUrl"]
-        # for i in range(len(data)): #should be an array of vig and publ urls
-        #     if vig is not None:
-        #       vin.append(i)
-        #     if publ is not None:
-        #       pub.append(i)
-        # total_v = len(vin)
-        # total_p = len(pub)
-        # print('#vignette Url = ',total_v,'\n#publicUrl = ',total_p,data.shape)
-        ########
-
-        # response = self.schema.copy()
-        # response["openpipe_canonical_source"] = ["Cleveland"]
       
-        # if data['images'] is not None:
-        #     response["openpipe_canonical_largeImage"] = [data["images"]["print"]["url"]]
-        #     response["openpipe_canonical_largeImageDimensions"] = [
-        #         str(data["images"]["print"]["width"]) + "," + str(data["images"]["print"]["height"])]
-        #     response["openpipe_canonical_smallImage"] = [data["images"]["web"]["url"]]
-        #     response["openpipe_canonical_smallImageDimensions"] = [
-        #         str(data["images"]["web"]["width"]) + "," + str(data["images"]["web"]["height"])]
-        #     response["openpipe_canonical_fullImage"] = [
-        #         "http://mec402.boisestate.edu/cgi-bin/assetSources/getClevelandConvertedTif.py?id=" + str(data["id"])]
-        #     # tileInfo = self.getTileImages(data["objectNumber"], 0)
-        #     # response["openpipe_canonical_fullImageDimensions"] = []
-        # response["openpipe_canonical_title"] = [data["title"]]
-        # if len(data["creators"]) > 0:
-        #     response["openpipe_canonical_artist"] = []
-        #     for c in data["creators"]:
-        #         response["openpipe_canonical_artist"].append(c["description"])
-        # if len(data["culture"]) > 0:
-        #     response["openpipe_canonical_culture"] = data["culture"]
-
-        # if data["creation_date_earliest"] is not None and data["creation_date_latest"] is not None and data["creation_date"] is not None:
-        #     era="CE"
-        #     year1 = abs(int(data["creation_date_earliest"]))
-        #     year2 = abs(int(data["creation_date_latest"]))
-        #     if "B.C." in data["creation_date"]:
-        #         era="BC"
-        #     response["openpipe_canonical_firstDate"] = [era+" "+str(year1)+" "+"JAN"+" "+"01"+" "+"00:00:00"]
-        #     response["openpipe_canonical_lastDate"] = [era+" "+str(year2)+" "+"JAN"+" "+"01"+" "+"00:00:00"]
-        #     response["openpipe_canonical_date"]=[response["openpipe_canonical_firstDate"][0],response["openpipe_canonical_lastDate"][0]]
-
-        # response["classification"] = [data["classification"]]
-        # self.schema.genre.push(data["city"])
-        # self.schema.medium.push(data["city"])
-        # response["nation"] = [data["country"]]
-        # response["city"] = [data["city"]]
-        # response["tags"] = data["tags"]
-        # response.update(data)
         return self.canonmap
 
     def getAssetMetaData(self, assetId):
@@ -481,7 +420,7 @@ if __name__=='__main__':
     #################################...........................
     # a = pm.getData(" chat ",1,100).............................................
     # print(json.dumps(a)).......................................................
-    m = pm.getData(q="chat", page=1, pageSize= 10)
+    m = pm.getData(q="chat", page=1, pageSize= 20)
     print("*************************** search ********************************") 
     print(m)
   
