@@ -56,16 +56,18 @@ class SmithsonianMuseum(MuseumsTM):
        url = 'https://api.si.edu/openaccess/api/v1.0/category/art_design/search'
        response = requests.get(url=url, params=parameters)
        data1 = response.json()
+       print("response:")
+#        print(data1)
       
        limit = 100
        out = []
       
        out = out + data1['response']['rows']
        size_ = data1['response']['rowCount']
-       print(size_)
+#        print(size_)
  
-       for offset in range(limit,size_,limit):
-         print(offset)
+       for offset in range(0,size_,limit):
+        #  print(offset)
  
          parameters = {'q': term, 'api_key': 'imQAjl1QkgYj0EiPybG1lKaz4dp0AZSauYCgPi3B', 'rows':limit,'start':0}
          response = requests.get(url=url, params=parameters)
@@ -81,23 +83,38 @@ class SmithsonianMuseum(MuseumsTM):
   
        return out
      
-   def getMetaTagMapping(self, data):   
-       self.canonmap["openpipe_canonical_id"]=data['id']
-       self.canonmap["openpipe_canonical_title"]=data['title']
-       self.canonmap["openpipe_canonical_artist"]=data['content']['freetext']['name'][0]['content']
-       self.canonmap["openpipe_canonical_date"]=data['content']['freetext']['date'][0]['content']
-       self.canonmap["openpipe_canonical_medium"]=data['content']['freetext']['setName'][1]['content']
-       self.canonmap["openpipe_canonical_fullImage"]=data['content']['descriptiveNonRepeating']['online_media']['media'][0]['thumbnail']
-       self.canonmap["openpipe_canonical_physicalDimensions"]=data['content']['descriptiveNonRepeating']['online_media']['media'][0]['resources'][1]['dimensions']
-       return self.canonmap
+   def getMetaTagMapping(self, data): 
+       temp = {
+              "openpipe_canonical_id": "objectID",
+              "openpipe_canonical_title": "title",
+              "openpipe_canonical_artist": "artistDisplayName",
+              "openpipe_canonical_date": "date",
+              "openpipe_canonical_medium": "medium",
+              "openpipe_canonical_physicalDimensions": "dimansions"
+              
+                       }  
+       print("in mapping:")
+       print(data["title"],temp["openpipe_canonical_title"])
+       temp["openpipe_canonical_id"]=data['id']
+       temp["openpipe_canonical_title"]=data['title']
+       temp["openpipe_canonical_artist"]=data['content']['freetext']['name'][0]['content']
+#        self.canonmap["openpipe_canonical_date"]=data['content']['freetext']['date'][0]['content']
+       temp["openpipe_canonical_medium"]=data['content']['freetext']['setName'][1]['content']
+       temp["openpipe_canonical_fullImage"]=data['content']['descriptiveNonRepeating']['online_media']['media'][0]['thumbnail']
+       temp["openpipe_canonical_physicalDimensions"]=data['content']['descriptiveNonRepeating']['online_media']['media'][0]['resources'][1]['dimensions']
+       end_date = ((data['content']['freetext']['date'][0]['content']).upper()).replace('A','E')
+       if end_date is not None:
+          temp["openpipe_canonical_Date"]= [str(end_date) + " " + "JAN" + " " + "01" + " " + "00:00:00"][0]
+       print(data["title"],temp["openpipe_canonical_title"])
+       return temp
       
    def getAssetMetaData(self, assetId):
-       assetId = str(assetId)
-       parameters = {'q': " cat ", 'api_key': 'imQAjl1QkgYj0EiPybG1lKaz4dp0AZSauYCgPi3B'}
-       url = 'https://api.si.edu/openaccess/api/v1.0/category/art_design/search'
-       response = requests.get(url=url, params=parameters)
-       data = response.json()
-       metaData = self.getMetaTagMapping(data)
+        #*************** Note: 
+        # The assetId is a dictionary here that contains the whole asset info here not just the id   
+        # the assetId name has not been change so it follows the parent class format
+        # TODO: Fix the name later 
+           
+       metaData = self.getMetaTagMapping(assetId)
        return metaData
  
    def getData(self, q, page, pageSize):
@@ -118,19 +135,15 @@ class SmithsonianMuseum(MuseumsTM):
            start = total - 1
        if int(start) + int(step) > total:
            step = total - int(start) - 1
-       print(start)
-       print(step)
+#        print(start)
+#        print(step)
        assets = retrievedAssets[int(start):int(start) + int(step)]
-       print(assets)
+#        print(assets)
  
-       pool = ThreadPool(len(assets))
        for asset in assets:
-         if asset != None:
-           results.append(pool.apply_async(self.getMetaTagMapping, args=[asset]))
-       
-       pool.close()
-       pool.join()
-       results = [r.get() for r in results]
+        #  print(asset["title"])
+         results.append(self.getAssetMetaData(asset))
+       print(results)
        return {"data": results,
                "total": len(results),
                "sourceName": "Smithsonian Museum"}
@@ -142,13 +155,13 @@ if __name__=='__main__':
  
        sm=SmithsonianMuseum("")
       
-       search=sm.searchForAssets(" cat ")
+#        search=sm.searchForAssets(" cat ")
 #        print(search)
-      
+       print("************************** End search ***************************")
        getdata = sm.getData(q=" cat ", page=1, pageSize= 8)
        a = json.dumps(getdata)
        print(a)
       
-       print("************************** End search ***************************")
+       
       
 

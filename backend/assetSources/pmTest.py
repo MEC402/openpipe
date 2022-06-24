@@ -51,7 +51,7 @@ class ParisMuseum(MuseumsTM):
         #                 }
 
 
-    def searchForAssets(self, term):
+    def searchForAssets(self, term, pageSize, pageNumber):
         
         url =  "https://apicollections.parismusees.paris.fr/graphql"
         header = {
@@ -71,29 +71,30 @@ class ParisMuseum(MuseumsTM):
 
         body = prefixbody + queryBody.tailbody
 
-        limit = 500
+        limit = pageSize
         out = []
-        variables = {'limit':limit,'offset':0}
+        variables = {'limit':limit,'offset': (pageNumber - 1) * limit} #
         # print(body)
         response = requests.post(url=url, headers=header, json={"query":body, 'variables':variables})
         data1 = response.json()
-        #print(data1)
+        # print(data1)
         out = out + data1['data']['nodeQuery']['entities']
         size_ = data1['data']['nodeQuery']['count']
         print(size_)
 
-        for offset in range(0,size_,limit):
-          # print(offset)
+        # for offset in range(0,size_,limit):
+        #   # print(offset)
 
-          variables = {'limit':limit,'offset':offset}
-          response = requests.post(url=url, headers=header, json={"query":body, 'variables':variables})
-          data = response.json()
-          #out.append(data)
-          out= out + data['data']['nodeQuery']['entities']
+        #   variables = {'limit':limit,'offset':offset}
+        #   response = requests.post(url=url, headers=header, json={"query":body, 'variables':variables})
+        #   print(response.text)
+        #   data = response.json()
+        #   #out.append(data)
+        #   out= out + data['data']['nodeQuery']['entities']
 
-          offset += limit
-          print(len(data['data']['nodeQuery']['entities']))
-          print(len(out))
+        #   offset += limit
+        #   print(len(data['data']['nodeQuery']['entities']))
+        #   print(len(out))
           # print(data)
         #return {data1}
         # print(out[:10])
@@ -103,273 +104,47 @@ class ParisMuseum(MuseumsTM):
         
 
     def getMetaTagMapping(self, data):
-      
-        self.canonmap["openpipe_canonical_id"]=data["entityUuid"]
-        self.canonmap["openpipe_canonical_title"]=data["title"]
+        print(data)
+        temp = {
+              "openpipe_canonical_id": "objectID",
+              "openpipe_canonical_title": "title",
+              "openpipe_canonical_artist": "artistDisplayName",
+              "openpipe_canonical_date": "date",
+              "openpipe_canonical_medium": "medium",
+              "openpipe_canonical_physicalDimensions": "dimansions"
+              
+                       }  
+        temp["openpipe_canonical_id"]=data["entityUuid"]
+        temp["openpipe_canonical_title"]=data["title"]
 
         # start_date = data["fieldDateProduction"]["startYear"]
         end_date = data["fieldDateProduction"]["endYear"]
         if end_date is not None:
-          self.canonmap["openpipe_canonical_lastDate"]= ["CE" + str(end_date) + " " + "JAN" + " " + "01" + " " + "00:00:00"]
-          self.canonmap["openpipe_canonical_date"] = self.canonmap["openpipe_canonical_lastDate"][0]
+          temp["openpipe_canonical_date"] = "CE" + str(end_date) + " " + "JAN" + " " + "01" + " " + "00:00:00"
+        else:
+          temp["openpipe_canonical_date"]=""
 
 
-        self.canonmap["openpipe_canonical_artist"]=data["fieldOeuvreAuteurs"][0]["entity"]["fieldAuteurAuteur"]["entity"]["name"]
+        temp["openpipe_canonical_artist"]=data["fieldOeuvreAuteurs"][0]["entity"]["fieldAuteurAuteur"]["entity"]["name"]
         if "fieldVisuels" in data and len(data["fieldVisuels"])>0:
           if data["fieldVisuels"][0]["entity"]["vignette"] != None:
-            self.canonmap["openpipe_canonical_fullImage"] = data["fieldVisuels"][0]["entity"]["vignette"]
+            temp["openpipe_canonical_fullImage"] = data["fieldVisuels"][0]["entity"]["vignette"]
 
       
-        return self.canonmap
+        return temp
 
     def getAssetMetaData(self, assetId):
-        assetId = str(assetId)
-        url =  "https://apicollections.parismusees.paris.fr/graphql"
-        header = {
-            "Content-Type": "application/json",
-            "auth-token": "323ac194-f611-4583-9620-b5e9351f56ad"
-        }
-
-
-
-#............................................................................................................................   body='''{nodeQuery ......................    
-
-        body='''{nodeQuery(filter: {conditions: [{field: "uuid", value: \"'''+assetId+'''\"}]}) {
-    entities {
-      entityUuid
-      ... on NodeOeuvre {
-        title
-
-        absolutePath
-        fieldLrefAdlib
-        fieldUrlAlias
-        fieldTitreDeMediation
-        fieldSousTitreDeMediation
-        fieldOeuvreAuteurs {
-          entity {
-            fieldAuteurAuteur {
-              e   {
-                name
-                fieldPipDateNaissance {
-                 startPrecision
-                  startYear
-                  startMonth
-                  startDay
-                  sort
-                  endPrecision
-                  endYear
-                  endMonth
-                  endDay
-                  processed
-                }
-                fieldPipLieuNaissance
-                fieldPipDateDeces {
-                 startPrecision
-                  startYear
-                  startMonth
-                  startDay
-                  sort
-                  endPrecision
-                  endYear
-                  endMonth
-                  endDay
-                  processed
-                }
-                 fieldLieuDeces
-              }
-            }
-            fieldAuteurFonction {
-              entity {
-                name
-              }
-            }
-          }
-        }
-        fieldVisuels {
-          entity {
-            name
-            vignette
-            publicUrl
-          }
-        }
-        fieldDateProduction {
-          startPrecision
-          startYear
-          startMonth
-          startDay
-          sort
-          endPrecision
-          endYear
-          endMonth
-          endDay
-          century
-          processed
-        }
-        fieldOeuvreSiecle {
-           entity {
-            name
-          }
-        }
-        fieldOeuvreTypesObjet {
-          entity {
-            name
-            fieldLrefAdlib
-            entityUuid
-          }
-        }
-        fieldDenominations {
-          entity {
-            name
-          }
-        }
-        fieldMateriauxTechnique{
-          entity {
-            name
-          }
-        }
-        fieldOeuvreDimensions {
-          entity {
-            fieldDimensionPartie {
-              entity {
-                name
-              }
-            }
-            fieldDimensionType {
-              entity {
-                name
-              }
-            }
-            fieldDimensionValeur
-            fieldDimensionUnite {
-             entity {
-                name
-              }
-            }
-          }
-        }
-        fieldOeuvreInscriptions{
-          entity {
-            fieldInscriptionType {
-              entity {
-                name
-              }
-            }
-            fieldInscriptionMarque {
-              value
-            }
-            fieldInscriptionEcriture {
-              entity {
-                name
-              }
-            }
-          }
-        }
-        fieldOeuvreDescriptionIcono {
-          value
-        }
-        fieldCommentaireHistorique {
-          value
-
-        }
-        fieldOeuvreThemeRepresente	 {
-          entity {
-            name
-          }
-        }
-        fieldLieuxConcernes {
-          entity {
-            name
-          }
-        }
-        fieldModaliteAcquisition {
-          entity {
-            name
-          }
-        }
-        fieldDonateurs {
-          entity {
-            name
-          }
-        }
-        fieldDateAcquisition {
-          startPrecision
-          startYear
-          startMonth
-          startDay
-          sort
-          endPrecision
-          endYear
-          endMonth
-          endDay
-          century
-          processed
-        }
-        fieldOeuvreNumInventaire
-        fieldOeuvreStyleMouvement {
-          entity {
-            name
-          }
-        }
-        fieldMusee {
-          entity {
-            name
-          }
-        }
-        fieldOeuvreExpose {
-          entity {
-            name
-          }
-        }
-        fieldOeuvreAudios {
-          entity {
-            fieldMediaFile {
-              entity {
-                url
-                uri {
-                  value
-                  url
-                }
-              }
-            }
-          }
-        }
-        fieldOeuvreVideos {
-          entity {
-            fieldMediaVideoEmbedField
-          }
-        }
-        fieldHdVisuel {
-          entity {
-            fieldMediaImage {
-              entity {
-                url
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}'''
-
-
-#............................................................................................................................   end  ......................    
-
-  
-        response = requests.post(url=url, headers=header, json={"query":body})
-        data = response.json()
-        metaData = self.getMetaTagMapping(data)
+        #*************** Note: 
+        # The assetId is a dictionary here that contains the whole asset info here not just the id   
+        # the assetId name has not been change so it follows the parent class format
+        # TODO: Fix the name later 
+        
+        metaData = self.getMetaTagMapping(assetId)
         return metaData
-
-    def getMetaDataByAssetID(self,objctID):
-        serviceName = str(objctID)
-        response = requests.get(url=self.url + serviceName)
-        data = response.json()
-        return data["data"]
 
     def getData(self, q, page, pageSize):
         results = []
-        retrievedAssets = self.searchForAssets(q)
+        retrievedAssets = self.searchForAssets(q, pageSize = pageSize, pageNumber = page)
         print("************PRINTING RETRIVED ASSETS*************")
         # print(retrievedAssets)
         print("************END of RETRIVED ASSETS*************")
@@ -390,19 +165,17 @@ class ParisMuseum(MuseumsTM):
             step = total - int(start) - 1
 
         assets = retrievedAssets[int(start):int(start) + int(step)]
-
+        # print(assets)
         # print(assets)
 
-        pool = ThreadPool(len(assets))
+
         for asset in assets:
+        #  print(asset["title"])
           if asset != None:
-            results.append(pool.apply_async(self.getMetaTagMapping, args=[asset]))
-            #results.append(pool.apply_async(self.getAssetMetaData, args=[asset["entityId"]]))...................................................
-        pool.close()
-        pool.join()
-        results = [r.get() for r in results]
+            results.append(self.getAssetMetaData(asset))
+        print(results)
         return {"data": results,
-                "total": 0,
+                "total": len(results),
                 "sourceName": "Paris Museum"}
 
 
@@ -422,7 +195,8 @@ if __name__=='__main__':
     # print(json.dumps(a)).......................................................
     m = pm.getData(q="chat", page=1, pageSize= 20)
     print("*************************** search ********************************") 
-    print(m)
+    a = json.dumps(m)
+    print(a)
   
 
     
