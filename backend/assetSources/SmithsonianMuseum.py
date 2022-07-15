@@ -1,10 +1,14 @@
 #!/bin/python3
  
+from turtle import width
 import requests
 import json
+
+from sympy import source
 from MuseumsTM import MuseumsTM
 from multiprocessing.pool import ThreadPool
 import formatHelp
+from ImageUtil import ImageUtil
  
  
 class SmithsonianMuseum(MuseumsTM):
@@ -12,37 +16,6 @@ class SmithsonianMuseum(MuseumsTM):
    def __init__(self, schema):
        self.schema= schema
        self.name = "Smithsonian"
-       self.canonmap = {
-              "openpipe_canonical_id": "objectID",
-        #       "openpipe_canonical_largeImage": "primaryImage",
-        #       "openpipe_canonical_smallImage": "primaryImageSmall",
-              "openpipe_canonical_title": "title",
-              "openpipe_canonical_artist": "artistDisplayName",
-              "openpipe_canonical_date": "date",
-        #       "openpipe_canonical_culture":  "culture",
-        #       "openpipe_canonical_classification": "classification",
-        #       "openpipe_canonical_nation":  "country",
-        #       "openpipe_canonical_city":  "city",
-        #       "openpipe_canonical_tags":  "tags",
-                # "openpipe_canonical_tags":  "tags",
-              
-              "openpipe_canonical_medium": "medium",
-              "openpipe_canonical_physicalDimensions": "dimansions"
-              
-                       }
-#        self.fullcanonmap = {
-#                "id": "openpipe_canonical_id",
-#                "title": "openpipe_canonical_title",
-#                "creators": "openpipe_canonical_artist",
-#                "culture": "openpipe_canonical_culture"
-#                        }
-#        self.canonmap = {
-#                "title": "openpipe_canonical_title",
-#                "creators": "openpipe_canonical_artist",
-#                "culture": "openpipe_canonical_culture",
-#                "medium": "openpipe_canonical_medium"
-#                       }
- 
  
    def searchForAssets(self, term):
           
@@ -52,34 +25,20 @@ class SmithsonianMuseum(MuseumsTM):
 #        return data1
       
  
-       parameters = {'q': term, 'api_key': 'imQAjl1QkgYj0EiPybG1lKaz4dp0AZSauYCgPi3B', 'rows' : 5}
+       parameters = {'q': term, 'api_key': 'imQAjl1QkgYj0EiPybG1lKaz4dp0AZSauYCgPi3B'}
        url = 'https://api.si.edu/openaccess/api/v1.0/category/art_design/search'
        response = requests.get(url=url, params=parameters)
        data1 = response.json()
-       print("response:")
-#        print(data1)
       
        limit = 100
        out = []
       
        out = out + data1['response']['rows']
        size_ = data1['response']['rowCount']
-#        print(size_)
  
        for offset in range(0,size_,limit):
-        #  print(offset)
- 
-         parameters = {'q': term, 'api_key': 'imQAjl1QkgYj0EiPybG1lKaz4dp0AZSauYCgPi3B', 'rows':limit,'start':0}
-         response = requests.get(url=url, params=parameters)
-         data = response.json()
-         out = out + data['response']['rows']
- 
+
          offset += limit
-       #   print(len(data['response']['rows']))
-       #   print(len(out))
-       # print(data)
-       # return {data1}
-#        print(out)
   
        return out
      
@@ -90,29 +49,44 @@ class SmithsonianMuseum(MuseumsTM):
               "openpipe_canonical_artist": "artistDisplayName",
               "openpipe_canonical_date": "date",
               "openpipe_canonical_medium": "medium",
-              "openpipe_canonical_physicalDimensions": "dimansions"
+              "openpipe_canonical_physicalDimensions": "dimansions",
+              "openpipe_canonical_fullImage": "fullImage",
+              "openpipe_canonical_source": "source",
+              "openpipe_canonical_sourceid": "sourceID",
+              "openpipe_canonical_fullImageDimensions": "fullImageDimensions",
+              "openpipe_canonical_largeImageDimensions": "largeImageDimensions",
+              "openpipe_canonical_largeImage": "largeImage",
+              "openpipe_canonical_smallImage": "smallImage",
+              "openpipe_canonical_smallImageDimensions": "smallImageDimensions"
               
                        }  
-       print("in mapping:")
-       print(data["title"],temp["openpipe_canonical_title"])
+       
        temp["openpipe_canonical_id"]=data['id']
        temp["openpipe_canonical_title"]=data['title']
        temp["openpipe_canonical_artist"]=data['content']['freetext']['name'][0]['content']
-#        self.canonmap["openpipe_canonical_date"]=data['content']['freetext']['date'][0]['content']
-       temp["openpipe_canonical_medium"]=data['content']['freetext']['setName'][1]['content']
-       temp["openpipe_canonical_fullImage"]=data['content']['descriptiveNonRepeating']['online_media']['media'][0]['thumbnail']
-       temp["openpipe_canonical_physicalDimensions"]=data['content']['descriptiveNonRepeating']['online_media']['media'][0]['resources'][1]['dimensions']
+       temp["openpipe_canonical_medium"]=data['content']['freetext']['physicalDescription'][0]['content']
+       width = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['resources'][1]['width']
+       height = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['resources'][1]['width']
+       temp["openpipe_canonical_physicalDimensions"]= str(width) + "," + str(height)
        end_date = ((data['content']['freetext']['date'][0]['content']).upper()).replace('A','E')
        if end_date is not None:
-          temp["openpipe_canonical_Date"]= [str(end_date) + " " + "JAN" + " " + "01" + " " + "00:00:00"][0]
-       print(data["title"],temp["openpipe_canonical_title"])
+          temp["openpipe_canonical_date"]= [str(end_date) + " " + "JAN" + " " + "01" + " " + "00:00:00"][0]
+       temp["openpipe_canonical_source"] = "Smithsonian"
+       temp["openpipe_canonical_sourceid"] = "5"
+       temp["openpipe_canonical_fullImage"]=data['content']['descriptiveNonRepeating']['online_media']['media'][0]['thumbnail']
+       imageInfo = ImageUtil()
+       dimentions = imageInfo.getPixelDimentions(temp["openpipe_canonical_fullImage"])
+        
+       temp["openpipe_canonical_fullImageDimensions"] = [str(dimentions[0]) + "," + str(dimentions[1])][0]
+       temp["openpipe_canonical_largeImageDimensions"] = [str(dimentions[0]) + "," + str(dimentions[1])][0]
+       temp["openpipe_canonical_smallImageDimensions"] = [str(dimentions[0]) + "," + str(dimentions[1])][0]
+       temp["openpipe_canonical_largeImage"] = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['thumbnail'] #-reused
+       temp["openpipe_canonical_smallImage"] = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['thumbnail'] #-reused
+       
+       
        return temp
       
    def getAssetMetaData(self, assetId):
-        #*************** Note: 
-        # The assetId is a dictionary here that contains the whole asset info here not just the id   
-        # the assetId name has not been change so it follows the parent class format
-        # TODO: Fix the name later 
            
        metaData = self.getMetaTagMapping(assetId)
        return metaData
@@ -120,11 +94,7 @@ class SmithsonianMuseum(MuseumsTM):
    def getData(self, q, page, pageSize):
        results = []
        retrievedAssets = self.searchForAssets(q)
-#        print("************PRINTING RETRIVED ASSETS*************")
-#        print(retrievedAssets)
-#        print(len(retrievedAssets)) 
-#        print("************END of RETRIVED ASSETS*************")
-        
+
        start = (page - 1) * pageSize
        step = pageSize
        total = len(retrievedAssets)
@@ -135,15 +105,13 @@ class SmithsonianMuseum(MuseumsTM):
            start = total - 1
        if int(start) + int(step) > total:
            step = total - int(start) - 1
-#        print(start)
-#        print(step)
+
        assets = retrievedAssets[int(start):int(start) + int(step)]
-#        print(assets)
  
        for asset in assets:
-        #  print(asset["title"])
+        
          results.append(self.getAssetMetaData(asset))
-       print(results)
+       
        return {"data": results,
                "total": len(results),
                "sourceName": "Smithsonian Museum"}
@@ -151,16 +119,28 @@ class SmithsonianMuseum(MuseumsTM):
  
 if __name__=='__main__':
  
-       print("*************************** search ********************************")
+       
  
        sm=SmithsonianMuseum("")
-      
-#        search=sm.searchForAssets(" cat ")
-#        print(search)
-       print("************************** End search ***************************")
+       
+       # print("*************************** search ********************************")
+       
+       # search=sm.searchForAssets(" cat ")
+       # print(search)
+       # print("************************** End search ***************************")
+       
+       print("*************************** START getData ********************************")
+       
        getdata = sm.getData(q=" cat ", page=1, pageSize= 8)
        a = json.dumps(getdata)
        print(a)
+       
+       print("*************************** END getData ********************************")
+       
+       
+
+
+
       
        
       
