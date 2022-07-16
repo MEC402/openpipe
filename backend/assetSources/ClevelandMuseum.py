@@ -4,6 +4,7 @@ import requests
 from MuseumsTM import MuseumsTM
 from multiprocessing.pool import ThreadPool
 import formatHelp
+from FormatConvert import FormatConvert
 
 
 class ClevelandMuseum(MuseumsTM):
@@ -61,10 +62,10 @@ class ClevelandMuseum(MuseumsTM):
             # tileInfo = self.getTileImages(data["objectNumber"], 0)
             # response["openpipe_canonical_fullImageDimensions"] = []
         response["openpipe_canonical_title"] = [data["title"]]
-        if len(data["creators"]) > 0:
-            response["openpipe_canonical_artist"] = []
-            for c in data["creators"]:
-                response["openpipe_canonical_artist"].append(c["description"])
+
+        response["openpipe_canonical_artist"] = [FormatConvert.getClevArtists(data)]
+
+
         if len(data["culture"]) > 0:
             response["openpipe_canonical_culture"] = data["culture"]
 
@@ -77,6 +78,8 @@ class ClevelandMuseum(MuseumsTM):
             response["openpipe_canonical_firstDate"] = [era+" "+str(year1)+" "+"JAN"+" "+"01"+" "+"00:00:00"]
             response["openpipe_canonical_lastDate"] = [era+" "+str(year2)+" "+"JAN"+" "+"01"+" "+"00:00:00"]
             response["openpipe_canonical_date"]=[response["openpipe_canonical_firstDate"][0],response["openpipe_canonical_lastDate"][0]]
+
+            response["openpipe_canonical_physicalDimensions"] = [FormatConvert.getClevDimensions(data)]
 
         # response["classification"] = [data["classification"]]
         # self.schema.genre.push(data["city"])

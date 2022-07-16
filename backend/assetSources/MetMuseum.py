@@ -6,7 +6,7 @@ from multiprocessing.pool import ThreadPool
 
 import requests
 import formatHelp
-import FormatConvert
+from FormatConvert import FormatConvert
 
 from ImageUtil import ImageUtil
 
@@ -64,14 +64,16 @@ class MetMuseum(MuseumsTM):
         dimentions = imageInfo.getPixelDimentions(response["openpipe_canonical_smallImage"][0])
         response["openpipe_canonical_smallImageDimensions"] = [str(dimentions[0]) + "," + str(dimentions[1])]
 
-        response["openpipe_canonical_title"] = FormatConvert.ConvertSring[data["title"]]
-        response["openpipe_canonical_artist"] = FormatConvert.ConvertSring[data["artistDisplayName"]]
-        response["openpipe_canonical_culture"] = FormatConvert.ConvertSring[data["culture"]]
-        response["openpipe_canonical_classification"] = FormatConvert.ConvertSring[data["classification"]]
+        response["openpipe_canonical_title"] = FormatConvert.ConvertString(data,"title")
+        response["openpipe_canonical_artist"] = FormatConvert.ConvertString(data,"artistAlphaSort")
+        response["openpipe_canonical_culture"] = FormatConvert.ConvertString(data,"culture")
+        response["openpipe_canonical_medium"] = FormatConvert.ConvertString(data,"medium")
+
+        response["openpipe_canonical_classification"] = FormatConvert.ConvertString(data,"classification")
         # self.schema.genre.push(data["city"])
         # self.schema.medium.push(data["city"])
-        response["openpipe_canonical_nation"] = FormatConvert.ConvertSring[data["country"]]
-        response["openpipe_canonical_city"] = FormatConvert.ConvertSring[data["city"]]
+        response["openpipe_canonical_nation"] = FormatConvert.ConvertString(data,"country")
+        response["openpipe_canonical_city"] = FormatConvert.ConvertString(data,"city")
 
         #tags are outdated and should not be canonical
         #if 'tags' in data.keys() and data["tags"] is not None:
@@ -81,9 +83,13 @@ class MetMuseum(MuseumsTM):
 
         #process the data information
         dateset = FormatConvert.getMetDate(data)
-        response["openpipe_canonical_firstDate"] = dateset["openpipe_canonical_firstdate"]
-        response["openpipe_canonical_lastDate"] = dateset["openpipe_canonical_lastdate"]
+        response["openpipe_canonical_firstDate"] = dateset["openpipe_canonical_firstDate"]
+        response["openpipe_canonical_lastDate"] = dateset["openpipe_canonical_lastDate"]
         response["openpipe_canonical_date"] = dateset["openpipe_canonical_date"]
+
+
+        response["openpipe_canonical_physicalDimensons"] = FormatConvert.getMetDimensions(data)
+
         response.update(data)
 
         return response

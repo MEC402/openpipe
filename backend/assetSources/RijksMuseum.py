@@ -2,6 +2,8 @@
 
 import requests
 import formatHelp
+from FormatConvert import FormatConvert
+
 from MuseumsTM import MuseumsTM
 from multiprocessing.pool import ThreadPool
 #    url = "https://www.rijksmuseum.nl/api/en/"
@@ -72,10 +74,7 @@ class RijksMuseum(MuseumsTM):
             response["openpipe_canonical_fullImageDimensions"] = [str(tileInfo[1])+","+str(tileInfo[2])]
 
         response["openpipe_canonical_title"] = [data["title"]]
-        if (len(data["principalMakers"]) > 0):
-            response["openpipe_canonical_artist"] = []
-            for artist in data["principalMakers"]:
-                response["openpipe_canonical_artist"].append(artist["name"])
+        response["openpipe_canonical_artist"] = [FormatConvert.getRijksArtist(data)]
 
         era = "CE"
         year1 = abs(int(data["dating"]["yearEarly"]))
@@ -93,6 +92,8 @@ class RijksMuseum(MuseumsTM):
         # schema["nation"].append(data["country"])
         # schema["city"].append(data["city"])
         # schema["tags"] = data["tags"]
+        response["openpipe_canonical_medium"] = [data["physicalMedium"]]
+        response["openpipe_canonical_physicalDimensions"] = [FormatConvert.getRijksDim(data)]
 
         response.update(data)
         return response
@@ -144,10 +145,10 @@ class RijksMuseum(MuseumsTM):
                if cantag not in response:
                   response[cantag] = {}
 #properly format artist names for cleveland
-               if atagname=="principalMakers":
-                  ares = formatHelp.RijksArtist(alltags[tagcount]['value'])
-                  response[cantag]['value'] = formatHelp.cleanList(ares)
-               else:
+#               if atagname=="principalMakers":
+#                  ares = formatHelp.RijksArtist(alltags[tagcount]['value'])
+#                  response[cantag]['value'] = formatHelp.cleanList(ares)
+#               else:
                   response[cantag]['value'] = formatHelp.cleanList(alltags[tagcount]['value'])
 
 
