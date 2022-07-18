@@ -28,7 +28,8 @@ musename = "all"
 # comment out before deploy
 dict = {'q': 'cats',
          'p': 1,
-         'ps': 10}
+         'ps': 10,
+          'name': 'Paris'}
 
 if 'type' not in dict.keys():
     dict["type"] = 1

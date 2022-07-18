@@ -27,6 +27,9 @@ class ImageUtil:
                 ...
                 }
         """
+        
+        # print(url)
+        
         width = 0
         height = 0
         if url is not None and url != "":
@@ -39,6 +42,7 @@ class ImageUtil:
             except Exception as e:
                 track = traceback.format_exc()
 #                Slack.sendMessage(track)
+
         return width, height
 
     def concatTiles(self, tilesData, imageWidth, imageHeight):
