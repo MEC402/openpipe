@@ -74,7 +74,8 @@ class SmithsonianMuseum(MuseumsTM):
     #    else:
     #        temp["openpipe_canonical_artist"]= "Unknown"
        
-    #    temp["openpipe_canonical_medium"]=data['content']['freetext']['physicalDescription'][0]['content']
+       temp["openpipe_canonical_medium"]=data['content']['freetext']['physicalDescription'][0]['content']
+    
     #    width_ = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['resources'][1]['width']
     #    height = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['resources'][1]['height']
     #    temp["openpipe_canonical_physicalDimensions"]= str(width_) + "," + str(height) #... to be change into another tag ...
