@@ -71,6 +71,9 @@ class ParisMuseum(MuseumsTM):
         temp["openpipe_canonical_source"] = "Paris"
         temp["openpipe_canonical_id"]=data["entityUuid"]
         temp["openpipe_canonical_title"]=data["title"]
+        
+        # print(data["fieldMateriauxTechnique"][0]["entity"]["name"])
+        
         end_date = data["fieldDateProduction"]["endYear"]
         if end_date is not None:
           temp["openpipe_canonical_date"] = "CE" + " " + str(end_date) + " " + "JAN" + " " + "01" + " " + "00:00:00"
@@ -95,7 +98,7 @@ class ParisMuseum(MuseumsTM):
         #   temp["openpipe_canonical_medium"] = ""
         
         temp["openpipe_canonical_sourceid"] = "4"
-        temp["openpipe_canonical_physicalDimensions"] = (str(21.0) + "," + str(29.7) + "," + str(1.0))
+        temp["openpipe_canonical_physicalDimensions"] = (str(21.0) + "," + str(29.7) + "," + str(1.0)) #default
         imageInfo = ImageUtil()
         dimentions = imageInfo.getPixelDimentions(temp["openpipe_canonical_fullImage"])
         temp["openpipe_canonical_fullImageDimensions"] = [str(dimentions[0]) + "," + str(dimentions[1])][0] 
@@ -142,16 +145,14 @@ if __name__=='__main__':
        pm=ParisMuseum("")
        
       #  print("*************************** search ********************************")
-      #  search=pm.searchForAssets(" cat ", pageSize = 1, pageNumber = 8)
+      #  search=pm.searchForAssets(" chat ", pageSize = 1, pageNumber = 8)
       #  print(search)
       #  print("************************** End search ***************************")
        
        print("*************************** START getData ********************************")
-       
        getdata = pm.getData(q=" cat ", page=1, pageSize= 5)
        a = json.dumps(getdata)
        print(a)
-       
        print("*************************** START getData ********************************")
 
 
