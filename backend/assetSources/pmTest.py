@@ -11,7 +11,7 @@ from wsgiref import headers
 import requests
 from MuseumsTM import MuseumsTM
 from multiprocessing.pool import ThreadPool
-import formatHelp
+# import formatHelp
 from ImageUtil import ImageUtil
 
 
@@ -47,7 +47,6 @@ class ParisMuseum(MuseumsTM):
         data1 = response.json()
         out = out + data1['data']['nodeQuery']['entities']
         size_ = data1['data']['nodeQuery']['count']
-        
         return out
         
 
@@ -72,7 +71,6 @@ class ParisMuseum(MuseumsTM):
         temp["openpipe_canonical_id"]=data["entityUuid"]
         temp["openpipe_canonical_title"]=data["title"]
         
-        # print(data["fieldMateriauxTechnique"][0]["entity"]["name"])
         
         end_date = data["fieldDateProduction"]["endYear"]
         if end_date is not None:
@@ -88,9 +86,8 @@ class ParisMuseum(MuseumsTM):
 
         # temp["openpipe_canonical_physicalDimensions___"]=data["fieldOeuvreDimensions"][0]["entity"]["fieldDimensionValeur"] #... revisit, Dimension is not accessible
         
-        # print(data["fieldOeuvreDimensions"][0])
-        
         # temp["openpipe_canonical_medium"] = data["fieldMateriauxTechnique"][0]["entity"]["name"] #... revist the french vs english
+        temp["openpipe_canonical_medium"] = ""
         # medium = data["fieldMaterialsTechnical"][0]["entity"]["name"]
         # if medium is not None:
         #   temp["openpipe_canonical_medium"] = data["fieldMaterialsTechnical"][0]["entity"]["name"]
@@ -128,7 +125,7 @@ class ParisMuseum(MuseumsTM):
             step = total - int(start) - 1
 
         assets = retrievedAssets[int(start):int(start) + int(step)]
-    
+        print(assets)
         for asset in assets:
        
           if asset != None:
@@ -138,22 +135,7 @@ class ParisMuseum(MuseumsTM):
                 "total": len(results),
                 "sourceName": "Paris Museum"}
 
-if __name__=='__main__':
- 
-      
- 
-       pm=ParisMuseum("")
-       
-      #  print("*************************** search ********************************")
-      #  search=pm.searchForAssets(" chat ", pageSize = 1, pageNumber = 8)
-      #  print(search)
-      #  print("************************** End search ***************************")
-       
-       print("*************************** START getData ********************************")
-       getdata = pm.getData(q=" cat ", page=1, pageSize= 5)
-       a = json.dumps(getdata)
-       print(a)
-       print("*************************** START getData ********************************")
+
 
 
   

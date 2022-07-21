@@ -1,6 +1,7 @@
 #!/bin/python3
  
 from turtle import width
+from matplotlib import artist
 import requests
 import json
 
@@ -45,17 +46,17 @@ class SmithsonianMuseum(MuseumsTM):
    def getMetaTagMapping(self, data): 
        temp = {
               "openpipe_canonical_id": "objectID",
+              "openpipe_canonical_sourceid": "sourceID",
+              "openpipe_canonical_source": "source",
               "openpipe_canonical_title": "title",
               "openpipe_canonical_artist": "artistDisplayName",
               "openpipe_canonical_date": "date",
               "openpipe_canonical_medium": "medium",
               "openpipe_canonical_physicalDimensions": "dimansions",
               "openpipe_canonical_fullImage": "fullImage",
-              "openpipe_canonical_source": "source",
-              "openpipe_canonical_sourceid": "sourceID",
               "openpipe_canonical_fullImageDimensions": "fullImageDimensions",
-              "openpipe_canonical_largeImageDimensions": "largeImageDimensions",
               "openpipe_canonical_largeImage": "largeImage",
+              "openpipe_canonical_largeImageDimensions": "largeImageDimensions",
               "openpipe_canonical_smallImage": "smallImage",
               "openpipe_canonical_smallImageDimensions": "smallImageDimensions"
               
@@ -64,29 +65,39 @@ class SmithsonianMuseum(MuseumsTM):
        temp["openpipe_canonical_id"]=data['id']
        temp["openpipe_canonical_title"]=data['title']
        
-       temp["openpipe_canonical_artist"]=data['content']['freetext']['name'][0]['content'] # this provide than necessary information
-       
-       # ...this print a error the asset skipped the 'name' under 'indexedStructured' .... check the
-       
-    #    artist = data['content']['indexedStructured']['name']
-    #    if artist is not None:
-    #        temp["openpipe_canonical_artist"]=artist
-    #    else:
-    #        temp["openpipe_canonical_artist"]= "Unknown"
+    #    temp["openpipe_canonical_artist"]=data['content']['freetext']['name'][0]['content'] # this provide than necessary information
+       if 'name' in data['content']['indexedStructured']:
+           temp["openpipe_canonical_artist"] = data['content']['indexedStructured']['name'][0]
+       else:
+           temp["openpipe_canonical_artist"]= data['content']['freetext']['name'][0]['content']
        
        temp["openpipe_canonical_medium"]=data['content']['freetext']['physicalDescription'][0]['content']
-    
-    #    width_ = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['resources'][1]['width']
-    #    height = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['resources'][1]['height']
-    #    temp["openpipe_canonical_physicalDimensions"]= str(width_) + "," + str(height) #... to be change into another tag ...
-    
-    #    temp["openpipe_canonical_fullImageDimensions"] = str(width_) + "," + str(height) #... to be used when confirmed 
+       width_ = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['resources'][1]['width']
+       height = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['resources'][1]['height']
+       temp["openpipe_canonical_fullImageDimensions"] = str(width_) + "," + str(height) 
        
-       physicalDimensions = data['content']['freetext']['physicalDescription'][1]['content'].split("(",1)[1]
-       temp["openpipe_canonical_physicalDimensions"] = physicalDimensions.replace("x",",").replace("cm"," ").replace(")"," ")
-    
-       end_date = data['content']['indexedStructured']['date'][0]
-       if end_date is not None: 
+    #    physicalDimensions = data['content']['freetext']['physicalDescription'][1]['content'].split("(",1)[1] 
+    #    temp["openpipe_canonical_physicalDimensions"] = physicalDimensions.replace("x",",").replace("cm","").replace(")","").replace(" ","") #---- this output had a dot(.) at the end. ----
+
+#------
+       if len(data['content']['freetext']['physicalDescription'])>1:
+           dimensionsSplit1 = data['content']['freetext']['physicalDescription'][1]['content'].split("(",1)[1]
+           head, sep, tail = dimensionsSplit1.partition(')')#-ignore all characters after ')'
+           dimensionsSplit2 = head
+           dim = dimensionsSplit2.replace("x",",").replace("cm","").replace(" ","")
+           if dim[-1] == '.':
+               temp["openpipe_canonical_physicalDimensions"] = dim[:-1]
+           else:
+               temp["openpipe_canonical_physicalDimensions"] = dim
+       else:
+            temp["openpipe_canonical_physicalDimensions"] = (str(21.0) + "," + str(29.7) + "," + str(1.0)) #-default
+#------check if there us one ',' 
+       if temp["openpipe_canonical_physicalDimensions"].count(',') == 1:
+           temp["openpipe_canonical_physicalDimensions"] = temp["openpipe_canonical_physicalDimensions"]+',-1'
+       print(temp["openpipe_canonical_physicalDimensions"])
+       
+       if 'date' in data['content']['indexedStructured']:
+           end_date = data['content']['indexedStructured']['date'][0]
            temp["openpipe_canonical_date"] = ["CE" + " " + end_date.replace("s"," ") + " " + "JAN" + " " + "01" + " " + "00:00:00"][0]
        else:
            temp["openpipe_canonical_date"] = ""
@@ -97,16 +108,14 @@ class SmithsonianMuseum(MuseumsTM):
           
        temp["openpipe_canonical_source"] = "Smithsonian"
        temp["openpipe_canonical_sourceid"] = "5"
-    #    temp["openpipe_canonical_fullImage"]=data['content']['descriptiveNonRepeating']['online_media']['media'][0]['thumbnail']
-    #    temp["openpipe_canonical_largeImage"] = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['thumbnail'] #-reused
-    #    temp["openpipe_canonical_smallImage"] = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['thumbnail'] #-reused
-       
+  
        imageInfo = ImageUtil()
        dimentions1 = imageInfo.getPixelDimentions(temp["openpipe_canonical_smallImage"])
        temp["openpipe_canonical_smallImageDimensions"] = [str(dimentions1[0]) + "," + str(dimentions1[1])][0]
-       dimentions2 = imageInfo.getPixelDimentions(temp["openpipe_canonical_fullImageDimensions"])
-       temp["openpipe_canonical_fullImageDimensions"] = [str(dimentions2[0]) + "," + str(dimentions2[1])][0]
+    #    dimentions2 = imageInfo.getPixelDimentions(temp["openpipe_canonical_fullImageDimensions"])
+    #    temp["openpipe_canonical_fullImageDimensions"] = [str(dimentions2[0]) + "," + str(dimentions2[1])][0]
        dimentions3 = imageInfo.getPixelDimentions(temp["openpipe_canonical_largeImageDimensions"])
+       
        temp["openpipe_canonical_largeImageDimensions"] = [str(dimentions3[0]) + "," + str(dimentions3[1])][0]
        
        
@@ -144,29 +153,6 @@ class SmithsonianMuseum(MuseumsTM):
                "sourceName": "Smithsonian Museum"}
  
  
-if __name__=='__main__':
- 
-       
- 
-       sm=SmithsonianMuseum("")
-       
-    #    print("*************************** search ********************************")
-       
-    #    search=sm.searchForAssets(" cat ")
-    #    print(search)
-    #    print("************************** End search ***************************")
-       
-       print("*************************** START getData ********************************")
-       
-       getdata = sm.getData(q=" cat ", page=1, pageSize= 4)
-       a = json.dumps(getdata)
-       print(a)
-       
-       print("*************************** END getData ********************************")
-       
-       
-
-
 
       
        
