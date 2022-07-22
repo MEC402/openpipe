@@ -94,7 +94,7 @@ class SmithsonianMuseum(MuseumsTM):
 #------check if there us one ',' 
        if temp["openpipe_canonical_physicalDimensions"].count(',') == 1:
            temp["openpipe_canonical_physicalDimensions"] = temp["openpipe_canonical_physicalDimensions"]+',-1'
-       print(temp["openpipe_canonical_physicalDimensions"])
+       
        
        if 'date' in data['content']['indexedStructured']:
            end_date = data['content']['indexedStructured']['date'][0]
@@ -103,7 +103,8 @@ class SmithsonianMuseum(MuseumsTM):
            temp["openpipe_canonical_date"] = ""
        
        temp["openpipe_canonical_fullImage"] = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['resources'][1]['url'] #full image
-       temp["openpipe_canonical_largeImage"] = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['resources'][2]['url'] #large image
+       temp["openpipe_canonical_largeImage"] = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['resources'][1]['url'] #reuse from fullImage
+       temp["openpipe_canonical_largeImageDimensions"] = str(width_) + "," + str(height) # reuse from fullImage
        temp["openpipe_canonical_smallImage"] = data['content']['descriptiveNonRepeating']['online_media']['media'][0]['thumbnail'] #small image
           
        temp["openpipe_canonical_source"] = "Smithsonian"
@@ -114,9 +115,8 @@ class SmithsonianMuseum(MuseumsTM):
        temp["openpipe_canonical_smallImageDimensions"] = [str(dimentions1[0]) + "," + str(dimentions1[1])][0]
     #    dimentions2 = imageInfo.getPixelDimentions(temp["openpipe_canonical_fullImageDimensions"])
     #    temp["openpipe_canonical_fullImageDimensions"] = [str(dimentions2[0]) + "," + str(dimentions2[1])][0]
-       dimentions3 = imageInfo.getPixelDimentions(temp["openpipe_canonical_largeImageDimensions"])
-       
-       temp["openpipe_canonical_largeImageDimensions"] = [str(dimentions3[0]) + "," + str(dimentions3[1])][0]
+    #    dimentions3 = imageInfo.getPixelDimentions(temp["openpipe_canonical_largeImageDimensions"])
+    #    temp["openpipe_canonical_largeImageDimensions"] = [str(dimentions3[0]) + "," + str(dimentions3[1])][0]
        
        
        
@@ -152,7 +152,7 @@ class SmithsonianMuseum(MuseumsTM):
                "total": len(results),
                "sourceName": "Smithsonian Museum"}
  
- 
+
 
       
        
