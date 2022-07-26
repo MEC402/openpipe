@@ -3,17 +3,17 @@
 #check assets for correctness in various ways and generate statistics
 #about the accuracy.
 
-import hjson
+import json
 import sys
 from parse  import *
 import re
 
 #this is a hack: the mods to sys.path should be done in a config element
-sys.path.append('e:/builds/openpipe/backend')
+sys.path.append('d:/builds/openpipe/')
 
-from openpipeAPI.ORM.BL import BL
-from openpipeAPI.ORM.ORM import ORM
-from openpipeAPI.ORM.TO import TO
+from backend.openpipeAPI.ORM.BL import BL
+from backend.openpipeAPI.ORM.ORM import ORM
+from backend.openpipeAPI.ORM.TO import TO
 
 import operator
 
@@ -337,7 +337,7 @@ def correctDimensions(aorm,adimlist):
                      arp = arp.replace(",","\',\'")
                      arp = arp.replace("}\',\'{","},{")
 #                 print(arp)
-                 dimobj = hjson.loads(arp)
+                 dimobj = json.loads(arp)
                  akv = extractBSizes(dimobj)
                  ares['dims'] = akv
                  updlist.append(ares)
