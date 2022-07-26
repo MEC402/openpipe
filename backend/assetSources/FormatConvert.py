@@ -47,7 +47,7 @@ class FormatConvert:
 #        print(data["measurements"])
 #        print("----------")
         if (data["measurements"] ==  None):
-           return ("-1.0, -1.0, -1.0")
+           return ("-1.0,-1.0,-1.0")
 
         for x in data["measurements"]:
 #           print(x)
@@ -91,6 +91,7 @@ class FormatConvert:
 #        print (restring)
         return (restring)
 
+
       #extract the physical dimensions of the Cleveland object
       # we are attempting to extract Height, Width, Depth
       # rules for the met.
@@ -108,7 +109,14 @@ class FormatConvert:
 #        print(data["measurements"])
 #        print("----------")
         if (data["dimensions"] ==  None):
-           return ("-1.0, -1.0, -1.0")
+           return ("-1.0,-1.0,-1.0")
+
+
+        for x in data["dimensions"]:
+          mysize = data["dimensions"][x]
+          if 'height' in mysize: height = mysize["height"]
+          if 'width' in mysize: width = mysize["width"]
+          if 'depth' in mysize: depth = mysize["depth"]
 
         if "overall" in data["dimensions"]:
           mysize = data["dimensions"]["overall"]
@@ -116,6 +124,15 @@ class FormatConvert:
           if 'width' in mysize: width = mysize["width"]
           if 'depth' in mysize: depth = mysize["depth"]
 
+
+        #mj = json.loads(measure)
+        #print(mj)
+#        print("END-----")
+
+        #restring = "H, W, D" cm, 21.0,29.7,1.0
+        restring = str(height)+","+str(width)+","+str(depth)
+#        print (restring)
+        return (restring)
         #mj = json.loads(measure)
         #print(mj)
 #        print("END-----")
@@ -171,7 +188,7 @@ class FormatConvert:
 #        print(data["measurements"])
 #        print("----------")
         if (data["dimensions"] ==  None):
-           return ("-1.0, -1.0, -1.0")
+           return ("-1.0,-1.0,-1.0")
 
 
         for x in data["dimensions"]:
@@ -196,3 +213,188 @@ class FormatConvert:
 #        print (restring)
         return (restring)
 
+
+
+      #extract the physical dimensions of the object from a string for the MET
+      # we are attempting to extract Height, Width, Depth
+      # rules for the met.
+      #  if height, width, depth present just use that.
+      #  for the met: Length and Depth are the same thing.
+      #  also we extract the largest Height, Width, and Depth values
+      #  when multiple sizes are included in the array.
+      def getMetDimensionsString(dimitem):
+        
+        height = -1.0
+        width = -1.0
+        depth = -1.0
+       
+#        print("START-----")
+#        print(data["measurements"])
+#        print("----------")
+
+        jimitem = dimitem.replace("{","{\"").replace(":","\":\"").replace(",","\",\"").replace("}","\"}").replace("\"{","{").replace("}\"","}").replace("\",\" ",", ").replace("\\"," ")
+        print(jimitem)
+        try:
+           dimjson = json.loads(jimitem)
+           print(dimjson)
+        except Exception:
+           print("Broken")
+           return ("-1.0,-1.0,-1.0")
+
+        if dimjson is None:
+           return ("-1.0,-1.0,-1.0")
+
+        for x in dimjson:
+#           print(x)
+           measure = x
+           onem = x['elementMeasurements'];
+#           print(onem)
+           if 'Height' in onem:
+#             print('Height found')
+             nheight = float(onem['Height'])
+#             print(nheight)
+             if (nheight > height):
+                height = nheight
+
+           if 'Width' in onem:
+#             print('Width found')
+             nwidth = float(onem['Width'])
+#             print(nwidth)
+             if (nwidth > width):
+                width = nwidth
+
+           if 'Depth' in onem:
+#             print('Depth found')
+             ndepth = float(onem['Depth'])
+#             print(ndepth)
+             if (ndepth > depth):
+                depth = ndepth
+
+           if 'Length' in onem:
+#             print('Length found')
+             ndepth = float(onem['Length'])
+#             print(ndepth)
+             if (ndepth > depth):
+                depth = ndepth
+
+        #mj = json.loads(measure)
+        #print(mj)
+#        print("END-----")
+
+        #restring = "H, W, D" cm, 21.0,29.7,1.0
+        restring = str(height)+","+str(width)+","+str(depth)
+#       print (restring)
+        return (restring)
+
+
+
+      #extract the physical dimensions of the Rijks object from a string
+      # we are attempting to extract Height, Width, Depth
+      # rules for the met.
+      #  if height, width, depth present just use that.
+      #  for the met: Length and Depth are the same thing.
+      #  also we extract the largest Height, Width, and Depth values
+      #  when multiple sizes are included in the array.
+
+      def getRijksDimString(dimitem):
+        
+        height = -1.0
+        width = -1.0
+        depth = -1.0
+       
+#        print("START-----")
+#        print(data["measurements"])
+#        print("----------")
+
+        jimitem = dimitem.replace("{","{\"").replace(":","\":\"").replace(",","\",\"").replace("}","\"}").replace("\"{","{").replace("}\"","}").replace("\",\" ",", ").replace("\\"," ").replace("\"'","\"").replace("'\"","\"")
+
+        print(jimitem)
+        try:
+           dimjson = json.loads(jimitem)
+           #print(dimjson)
+        except Exception:
+           print("Broken")
+           return ("-1.0,-1.0,-1.0")
+
+        if dimjson is None:
+           return ("-1.0,-1.0,-1.0")
+
+        for x in dimjson:
+          if x["type"] == "height":
+              if x["value"] != "null":
+                height = float(x["value"])
+
+          if x["type"] == "width":
+              if x["value"] != "null":
+                width = float(x["value"])
+
+          if x["type"] == "depth":
+              if x["value"] != "null":
+                depth = float(x["value"])
+
+          if x["type"] == "diameter":
+              if x["value"] != "null":
+                width = float(x["value"])
+
+        #mj = json.loads(measure)
+        #print(mj)
+#        print("END-----")
+
+        #restring = "H, W, D" cm, 21.0,29.7,1.0
+        restring = str(height)+","+str(width)+","+str(depth)
+#        print (restring)
+        return (restring)
+
+
+
+      #extract the physical dimensions of the Cleveland object from a string
+      # we are attempting to extract Height, Width, Depth
+      # rules for the met.
+      #  if height, width, depth present just use that.
+      #  for the met: Length and Depth are the same thing.
+      #  also we extract the largest Height, Width, and Depth values
+      #  when multiple sizes are included in the array.
+      def getClevDimString(dimitem):
+        
+        height = -1.0
+        width = -1.0
+        depth = -1.0
+       
+#        print("START-----")
+#        print(data["measurements"])
+#        print("----------")
+        jimitem = dimitem.replace("\'","").replace("{","{\"").replace(":","\":\"").replace(",","\",\"").replace("}","\"}").replace("\"{","{").replace("}\"","}").replace("\\"," ").replace("\"'","\"").replace("'\"","\"").replace("\" {"," {").replace(",\" ",",\"").replace(":\" ",":\"")
+        print(jimitem)
+        try:
+           dimjson = json.loads(jimitem)
+           #print(dimjson)
+        except Exception:
+           print("Broken")
+           return ("-1.0,-1.0,-1.0")
+
+        if dimjson is None:
+           return ("-1.0,-1.0,-1.0")
+
+
+
+        for x in dimjson:
+          mysize = dimjson[x]
+          if 'height' in mysize: height = mysize["height"]
+          if 'width' in mysize: width = mysize["width"]
+          if 'depth' in mysize: depth = mysize["depth"]
+
+        if "overall" in dimjson:
+          mysize = dimjson["overall"]
+          if 'height' in mysize: height = mysize["height"]
+          if 'width' in mysize: width = mysize["width"]
+          if 'depth' in mysize: depth = mysize["depth"]
+
+
+        #mj = json.loads(measure)
+        #print(mj)
+#        print("END-----")
+
+        #restring = "H, W, D" cm, 21.0,29.7,1.0
+        restring = str(height)+","+str(width)+","+str(depth)
+#        print (restring)
+        return (restring)
