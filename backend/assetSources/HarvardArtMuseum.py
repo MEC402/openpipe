@@ -82,7 +82,7 @@ class HarvardArtMuseum(MuseumsTM):
            temp["openpipe_canonical_sourceid"] = ""
            temp["openpipe_canonical_source"] = "Harvard"
        
-    #    temp["openpipe_canonical_fullImage"]=data['images'][0]['baseimageurl']
+           temp["openpipe_canonical_fullImage"]=data['images'][0]['baseimageurl']
        
        
         
@@ -132,7 +132,7 @@ if __name__=='__main__':
        
        print("*************************** START getData ********************************")
        
-       getdata = sm.getData(q=" cat ", page=1, pageSize= 8)
+       getdata = sm.getData(q=" cat ", page=1, pageSize= 20) 
        a = (getdata)
        print(a)
        
