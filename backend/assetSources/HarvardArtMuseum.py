@@ -68,7 +68,10 @@ class HarvardArtMuseum(MuseumsTM):
        temp["openpipe_canonical_title"]=data['title']
        temp["openpipe_canonical_medium"]=data['medium']
        temp["openpipe_canonical_physicalDimensions"]=data['dimensions']
-       if data['images']is not None:
+       if len(data['images'])is not 0:
+           
+    #    print(len(data['images']))
+           
         #    print(data['images'][0]['baseimageurl'])
            width = data['images'][0]['width']
            height = data['images'][0]['height']
@@ -81,8 +84,7 @@ class HarvardArtMuseum(MuseumsTM):
            temp["openpipe_canonical_largeImageDimensions"] = [str(dimentions1[0]) + "," + str(dimentions1[1])][0] #- reused 
            temp["openpipe_canonical_sourceid"] = ""
            temp["openpipe_canonical_source"] = "Harvard"
-       
-    #    temp["openpipe_canonical_fullImage"]=data['images'][0]['baseimageurl']
+           temp["openpipe_canonical_fullImage"]= data['images'][0]['baseimageurl']
        
        
         
@@ -132,7 +134,7 @@ if __name__=='__main__':
        
        print("*************************** START getData ********************************")
        
-       getdata = sm.getData(q=" cat ", page=1, pageSize= 8)
+       getdata = sm.getData(q=" cat ", page=1, pageSize= 20)
        a = (getdata)
        print(a)
        
