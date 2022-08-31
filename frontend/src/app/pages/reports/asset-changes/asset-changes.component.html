@@ -1,11 +1,40 @@
-<nb-card>
-  <nb-card-header>
-    <input nbInput placeholder="Pick Date" [nbDatepicker]="formpicker">
-    <nb-datepicker #formpicker></nb-datepicker>
-  </nb-card-header>
-  <nb-card-body>
-    <ng2-smart-table [settings]="settings" [source]="source"
-                     (editConfirm)="onEditConfirm($event)" >
-    </ng2-smart-table>
-  </nb-card-body>
-</nb-card>
+ Number of assets changed since:
+<input nbInput placeholder="Pick a Date" [nbDatepicker]="ngmodel" [(ngModel)]="ngModelDate" (ngModelChange)="onDateChange()">
+<nb-datepicker #ngmodel></nb-datepicker>
+
+ is: {{totalAssets}}
+
+<div class="grid-container">
+  <div class="camera" >
+    <div class="lists row">
+      <div class="col-md-4 ">
+        <nb-flip-card [flipped]="showImage">
+          <nb-card-front>
+            <nb-card>
+              <nb-card-body>
+                <ng2-smart-table [settings]="assetsSettings" [source]="changedAssets" (userRowSelect)="onClick($event)"	>
+                </ng2-smart-table>
+              </nb-card-body>
+            </nb-card>
+          </nb-card-front>
+          <nb-card-back>
+            <nb-card>
+              <nb-card-body (click)="onFlipCard()">
+                <video width="320" height="240" [src]="currentAssetFullImage" controls *ngIf="currentAssetType=='video'" ></video>
+                <div class="wrapper">
+                  <div class="box box1">
+                    <img [src]="currentAssetImage" *ngIf="currentAssetType!='video'">
+                  </div>
+                </div>
+              </nb-card-body>
+            </nb-card>
+          </nb-card-back>
+        </nb-flip-card>
+      </div>
+
+      <div class="col-md-8 ">
+        <ngx-asset-tag-card [asset]="currentAsset" ></ngx-asset-tag-card>
+      </div>
+    </div>
+  </div>
+</div>
