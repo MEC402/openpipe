@@ -1,0 +1,24 @@
+{
+  "museum1": [ {"source": "MET",
+    "url": "https://collectionapi.metmuseum.org/public/collection/v1/",
+    "class": "MetMuseum", "key": "none" },
+    {"source": "Rijks",
+      "url": "https://www.rijksmuseum.nl/api/en/",
+      "class": "RijksMuseum", "key": "qvMYRE87" },
+    {"source": "Cleveland",
+      "url": "https://openaccess-api.clevelandart.org/api/artworks/",
+      "class": "ClevelandMuseum", "key": "none" },
+    {"source": "Europe",
+      "url": "https://api.europeana.eu/api/v2/",
+      "class": "EuropeMuseum", "key": "ixzop5MkY" },
+    {"source": "Meise",
+      "url": "https://api.europeana.eu/api/v2/",
+      "class": "EuropeMuseum", "key": "ixzop5MkY", "dataprovider": "Meise+Botanic+Garden" },
+    {"source": "Wienbibliothek",
+      "url": "https://api.europeana.eu/api/v2/",
+      "class": "EuropeMuseum", "key": "ixzop5MkY", "dataprovider": "Wienbibliothek+im+Rathaus" },
+    {"source": "University of Graz",
+      "url": "https://api.europeana.eu/api/v2/",
+      "class": "EuropeMuseum", "key": "ixzop5MkY", "dataprovider": "University of Graz, Institute of Plant Sciences - Herbarium GZU" }
+  ]
+}
