@@ -3,32 +3,66 @@ import json
 from backend.openpipeAPI.ORM.ORM import ORM
 from backend.openpipeAPI.ORM.TO import TO
 
-orm=ORM()
+orm = ORM()
 tables = TO().getClasses()
 Asset = tables["asset"]
 
-stm="""SELECT 
-    asset.*, value, displayName, source.id AS sid
+undefined_source_assets_stm = """SELECT 
+    asset.id, asset.metaDataId, asset.IdAtSource, tagName, value
 FROM
-    artmaster.asset
+    asset
         JOIN
     metaTag ON asset.metaDataId = metaTag.metaDataId
-        JOIN
-    source ON value = sourceName
 WHERE
-    sourceId = 'undefined'
-        AND tagName = 'openpipe_canonical_source';"""
+    idAtSource = 'undefined'
+        AND (tagName = 'openpipe_canonical_source'
+        OR tagName='id' OR tagName='objectID' )
+ORDER BY asset.metaDataId;"""
 
+res = orm.session.execute(undefined_source_assets_stm)
 
-res=orm.executeSelect(stm)
-i=1
+i = 1
 
+map = {}
 
-for r in res['data']:
+for r in res:
+    aid = r[0]
+    mid = r[1]
+    idAtSource = r[2]
+    tagName = r[3]
+    value = r[4]
 
-    print(r['id'][0],r['sid'][0],i)
-    orm.session.query(Asset).filter(Asset.id == int(r['id'][0])).update({"sourceId": r['sid'][0]})
-    i = i + 1
+    if "openpipe_canonical_" in tagName:
+        source = -1
+        if value == "The Metropolitan Museum of Art":
+            source = 1
+        elif value == "Rijksmuseum Amsterdam":
+            source = 2
+        elif value == "Cleveland Museum of Art":
+            source = 3
 
-print(i)
+        if aid in map:
+            map[aid]["source"] = source
+        else:
+            map[aid] = {"source": source}
+    elif tagName == "id":
+        if aid in map:
+            map[aid]["sid"] = value
+        else:
+            map[aid] = {"sid": value}
+    elif tagName == "objectID":
+        if aid in map:
+            map[aid]["sid"] = value
+        else:
+            map[aid] = {"sid": value}
+
+update = []
+for m in map:
+    if "sid" in map[m]:
+        update.append({"id": m, "IdAtSource": map[m]["sid"], "sourceId": map[m]["source"]})
+    else:
+        print(map[m])
+
+# print(update, len(update))
+orm.bulkUpdate(update, Asset, 1000)
 orm.commitClose()

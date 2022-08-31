@@ -54,3 +54,4 @@ frontend/.firebaserc
 *.png
 AWS_Layer/Database_Access_Layer/badAssets-0.txt
 AWS_Layer/Database_Access_Layer/badAssets.txt
+*.npz

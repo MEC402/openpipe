@@ -88,8 +88,8 @@ for canonicalTag in canonicalTagResultSet["data"]:
         # print(insertDataArray)
 
 
-# orm.bulkInsert(insertDataArray)
-# print("insertSize = "+str(len(insertDataArray)))
-#
-# print("compressionCount = "+str(compressionCount))
-# orm.commitClose()
+orm.bulkInsert(insertDataArray)
+print("insertSize = "+str(len(insertDataArray)))
+
+print("compressionCount = "+str(compressionCount))
+orm.commitClose()

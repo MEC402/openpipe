@@ -35,8 +35,11 @@ for topic in topicsResultSet["data"]:
 print(topicHashMap.keys())
 # print(topicHashMap["400"])
 
-metaTagResultSet = orm.executeSelect(
-    """SELECT * FROM artmaster.metaTag where tagName like 'openpipe_canonical_%' order by metaDataId asc;""")
+# metaTagResultSet = orm.executeSelect(
+#     """SELECT * FROM artmaster.metaTag where tagName like 'openpipe_canonical_%' order by metaDataId asc;""")
+
+stm= """select asset.metaDataId from asset  join collectionMember on asset.id=assetId where collectionId=222"""
+metaTagResultSet = orm.executeSelect(stm)
 
 updateDataArray = {}
 
@@ -51,8 +54,21 @@ banCanonicals = ["openpipe_canonical_id", "openpipe_canonical_fullImage", "openp
 i = 0
 mappings = []
 
-resultSet = orm.session.query(MetaTag).filter(MetaTag.tagName.like("openpipe_canonical_%")).order_by(
-        MetaTag.metaDataId)
+mids=()
+for d in metaTagResultSet["data"]:
+    mids+=(d['metaDataId'][0],)
+
+print(mids)
+
+# resultSet = orm.session.query(MetaTag).filter(MetaTag.tagName.like("openpipe_canonical_%")).order_by(MetaTag.metaDataId)
+
+resultSet = orm.session.query(MetaTag).\
+    filter(and_(MetaTag.tagName.like("openpipe_canonical_%"),
+                MetaTag.metaDataId.in_(mids))).\
+    order_by(MetaTag.metaDataId).all()
+
+print(len(resultSet))
+
 
 for tag in resultSet:
 
@@ -91,7 +107,3 @@ for i in range(0,q):
     print("************** Done commiting to DB **************")
 orm.session.bulk_update_mappings(MetaTag,mappings[q*biteSize:q*biteSize+r])
 orm.commitClose()
-
-
-
-
