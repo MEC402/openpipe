@@ -7,6 +7,9 @@ from mysql.connector import Error
 
 class LocalSearch:
 
+    def setName(self,aname):
+        self.name = aname
+
     def searchAssets(self, term):
         result = {}
         try:

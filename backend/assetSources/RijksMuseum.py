@@ -1,33 +1,60 @@
 #!/bin/python3
 
 import requests
+import formatHelp
+from FormatConvert import FormatConvert
+
+from MuseumsTM import MuseumsTM
 from multiprocessing.pool import ThreadPool
+#    url = "https://www.rijksmuseum.nl/api/en/"
 
-from backend.assetSources.CanonicalSchema import CanonicalSchema
+class RijksMuseum(MuseumsTM):
 
-
-class RijksMuseum:
     url = "https://www.rijksmuseum.nl/api/en/"
 
+
     def __init__(self, schema):
-        self.schema = schema
+        self.schema= schema
+        self.name = "Rijks"
+#        self.canonmap = {
+#                "openpipe_canonical_id": "objectID",
+#                "openpipe_canonical_largeImage": "primaryImage",
+#                "openpipe_canonical_smallImage": "primaryImageSmall",
+#                "openpipe_canonical_title": "title",
+#                "openpipe_canonical_artist": "artistDisplayName",
+#                "openpipe_canonical_culture":  "culture",
+#                "openpipe_canonical_classification": "classification",
+#                "openpipe_canonical_nation":  "country",
+#                "openpipe_canonical_city":  "city",
+#                "openpipe_canonical_tags":  "tags"
+#                        }
+        self.fullcanonmap = {
+                "objectNumber": "openpipe_canonical_id",
+                "title": "openpipe_canonical_title",
+                "principalMakers": "openpipe_canonical_artist",
+                        }
+        self.canonmap = {
+                "title": "openpipe_canonical_title",
+                "principalMakers": "openpipe_canonical_artist",
+                "medium": "openpipe_canonical_medium",
+                "culture": "openpipe_canonical_culture"
+                        }
+
+
 
     def searchRijkForAssets(self, term, page, pageSize):
         serviceName = "collection"
-        params = {'key': "qvMYRE87", 'format': "json", 'q': term, 'p': page, 'ps': pageSize}
-        response = requests.get(url=self.url + serviceName, params=params)
+        params = {'key': self.attributes['key'], 'format': "json", 'q': term, 'p': page, 'ps': pageSize}
+        response = requests.get(url=self.attributes['url'] + serviceName, params=params)
         data = response.json()
         return data
 
     def getRijkMetaTagMapping(self, assetOriginalID):
         serviceName = "collection/" + str(assetOriginalID) + "/"
-        params = {'key': "qvMYRE87", 'format': "json"}
-        response = requests.get(url=self.url + serviceName, params=params)
-        if response.status_code == 200:
-            data = response.json()
-            return self.getRijkAssetMetaData(data["artObject"])
-        else:
-            return None
+        params = {'key': self.attributes['key'], 'format': "json"}
+        response = requests.get(url=self.attributes['url'] + serviceName, params=params)
+        data = response.json()
+        return self.getRijkAssetMetaData(data["artObject"])
 
     def getRijkAssetMetaData(self, data):
         response = {}
@@ -47,10 +74,7 @@ class RijksMuseum:
             response["openpipe_canonical_fullImageDimensions"] = [str(tileInfo[1]) + "," + str(tileInfo[2])]
 
         response["openpipe_canonical_title"] = [data["title"]]
-        if (len(data["principalMakers"]) > 0):
-            response["openpipe_canonical_artist"] = []
-            for artist in data["principalMakers"]:
-                response["openpipe_canonical_artist"].append(artist["name"])
+        response["openpipe_canonical_artist"] = [FormatConvert.getRijksArtist(data)]
 
         era = "CE"
         year1 = 0
@@ -73,10 +97,12 @@ class RijksMuseum:
         # schema["culture"].append(data["culture"])
         # schema["classification"].append(data["classification"])
         # # schema.genre.push(data["city"])
-        # # schema.medium.push(data["city"])
+        # # schema.medium.push(data["city"]) 
         # schema["nation"].append(data["country"])
         # schema["city"].append(data["city"])
         # schema["tags"] = data["tags"]
+        response["openpipe_canonical_medium"] = [data["physicalMedium"]]
+        response["openpipe_canonical_physicalDimensions"] = [FormatConvert.getRijksDim(data)]
 
         response.update(data)
         return response
@@ -105,8 +131,8 @@ class RijksMuseum:
         imgWidth = 0
         imgHeight = 0
         serviceName = "collection/" + objectId + "/tiles"
-        params = {'key': "qvMYRE87"}
-        response = requests.get(url=self.url + serviceName, params=params)
+        params = {'key': self.attributes['key']}
+        response = requests.get(url=self.attributes['url'] + serviceName, params=params)
         data = response.json()
         for d in data["levels"]:
             if d['name'] == "z" + str(z):
@@ -116,5 +142,48 @@ class RijksMuseum:
                 break
         return tileData, imgWidth, imgHeight
 
+    
+    def getMappedCanonTags(self, metadataid, aorm,alltags,curtag):
+        response = {}
+        # get all the tags for this asset from the table
+        response["openpipe_canonical_source"] = {'value': "Rijksmuseum Amsterdam", "status": "unknown"}
+        tagcount = curtag
+#        print (alltags[tagcount]['metaDataId'][0], metadataid)
+        while tagcount < len(alltags) and alltags[tagcount]['metaDataId'][0] == metadataid:
+#          print(alltags[tagcount]['metaDataId'][0], tagcount, metadataid)
 
-print(CanonicalSchema().getSchema(0))
+          if alltags[tagcount]['tagName'][0] in self.canonmap:
+               atagname = alltags[tagcount]['tagName'][0]
+               cantag = self.canonmap[atagname]
+               print(cantag,atagname,alltags[tagcount]['value'])
+               if cantag not in response:
+                  response[cantag] = {}
+#properly format artist names for cleveland
+#               if atagname=="principalMakers":
+#                  ares = formatHelp.RijksArtist(alltags[tagcount]['value'])
+#                  response[cantag]['value'] = formatHelp.cleanList(ares)
+#               else:
+                  response[cantag]['value'] = formatHelp.cleanList(alltags[tagcount]['value'])
+
+
+
+          if alltags[tagcount]['tagName'][0] in self.canonmap.values():
+               atagname = alltags[tagcount]['tagName'][0]
+               print(atagname,alltags[tagcount]['value'])
+
+               if atagname not in response:
+                   response[atagname] = {}
+               response[atagname]['status'] = alltags[tagcount]['status'][0]
+
+
+        #handle tags that need processing, imaging
+
+
+        #handle dates that need to be calculated.
+
+        #handle special formatting cases: customized Museum formats
+          tagcount += 1
+
+
+        return response, tagcount
+

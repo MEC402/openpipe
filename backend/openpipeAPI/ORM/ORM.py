@@ -40,6 +40,31 @@ class ORM:
 
     def update(self, object):
         return
+    def updateSqlMulti(self, query):
+        try:
+            connection = mysql.connector.connect(
+                host=self.connection["address"],
+                user=self.connection["username"],
+                passwd=self.connection["password"],
+                database=self.connection["schema"]
+            )
+            cursor = connection.cursor()
+            for res in cursor.execute(query, multi=True ):
+              print("Number of Rows", res.statement, res.rowcount)
+
+            connection.commit()
+#            print(cursor.rowcount, "records affected")
+
+        except Error as e:
+            #            print("Error reading data from MySQL table", e)
+            pass
+
+        finally:
+            if (connection.is_connected()):
+                connection.close()
+                cursor.close()
+        
+        return
 
     def delete(self, obj):
         self.session.delete(obj)
@@ -143,7 +168,8 @@ class ORM:
                 connection.close()
                 cursor.close()
 
-    def executeSelectParam(self, query, params):
+    def batchSql(self, data, query,commit=False):
+
         try:
             connection = mysql.connector.connect(
                 host=self.connection["address"],
@@ -152,32 +178,26 @@ class ORM:
                 database=self.connection["schema"]
             )
             cursor = connection.cursor()
-            cursor.execute(query, params)
-            records = cursor.fetchall()
+
+            cursor.executemany(query, data)
+            affected_rows = cursor.rowcount
+
+            if commit == False:
+             print("Number of rows affected : {}".format(affected_rows))
+            else:
+              print("commit!")
+              connection.commit()
+
         except Error as e:
-            #            print("Error reading data from MySQL table", e)
+            print("Error reading data from MySQL table", e)
             pass
 
         finally:
             if (connection.is_connected()):
                 connection.close()
                 cursor.close()
-        return records
 
-    def bulkUpdate(self, mappings, TableClass, batchSize):
-        updateSize = len(mappings)
-        biteSize = batchSize
-        q = int(updateSize / biteSize)
-        r = updateSize % biteSize
 
-        for i in range(0, q):
-            print("************** commiting to DB **************")
-            self.session.bulk_update_mappings(TableClass, mappings[i * biteSize:i * biteSize + biteSize])
-            self.session.flush()
-            self.session.commit()
-            print("************** Done commiting to DB **************")
-        self.session.bulk_update_mappings(TableClass, mappings[q * biteSize:q * biteSize + r])
-        self.commitClose()
 # to=TO()
 # orm=ORM()
 # print(to.getClasses())

@@ -3,17 +3,17 @@
 #check assets for correctness in various ways and generate statistics
 #about the accuracy.
 
-import hjson
+import json
 import sys
 from parse  import *
 import re
 
 #this is a hack: the mods to sys.path should be done in a config element
-sys.path.append('e:/builds/openpipe/backend')
+sys.path.append('d:/builds/openpipe/')
 
-from openpipeAPI.ORM.BL import BL
-from openpipeAPI.ORM.ORM import ORM
-from openpipeAPI.ORM.TO import TO
+from backend.openpipeAPI.ORM.BL import BL
+from backend.openpipeAPI.ORM.ORM import ORM
+from backend.openpipeAPI.ORM.TO import TO
 
 import operator
 
@@ -23,7 +23,7 @@ import operator
 def getAssets(aorm):
 #    tables = TO().getClasses()
 #    MetaTag = tables["metaTag"]
-    res =aorm.executeSelect("""SELECT * FROM asset;""")
+    res =aorm.executeSelect("""SELECT * FROM asset order by metaDataId;""")
     return res
 
 def get_tagName(atag):
@@ -32,7 +32,8 @@ def get_tagName(atag):
 
 #get the canonical topic names that must exist for each asset
 def getCanons(aorm):
-    res = aorm.executeSelect("""SELECT name FROM canonicalMetaTag where req='yes'""")
+#    res = aorm.executeSelect("""SELECT name FROM canonicalMetaTag where req='yes'""")
+    res = aorm.executeSelect("""SELECT name FROM canonicalMetaTag""")
     ares=[]
     for an in res['data']:
         ares.append(an['name'][0])
@@ -40,13 +41,39 @@ def getCanons(aorm):
 
 #get the canonical topic names that must exist for each asset
 def getCanonTopics(aorm):
-    res = aorm.executeSelect("""SELECT tagName, status, value FROM metaTag where tagName like 'openpipe_canonical_%'""")
+    res = aorm.executeSelect("""SELECT tagName, status, value FROM metaTag where tagName like 'openpipe_canonical_%';""")
     ares=[]
     for an in res['data']:
         ares.append(an)
     ares.sort(key=operator.itemgetter('tagName','status'))
 #    print(ares)
     return ares
+
+#get the canonical topic names that must exist for each asset
+def getAssetCanonTags(anasset,aorm):
+    query="SELECT tagName, status, value FROM metaTag where metaDataId=" +str(anasset['metaDataId'][0]) +" and tagName like 'openpipe_canonical_%';" 
+#    print(query)
+    res = aorm.executeSelect(query)
+    ares={}
+    for an in res['data']:
+        ares[an['tagName'][0]] = {'value': an['value'][0], 'status': an['status'][0]}
+    return ares
+
+#update a set of specific cannon tags for a specific asset
+def updateAssetCanonTags(anasset, cantag, aorm):
+
+    for acan in cantag:
+       avalue = cantag[acan]['value']
+       astatus = cantag[acan]['status']
+       if astatus == 'formatted':
+ #       print(avalue)
+ #       print(astatus)
+ #       print(acan)
+        query="update metaTag set value=\'"+avalue +"\', status=\'"+astatus+"\' where metaDataId=\'" +str(anasset['metaDataId'][0]) +"\' and tagName=\'"+acan+"\';"
+ #       print(query)
+        #res = aorm.executeSelect(query)
+
+
 
 def getPhysical(aorm):
     tables = TO().getClasses()
@@ -310,7 +337,7 @@ def correctDimensions(aorm,adimlist):
                      arp = arp.replace(",","\',\'")
                      arp = arp.replace("}\',\'{","},{")
 #                 print(arp)
-                 dimobj = hjson.loads(arp)
+                 dimobj = json.loads(arp)
                  akv = extractBSizes(dimobj)
                  ares['dims'] = akv
                  updlist.append(ares)
