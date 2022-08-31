@@ -19,6 +19,11 @@ export class DataAccessService {
     this.awsApiDomainName = 'https://lmod9t47la.execute-api.us-west-2.amazonaws.com/v1/';
   }
 
+  public getMuseumInfo():  Observable<MuseumInfo> {
+    const url = this.webServerURL + 'assetSources/rona/museumsInfo.py';
+    return this.http.get<MuseumInfo>(url);
+  }
+
   public getMuseumData(searchTerm: string, museumName  , page: number , pageSize: number): Observable<Results> {
     const url = this.webServerURL + 'assetSources/rona/multiSources.py';
     const params = new HttpParams()
@@ -62,8 +67,10 @@ export class DataAccessService {
   }
 
   public getFolderDetails(folderId): Observable<FolderDetails> {
-    const url = this.domainURL + 'api/v1/folder/' + folderId;
-    return this.http.get<FolderDetails>(url);
+    const url = this.awsApiDomainName + 'folder';
+    const params = new HttpParams()
+      .set('id', folderId);
+    return this.http.get<FolderDetails>(url, {params: params});
   }
 
   public createCollection(name: string): Observable<InsertionResponse> {
@@ -149,6 +156,12 @@ export class DataAccessService {
   public getFolderAssets(collectionId, p, ps): Observable<Assets> {
     const getAssetsInCollectionURL = this.awsApiDomainName + 'folderassets';
     const assetsInCollectionParams = new HttpParams().set('folderId', collectionId).set('p', p).set('ps', ps);
+    return this.http.get<Assets>(getAssetsInCollectionURL, {params: assetsInCollectionParams});
+  }
+
+  public getChangedAssets(date, p, ps): Observable<Assets> {
+    const getAssetsInCollectionURL = this.awsApiDomainName + 'search/changed-assets';
+    const assetsInCollectionParams = new HttpParams().set('date', date).set('p', p).set('ps', ps);
     return this.http.get<Assets>(getAssetsInCollectionURL, {params: assetsInCollectionParams});
   }
 
@@ -412,10 +425,30 @@ export class DataAccessService {
     return this.http.post<InsertionResponse>(URL, mergeData);
   }
 
+  public deleteAssetFromFolder(assetId, folderId) {
+    const URL = this.awsApiDomainName + 'folderassets';
+    const params = new HttpParams()
+      .set('assetId', assetId)
+      .set('folderId', folderId);
+    let options = { params: params };
+
+    return this.http.delete<InsertionResponse>(URL, options);
+  }
+
   public getUserInfo(token) {
     const url = 'https://www.googleapis.com/oauth2/v3/userinfo';
     const params = new HttpParams().set('access_token', token);
     return this.http.get<UserInfo>(url, {params: params});
+  }
+
+  public addAssetsToFolder(data) {
+    const URL = this.awsApiDomainName + 'folderassets';
+    const postBody = {'data': data};
+    const headers = new HttpHeaders({
+      'Content-Type': 'text/json',
+      'Access-Control-Allow-Origin': '*',
+    });
+    return this.http.post(URL, postBody);
   }
 }
 
@@ -435,14 +468,25 @@ class Results {
   assets: any[];
 }
 
+class MuseumInfo {
+  museum1: any[];
+}
+
 class Asset {
   total;
   tagData;
 }
 
 class FolderDetails {
-  folderInfo: any;
-  metaTags: any;
+  insertTime;
+  image;
+  id;
+  name;
+  metaDataId;
+  lastModified;
+  verified;
+  note;
+  layoutType;
 }
 
 class CollectionResults {

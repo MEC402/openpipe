@@ -1,27 +1,49 @@
 <div class="lists row">
-  <div class="col-md-4 ">
+  <div class="col-md-1 ">
     <nb-select placeholder="Select Folder" [(selected)]="chosenCollection" (selectedChange)="onSelect()">
       <nb-option *ngFor="let c of collections" [value]="c">{{c.name}}</nb-option>
     </nb-select>
-    <nb-card size="giant">
-      <nb-card-body>
-        <ng2-smart-table [settings]="assetsSettings" [source]="assetsSource" (userRowSelect)="onRowSelect($event)"></ng2-smart-table>
-      </nb-card-body>
-    </nb-card>
   </div>
 
-  <div class="col-md-8 ">
-    <div class="row">
-      <button nbButton status="info" size="tiny" (click)="addText()">Add Text</button>
-      <button nbButton status="info" size="tiny" (click)="saveLayout()">save layout</button>
-    </div>
-    <nb-tabset (changeTab)="onChangeTab($event)">
-      <nb-tab tabTitle="Left Wall" id="container1">
-      </nb-tab>
-      <nb-tab tabTitle="Center Wall" id="container2">
-      </nb-tab>
-      <nb-tab tabTitle="Right Wall" id="container3">
-      </nb-tab>
-    </nb-tabset>
+  <div class="col-md-2 ">
+    <button nbButton status="info" size="tiny" (click)="saveLayout()">
+      <nb-icon icon="save-outline"></nb-icon>
+    </button>
+    <button nbButton status="info" size="tiny">
+      <nb-icon icon="plus-outline"></nb-icon>
+    </button>
+  </div>
+  <div class="col-md-3 ">
+    <input type="text" nbInput [(ngModel)]="zoom">
+    <button nbButton status="info" size="tiny" (click)="changeZoom()">
+      <nb-icon icon="maximize-outline"></nb-icon>
+    </button>
+  </div>
+
+  <div class="col-md-4 ">
+    <button nbButton [style.border]="0" [style.background]="activeWall=='Left'?   '#7e2aec': '#c1bdc1'" size="small" (click)="changeWall('l')"> Left </button>
+    <button nbButton [style.border]="0" [style.background]="activeWall=='Center'? '#7e2aec': '#c1bdc1'" size="small" (click)="changeWall('c')"> Center </button>
+    <button nbButton [style.border]="0" [style.background]="activeWall=='Right'?  '#7e2aec': '#c1bdc1'" size="small" (click)="changeWall('r')"> Right </button>
   </div>
 </div>
+
+<!--  <div class="col-md-2">-->
+<!--    <nb-card size="giant">-->
+<!--      <nb-card-body>-->
+<!--        <ng2-smart-table [settings]="assetsSettings" [source]="assetsSource" (userRowSelect)="onRowSelect($event)"></ng2-smart-table>-->
+<!--      </nb-card-body>-->
+<!--    </nb-card>-->
+<!--  </div>-->
+<!--    <div id="container1" [style.visibility]="activeWall=='Left'?   'visible': 'hidden'" ></div>-->
+<!--    <div id="container2" [style.visibility]="activeWall=='Center'? 'visible': 'hidden'" ></div>-->
+<!--    <div id="container3" [style.visibility]="activeWall=='Right'?  'visible': 'hidden'" ></div>-->
+
+<div id="container1" ></div>
+<!--<nb-card size="giant" >-->
+<!--  <nb-card-body id="container1">-->
+
+<!--  </nb-card-body>-->
+
+<!--</nb-card>-->
+
+

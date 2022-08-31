@@ -59,7 +59,7 @@ export class CanvasEditorComponent implements OnInit {
   }
 
   addImage(asset) {
-    const image = this.shapeService.image(asset.openpipe_canonical_smallImage, this.width, this.height);
+    const image = this.shapeService.image(asset.openpipe_canonical_smallImage, this.width, this.height,100,100);
 
     image.on('click', e => this.onShapeClick(e));
     image.on('keyup', e => this.onShapeDelete(e));

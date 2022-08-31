@@ -10,16 +10,21 @@ export class ShapeService {
 
   constructor() { }
 
-  image(url,sw,sh) {
+  image(url, x, y, w, h) {
     const img = new Image();
     img.src = url;
+    img.onerror = function () {
+      img.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Picture_icon_BLACK.svg/149px-Picture_icon_BLACK.svg.png';
+    };
     return new Konva.Image({
       image: img,
-      x: 10,
-      y: 10,
+      x: Math.ceil(x),
+      y: Math.ceil(y),
       draggable: true,
-      scaleX: 0.5,
-      scaleY: 0.5,
+      // scaleX: 0.5,
+      // scaleY: 0.5,
+      width: Math.ceil(w),
+      height: Math.ceil(h),
       dragBoundFunc: function (pos) {
         return {
           x: pos.x < 0 ? 0 : pos.x,
