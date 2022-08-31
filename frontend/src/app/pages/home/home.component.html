@@ -2,10 +2,7 @@
   <input type="text" nbInput placeholder="Put the search term here" shape="round" [(ngModel)]="searchTerm" (keydown.enter)="searchAssets()" >
   <button nbButton hero status="primary" shape="round" size="tiny" (click)="searchAssets()"><nb-icon icon="search-outline"></nb-icon></button>
   <div>
-    <nb-checkbox [(checked)]="met" >MET</nb-checkbox>
-    <nb-checkbox [(checked)]="rijk">Rijksmuseum</nb-checkbox>
-    <nb-checkbox [(checked)]="cleveland">Cleveland Museum of Art</nb-checkbox>
-    <nb-checkbox [(checked)]="local">Local</nb-checkbox>
+    <nb-checkbox [(checked)]="sc.checked" *ngFor="let sc of sourceCheckboxes">{{sc.name}}</nb-checkbox>
   </div>
 </div>
 

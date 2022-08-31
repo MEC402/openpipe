@@ -31,7 +31,7 @@ export class AssetTagCardComponent implements OnInit {
     'openpipe_canonical_Moment', 'openpipe_canonical_medium', 'openpipe_canonical_Technique', 'openpipe_canonical_country'
     , 'openpipe_canonical_culture', 'openpipe_canonical_period', 'openpipe_canonical_biography'
     , 'openpipe_canonical_longitude', 'openpipe_canonical_latitude', 'openpipe_canonical_classification',
-    'openpipe_canonical_Object_Type', 'openpipe_canonical_Region', 'openpipe_canonical_largeImageDimensions'];
+    'openpipe_canonical_Object_Type', 'openpipe_canonical_Region', 'openpipe_canonical_largeImageDimensions','openpipe_canonical_source'];
 
   constructor(private dataAccess: DataAccessService) { }
 

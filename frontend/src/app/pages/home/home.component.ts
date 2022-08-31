@@ -32,10 +32,7 @@ export class HomeComponent implements OnInit {
 
   searchTerm: string;
   source = [];
-  met = true;
-  rijk = true;
-  cleveland = true;
-  local = true;
+  sourceCheckboxes = [{name: 'Local', checked: false}];
   isSingleView = false;
 
   tableSource: LocalDataSource = new LocalDataSource();
@@ -79,85 +76,36 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.dataAccess.getMuseumInfo().subscribe(res => {
+      res.museum1.forEach(d => {
+        this.sourceCheckboxes.push({name: d.source, checked: false});
+      });
+    });
 
   }
 
   searchAssets() {
     this.source = [];
     this.tableSource.empty();
-    if (this.met) {
-      // this.dataAccess.getMETsData(this.searchTerm, 0 , 20).subscribe(res => {
-      this.dataAccess.getMuseumData(this.searchTerm, 'met' , 1, 20).subscribe(res => {
-        res['name'] = 'MET Museum';
-        res['sourceName'] = 'MET';
-        res['page'] = 1;
-        res['pageSize'] = 20;
-        res['total'] = res['museumCount']['MET'];
-        this.source.push(res);
-        res['data'].forEach(d => {
-          console.log(d);
-          d['name'] = 'MET Museum';
-          this.tableSource.add(d);
-        });
-        this.tableSource.refresh();
-      });
-    }
 
-    if (this.rijk) {
-      // this.dataAccess.getRijksData(this.searchTerm, 0 , 20).subscribe(res => {
-      this.dataAccess.getMuseumData(this.searchTerm, 'rijks' , 1, 20).subscribe(res => {
-        // const data = {'name': 'Rijk Museum', 'data': res};
-        res['name'] = 'Rijks Museum';
-        res['sourceName'] = 'Rijks';
-        res['page'] = 1;
-        res['pageSize'] = 20;
-        res['total'] = res['museumCount']['Rijks'];
-        this.source.push(res);
-        res['data'].forEach(d => {
-          console.log(d);
-          d['name'] = 'Rijks Museum';
-          this.tableSource.add(d);
-        });
-        this.tableSource.refresh();
-      });
-    }
-
-    if (this.cleveland) {
-      // this.dataAccess.getClevelandData(this.searchTerm, 0 , 20).subscribe(res => {
-      this.dataAccess.getMuseumData(this.searchTerm, 'Cleveland' , 1, 20).subscribe(res => {
-        // const data = {'name': 'Cleveland Museum', 'data': res};
-        res['name'] = 'Cleveland Museum';
-        res['sourceName'] = 'Cleveland';
-        res['page'] = 1;
-        res['pageSize'] = 20;
-        res['total'] = res['museumCount']['Cleveland'];
-        this.source.push(res);
-        res['data'].forEach(d => {
-          console.log(d);
-          d['name'] = 'Cleveland Museum';
-          this.tableSource.add(d);
-        });
-        this.tableSource.refresh();
-      });
-    }
-
-    if (this.local) {
-      // this.dataAccess.getClevelandData(this.searchTerm, 0 , 20).subscribe(res => {
-      this.dataAccess.getMuseumData(this.searchTerm, 'local' , 1, 20).subscribe(res => {
-        // const data = {'name': 'Local Assets', 'data': res};
-        res['name'] = 'Local';
-        res['page'] = 1;
-        res['pageSize'] = 20;
-        this.source['data'].push(res);
-        res['data'].forEach(d => {
-          console.log(d);
-          d['name'] = 'Local';
-          this.tableSource.add(d);
-        });
-        this.tableSource.refresh();
-      });
-    }
-
+    this.sourceCheckboxes.forEach(museumSource => {
+      if (museumSource.checked) {
+          this.dataAccess.getMuseumData(this.searchTerm, museumSource.name, 1, 20).subscribe(res => {
+            res['name'] = museumSource.name;
+            res['sourceName'] = museumSource.name;
+            res['page'] = 1;
+            res['pageSize'] = 20;
+            res['total'] = res['museumCount'][museumSource.name];
+            this.source.push(res);
+            res['data'].forEach(d => {
+              // console.log(d);
+              d['name'] = museumSource.name;
+              this.tableSource.add(d);
+            });
+            this.tableSource.refresh();
+          });
+      }
+    });
   }
 
   nextPage(source) {
