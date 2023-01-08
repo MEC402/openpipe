@@ -21,7 +21,8 @@ print("Content-Type: text/json\n")
 
 dict = cgiFieldStorageToDict(cgi.FieldStorage())
 
-musename = "all"
+#musename = "all"
+musename = "Rijsk"
 # remberandt
 
 #debuging code for test of implementation
