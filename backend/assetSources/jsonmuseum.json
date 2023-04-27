@@ -1,0 +1,27 @@
+{ "canons": [
+        { "code": "COPY", "src": "museum tag", "dst": "openpipe_canonical_xxx", "function": "functioname" },
+        { "code": "STATIC", "src": "JSON", "dst": "openpipe_canonical_source"},
+        { "code": "COPY", "src": "objectID", "dst": "openpipe_canonical_id"},
+        { "code": "COPY", "src": "primaryImage", "dst": "openpipe_canonical_largeImage"},
+
+        {"code": "COPY", "src": "primaryImageSmall", "dst": "openpipe_canonical_smallImage"},
+
+
+        {"code": "COPY", "dst": "openpipe_canonical_title", "src": "title"},
+        {"code": "COPY", "dst": "openpipe_canonical_artist", "src": "artistAlphaSort"},
+        {"code": "COPY", "dst": "openpipe_canonical_culture", "src": "culture"},
+        {"code": "COPY", "dst": "openpipe_canonical_medium", "src": "medium"},
+
+        {"code": "COPY", "dst": "openpipe_canonical_classification", "src": "classification"},
+        {"code": "COPY", "dst": "openpipe_canonical_nation", "src": "country"},
+        {"code": "COPY", "dst": "openpipe_canonical_city", "src":  "city"},
+
+        dateset = FormatConvert.getMetDate(data)
+        {"code": "METDATE", "dst": response["openpipe_canonical_firstDate", "src": "date"},
+        {"code": "METDATE", "dst": response["openpipe_canonical_lastDate", "src": "date"},
+        {"code": "METDATE", "dst": response["openpipe_canonical_date", "src": "date"},
+
+
+        {"code": "METDIMS", "dst": "openpipe_canonical_physicalDimensons", "src": "date", "function": "metdate"}
+]
+}
