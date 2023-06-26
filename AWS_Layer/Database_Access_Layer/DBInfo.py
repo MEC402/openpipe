@@ -1,8 +1,19 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+host = os.getenv('DB_HOSTNAME')
+username = os.getenv('DB_USERNAME')
+password = os.getenv('DB_PASSWORD')
+schema = os.getenv('DB_SCHEMA')
+
 class DBInfo:
-    data = {"production": {"address": "artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
-                           "schema": "artmaster",
-                           "username": "artmaster",
-                           "password": "ArtMaster51"},
+    """Maintains DB credentials from environment variables"""
+    data = {"production": {"address": host,
+                           "schema": schema,
+                           "username": username,
+                           "password": password},
             "dev": {"address": "artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
                     "schema": "artmaster",
                     "username": "artmaster",
