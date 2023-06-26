@@ -7,14 +7,29 @@ import sqlalchemy as db
 import mysql.connector
 from datetime import datetime
 
+from urllib.parse import quote
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+dbhost = os.getenv('DB_HOSTNAME')
+dbusername = os.getenv('DB_USERNAME')
+dbpassword = os.getenv('DB_PASSWORD')
+dbschema = os.getenv('DB_SCHEMA')
+
+dbhost_urlencoded = quote(os.getenv('DB_HOSTNAME'))
+dbusername_urlencoded = quote(os.getenv('DB_USERNAME'))
+dbpassword_urlencoded = quote(os.getenv('DB_PASSWORD'))
+dbschema_urlencoded = quote(os.getenv('DB_SCHEMA'))
 
 def insertIntoMetaTags(data,mid):
     try:
         connection = mysql.connector.connect(
-            host="artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
-            user="artmaster",
-            passwd="ArtMaster51",
-            database="artmaster"
+            host=dbhost,
+            user=dbusername,
+            passwd=dbpassword,
+            database=dbschema
         )
         cursor = connection.cursor(prepared=True)
 
@@ -40,10 +55,10 @@ def insertIntoMetaTags(data,mid):
 def insertIntoMetaData():
     try:
         connection = mysql.connector.connect(
-            host="artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
-            user="artmaster",
-            passwd="ArtMaster51",
-            database="artmaster"
+            host=dbhost,
+            user=dbusername,
+            passwd=dbpassword,
+            database=dbschema
         )
 
         cursor = connection.cursor(prepared=True)
@@ -62,10 +77,10 @@ def insertIntoMetaData():
 def insertIntoCollectionMember(assetId,collectionId,searchTerm):
     try:
         connection = mysql.connector.connect(
-            host="artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
-            user="artmaster",
-            passwd="ArtMaster51",
-            database="artmaster"
+            host=dbhost,
+            user=dbusername,
+            passwd=dbpassword,
+            database=dbschema
         )
 
         cursor = connection.cursor(prepared=True)
@@ -85,10 +100,10 @@ def insertIntoCollectionMember(assetId,collectionId,searchTerm):
 def insertIntoAsset(shortName, uri, idAtSource, sourceId, metaDataId,scope):
     try:
         connection = mysql.connector.connect(
-            host="artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
-            user="artmaster",
-            passwd="ArtMaster51",
-            database="artmaster"
+            host=dbhost,
+            user=dbusername,
+            passwd=dbpassword,
+            database=dbschema
         )
 
         cursor = connection.cursor(prepared=True)
@@ -106,8 +121,9 @@ def insertIntoAsset(shortName, uri, idAtSource, sourceId, metaDataId,scope):
             connection.close()
 
 def getSchema(type):
-    engine = db.create_engine(
-        'mysql+mysqlconnector://artmaster:ArtMaster51@artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com/artmaster')
+    connection_string = f'mysql+mysqlconnector://{dbusername_urlencoded}:{dbpassword_urlencoded}@{dbhost_urlencoded}/{dbschema_urlencoded}'
+    engine = db.create_engine(connection_string)
+    #    'mysql+mysqlconnector://artmaster:ArtMaster51@artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com/artmaster')
     connection = engine.connect()
     metadata = db.MetaData()
     canonicalMetaTag = db.Table('canonicalMetaTag', metadata, autoload=True, autoload_with=engine)
