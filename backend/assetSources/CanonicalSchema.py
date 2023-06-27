@@ -1,15 +1,24 @@
 import sqlalchemy as db
 
 from urllib.parse import quote
-import os
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
-dbhost_urlencoded = quote(os.getenv('DB_HOSTNAME'))
-dbusername_urlencoded = quote(os.getenv('DB_USERNAME'))
-dbpassword_urlencoded = quote(os.getenv('DB_PASSWORD'))
-dbschema_urlencoded = quote(os.getenv('DB_SCHEMA'))
+environment = os.getenv('ENVIRONMENT')
+
+if environment == 'dev':
+    dbhost_urlencoded = quote(os.getenv('DB_HOSTNAME_DEV'))
+    dbusername_urlencoded = quote(os.getenv('DB_USERNAME_DEV'))
+    dbpassword_urlencoded = quote(os.getenv('DB_PASSWORD_DEV'))
+    dbschema_urlencoded = quote(os.getenv('DB_SCHEMA_DEV'))
+
+elif environment == 'prod':
+    dbhost_urlencoded = quote(os.getenv('DB_HOSTNAME_PROD'))
+    dbusername_urlencoded = quote(os.getenv('DB_USERNAME_PROD'))
+    dbpassword_urlencoded = quote(os.getenv('DB_PASSWORD_PROD'))
+    dbschema_urlencoded = quote(os.getenv('DB_SCHEMA_PROD'))
 
 class CanonicalSchema:
     def getSchema(self,type):

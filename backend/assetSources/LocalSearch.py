@@ -5,6 +5,24 @@ from multiprocessing.pool import ThreadPool
 import mysql.connector
 from mysql.connector import Error
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+environment = os.getenv('ENVIRONMENT')
+
+if environment == 'dev':
+    dbhost = os.getenv('DB_HOSTNAME_DEV')
+    dbusername = os.getenv('DB_USERNAME_DEV')
+    dbpassword = os.getenv('DB_PASSWORD_DEV')
+    dbschema = os.getenv('DB_SCHEMA_DEV')
+elif environment == 'prod':
+    dbhost = os.getenv('DB_HOSTNAME_PROD')
+    dbusername = os.getenv('DB_USERNAME_PROD')
+    dbpassword = os.getenv('DB_PASSWORD_PROD')
+    dbschema = os.getenv('DB_SCHEMA_PROD')
+
 class LocalSearch:
 
     def setName(self,aname):
@@ -14,10 +32,10 @@ class LocalSearch:
         result = {}
         try:
             connection = mysql.connector.connect(
-                host="artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
-                user="artmaster",
-                passwd="ArtMaster51",
-                database="artmaster"
+                host=dbhost,
+                user=dbusername,
+                passwd=dbpassword,
+                database=dbschema
             )
 
             sql_select_Query = "SELECT asset.id, MATCH(metaTag.tagName,metaTag.value) AGAINST(%s IN NATURAL LANGUAGE MODE) as relevance FROM metaTag join asset on metaTag.metaDataId=asset.metaDataId where MATCH(metaTag.tagName,metaTag.value) AGAINST(%s IN NATURAL LANGUAGE MODE)  ORDER BY relevance DESC"
@@ -41,10 +59,10 @@ class LocalSearch:
         result = {}
         try:
             connection = mysql.connector.connect(
-                host="artmaster-production.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
-                user="artmaster",
-                passwd="ArtMaster51",
-                database="artmaster"
+                host=dbhost,
+                user=dbusername,
+                passwd=dbpassword,
+                database=dbschema
             )
 
             sql_select_Query = "select tagName, value from asset join metaTag on asset.metaDataId=metaTag.metaDataId where asset.id=%s"

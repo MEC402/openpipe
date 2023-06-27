@@ -1,12 +1,20 @@
-import os
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
-dbhost = os.getenv('DB_HOSTNAME')
-dbusername = os.getenv('DB_USERNAME')
-dbpassword = os.getenv('DB_PASSWORD')
-dbschema = os.getenv('DB_SCHEMA')
+environment = os.getenv('ENVIRONMENT')
+
+if environment == 'dev':
+    dbhost = os.getenv('DB_HOSTNAME_DEV')
+    dbusername = os.getenv('DB_USERNAME_DEV')
+    dbpassword = os.getenv('DB_PASSWORD_DEV')
+    dbschema = os.getenv('DB_SCHEMA_DEV')
+elif environment == 'prod':
+    dbhost = os.getenv('DB_HOSTNAME_PROD')
+    dbusername = os.getenv('DB_USERNAME_PROD')
+    dbpassword = os.getenv('DB_PASSWORD_PROD')
+    dbschema = os.getenv('DB_SCHEMA_PROD')
 
 class DBInfo:
     """Maintains DB credentials from environment variables"""
@@ -14,10 +22,11 @@ class DBInfo:
                            "schema": dbschema,
                            "username": dbusername,
                            "password": dbpassword},
-            "dev": {"address": "artmuseum.c2p1mleoiwlk.us-west-2.rds.amazonaws.com",
-                    "schema": "artmaster",
-                    "username": "artmaster",
-                    "password": "ArtMaster51"},
+# Keeping the below redundancy for now, prod vs dev is handled elsewhere now.
+            "dev": {"address": dbhost,
+                    "schema": dbschema,
+                    "username": dbusername,
+                    "password": dbpassword},
             "host": {"address": "localhost",
                     "schema": "artmaster",
                     "username": "root",
