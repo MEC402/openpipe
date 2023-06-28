@@ -1,4 +1,5 @@
 import json
+import os
 
 from DataAccess import DataAccess as da
 from TO import TO
@@ -14,17 +15,25 @@ def getAllAssetsWithGUID(page, pageSize, changeStart, changeEnd, none):
                "culture": "700", "genre": "800", "medium": "900", "nation": "a00",
                "artist": "400", "title": "000", "tags": "000"
                }
-    guidURL = "http://mec402.boisestate.edu/cgi-bin/openpipe/data/"
-    sguidURL = "http://mec402.boisestate.edu/"
+    # guidURL = "http://mec402.boisestate.edu/cgi-bin/openpipe/data/"
+    # sguidURL = "http://mec402.boisestate.edu/"
+    guidURL = os.getenv('DATA_URL')
+    sguidURL = os.getenv('BASE_URL')
+
     if (page < 1):
         page = 1
     start = (page - 1) * pageSize
     step = pageSize
 
+    # results = {"total_assets": 0,
+    #            "assets_in_page": 0,
+    #            "guidbase": "http://mec402.boisestate.edu/",
+    #            "data": []}
+    
     results = {"total_assets": 0,
-               "assets_in_page": 0,
-               "guidbase": "http://mec402.boisestate.edu/",
-               "data": []}
+           "assets_in_page": 0,
+           "guidbase": os.getenv('BASE_URL'),
+           "data": []}
 
     if int(page) < 0:
         return results

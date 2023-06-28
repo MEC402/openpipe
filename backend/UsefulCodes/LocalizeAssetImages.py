@@ -36,11 +36,17 @@ thPath = "/WorldMuseum/fileStore/imageThumbnails/"
 # path = "assetImages/"
 # thPath = "imageThumbnails/"
 
-destURL = "http://mec402.boisestate.edu/wmuseum/fileStore/assetImages/"
-thDestURL = "http://mec402.boisestate.edu/wmuseum/fileStore/imageThumbnails/"
+# destURL = "http://mec402.boisestate.edu/wmuseum/fileStore/assetImages/"
+# thDestURL = "http://mec402.boisestate.edu/wmuseum/fileStore/imageThumbnails/"
 
-substURL = "http://mec402.boisestate.edu/assets/smallImage.jpg"
-thSubstURL = "http://mec402.boisestate.edu/assets/thumbnail.jpg"
+# substURL = "http://mec402.boisestate.edu/assets/smallImage.jpg"
+# thSubstURL = "http://mec402.boisestate.edu/assets/thumbnail.jpg"
+
+destURL = os.getenv('DEST_URL')
+thDestURL = os.getenv('thDEST_URL')
+
+substURL = os.getenv('SUBST_URL')
+thSubstURL = os.getenv('tbSUBST_URL')
 
 for r in res['data']:
     if r['value'][0] != "{BASEURI}/smallImage.jpg":
