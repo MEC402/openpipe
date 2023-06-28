@@ -5,6 +5,7 @@ from io import BytesIO
 from PIL import Image
 from openpipeAPI.ORM.ORM import ORM
 from openpipeAPI.ORM.TO import TO
+import os
 
 
 def convertImageFromURL(url, path, thPath, fileName, thFileName):

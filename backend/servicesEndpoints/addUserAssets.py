@@ -10,6 +10,7 @@ import json
 import Slack
 import traceback
 import sys
+import os
 
 try:
     print("Content-Type: text/json")
@@ -21,11 +22,14 @@ try:
     if fileitem is not None and fileitem.file:
         sourcefileName = os.path.basename(fileitem.filename)
         ext = sourcefileName.partition('.')[-1]
-        baseURI="http://mec402.boisestate.edu/assets/uploads/"
+        # baseURI="http://mec402.boisestate.edu/assets/uploads/"
+    
+        baseURL = os.getenv('UPLD_URL')
+
         sourceId = "666"
         folderId = 130
 
-        data={"shortName":sourcefileName,"uri":baseURI,"folderId":folderId,"assetType":ext}
+        data={"shortName":sourcefileName,"uri":baseURL,"folderId":folderId,"assetType":ext}
         uniqueFileName=BL().saveUploadAsset()
 
         # Save to server

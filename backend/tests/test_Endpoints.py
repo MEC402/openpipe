@@ -1,4 +1,5 @@
 import requests
+import os
 
 
 class TestEndpoints():
@@ -6,7 +7,10 @@ class TestEndpoints():
         Class for testing the end points.
         url points to the API base.
     """
-    url='http://mec402.boisestate.edu/cgi-bin/'
+    # url='http://mec402.boisestate.edu/cgi-bin/'
+    url = os.getenv('CGI_BIN_URL')
+    
+    
     def test_allSources(self):
         """
             test if the allSourses endpoint is working

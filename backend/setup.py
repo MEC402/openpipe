@@ -1,5 +1,6 @@
 import pathlib
 from setuptools import setup
+import os
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
@@ -14,7 +15,8 @@ setup(
     description="OpenPipe is an open source federated content production pipeline this is lightweight and extensible.",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/MEC402/openpipe",
+    # url="https://github.com/MEC402/openpipe",
+    url = os.getenv('MEC_402_URL'),
     author="Openpipe Team",
     # author_email="office@realpython.com",
     # license="MIT",
