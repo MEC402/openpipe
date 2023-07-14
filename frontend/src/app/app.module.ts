@@ -53,7 +53,7 @@ import { OAuth2CallbackComponent } from './oauth2-callback/oauth2-callback.compo
             endpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
             responseType: NbOAuth2ResponseType.TOKEN,
             scope: 'https://www.googleapis.com/auth/userinfo.profile',
-            redirectUri: 'http://localhost:4200/auth/callback',
+            redirectUri: 'http://dev-worldmuseum.com/auth/callback',
           },
         }),
       ],
