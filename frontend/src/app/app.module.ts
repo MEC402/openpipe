@@ -47,7 +47,7 @@ import { OAuth2CallbackComponent } from './oauth2-callback/oauth2-callback.compo
     NbAuthModule.forRoot({
       strategies: [
         NbOAuth2AuthStrategy.setup({
-          clientId: 'Add_Client_ID_HERE',
+          clientId: '609231071331-kaggktmbo6v8qnvrp5o3d850gq44jj10.apps.googleusercontent.com',
           name: 'google',
           authorize: {
             endpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
