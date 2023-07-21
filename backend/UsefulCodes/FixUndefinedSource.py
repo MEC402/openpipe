@@ -14,7 +14,7 @@ FROM
         JOIN
     metaTag ON asset.metaDataId = metaTag.metaDataId
 WHERE
-    idAtSource = 'undefined'
+    idAtSource = 'undefined' or sourceId='undefined'
         AND (tagName = 'openpipe_canonical_source'
         OR tagName='id' OR tagName='objectID' )
 ORDER BY asset.metaDataId;"""
@@ -63,6 +63,6 @@ for m in map:
     else:
         print(map[m])
 
-# print(update, len(update))
+print(update, len(update))
 orm.bulkUpdate(update, Asset, 1000)
 orm.commitClose()

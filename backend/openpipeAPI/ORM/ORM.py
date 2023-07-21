@@ -40,6 +40,22 @@ class ORM:
 
     def update(self, object):
         return
+
+    def bulkUpdate(self, mappings, TableClass, batchSize):
+        updateSize = len(mappings)
+        biteSize = batchSize
+        q = int(updateSize / biteSize)
+        r = updateSize % biteSize
+
+        for i in range(0, q):
+            print("************** commiting to DB **************")
+            self.session.bulk_update_mappings(TableClass, mappings[i * biteSize:i * biteSize + biteSize])
+            self.session.flush()
+            self.session.commit()
+            print("************** Done commiting to DB **************")
+        self.session.bulk_update_mappings(TableClass, mappings[q * biteSize:q * biteSize + r])
+        self.commitClose()
+
     def updateSqlMulti(self, query):
         try:
             connection = mysql.connector.connect(

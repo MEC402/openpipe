@@ -35,11 +35,11 @@ for topic in topicsResultSet["data"]:
 print(topicHashMap.keys())
 # print(topicHashMap["400"])
 
-# metaTagResultSet = orm.executeSelect(
-#     """SELECT * FROM artmaster.metaTag where tagName like 'openpipe_canonical_%' order by metaDataId asc;""")
+metaTagResultSet = orm.executeSelect(
+    """SELECT * FROM artmaster.metaTag where tagName like 'openpipe_canonical_%' order by metaDataId asc;""")
 
-stm= """select asset.metaDataId from asset  join collectionMember on asset.id=assetId where collectionId=222"""
-metaTagResultSet = orm.executeSelect(stm)
+# stm= """select asset.metaDataId from asset  join collectionMember on asset.id=assetId where collectionId=222"""
+# metaTagResultSet = orm.executeSelect(stm)
 
 updateDataArray = {}
 

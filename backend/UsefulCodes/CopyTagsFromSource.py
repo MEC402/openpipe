@@ -20,7 +20,7 @@ MetaTags = tables["metaTag"]
 # for t in tagResultSet["data"]:
 #     mid = t["metaDataId"][0]
 #     tagName = t["tagName"][0]
-#     value = t["value"][0]
+#     value = t["value"][0] 
 #     tagId = t['id'][0]
 #     if mid not in tags:
 #         tags[mid] = {tagName: {"value": value, "id": tagId}}
@@ -121,5 +121,98 @@ def copyClevelandArtistFromSource():
     orm.session.close()
 
 
-# copyMetMediumFromSource()
-copyClevelandArtistFromSource()
+
+def copyFullFromLarge():
+    stm="""select q.id as sId,p.id as dId,q.metaDataId as sMid, p.metaDataId as dMid, q.tagName as sTagName,q.value as sValue , p.tagName as dTagName,p.value as dValue from (select * from metaTag where tagName="openpipe_canonical_fullImage" and value="") as q join 
+(select * from metaTag where tagName="openpipe_canonical_largeImage") as p on p.metadataId=q.metadataId ;"""
+    updates = []
+    resultSet = orm.session.execute(stm, {})
+    for r in resultSet:
+        sId = r[0]
+        dId = r[1]
+        sMid = r[2]
+        dMid = r[3]
+        sTagName = r[4]
+        sValue = r[5]
+        dTagName = r[6]
+        dValue = r[7]
+        # print(sValue,dValue)
+        updates.append({"id": sId, "value": dValue, "note": "sep6"})
+
+    print(len(updates))
+    print(updates)
+    orm.bulkUpdate(updates, MetaTags, 100)
+    orm.session.commit()
+    orm.session.close()
+
+def findDimension():
+    from requests import get
+    from io import BytesIO
+    from PIL import Image
+
+    stm = """SELECT 
+    q.id AS sId,
+    p.id AS dId,
+    q.metaDataId AS sMid,
+    p.metaDataId AS dMid,
+    q.tagName AS sTagName,
+    q.value AS sValue,
+    p.tagName AS dTagName,
+    p.value AS dValue
+FROM
+    (SELECT 
+        *
+    FROM
+        metaTag
+    WHERE
+        tagName = 'openpipe_canonical_smallImageDimensions'
+            AND metaDataId in (select id from asset where asset.id in (12286, 12604, 12606, 12608, 12609, 12610, 12611, 12649, 12650, 12651, 12652)) ) AS q
+        JOIN
+    (SELECT 
+        *
+    FROM
+        metaTag
+    WHERE
+        tagName = 'openpipe_canonical_smallImage') AS p ON p.metadataId = q.metadataId where p.value not like "%getClevelandConvertedTif%";"""
+    updates = []
+    resultSet = orm.session.execute(stm, {})
+    count=0
+    badAssets=[]
+    for r in resultSet:
+        try:
+            print(count)
+            sId = r[0]
+            dId = r[1]
+            sMid = r[2]
+            dMid = r[3]
+            sTagName = r[4]
+            sValue = r[5]
+            dTagName = r[6]
+            dValue = r[7]
+            # print(sValue,dValue)
+            if dValue != "" and not (dValue.endswith('.mp4')or dValue.endswith('.mov')):
+                image_raw = get(dValue)
+                image = Image.open(BytesIO(image_raw.content))
+                width, height = image.size
+                updates.append({"id": sId, "value": str(width)+","+str(height), "note": "sep6ldim"})
+            else:
+                print(dValue)
+            count+=1
+        except Exception as err:
+            print(err)
+            print({"sid":sId,"dvalue":dValue})
+            badAssets.append({"sid":sId,"dvalue":dValue})
+
+    print(len(updates))
+    print(updates)
+    print(badAssets)
+    orm.bulkUpdate(updates, MetaTags, 100)
+    orm.session.commit()
+    orm.session.close()
+
+copyMetMediumFromSource()
+# copyClevelandArtistFromSource()
+# copyFullFromLarge()
+# findDimension()
+
+
