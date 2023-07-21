@@ -3,6 +3,7 @@
 sudo firewall-cmd --add-service=http --permanent
 sudo firewall-cmd --add-service=https --permanent
 sudo firewall-cmd --reload
+apachectl restart
 ```
 
 ### Get Apache error log (Cleaned)
