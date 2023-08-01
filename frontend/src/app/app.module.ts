@@ -47,13 +47,14 @@ import { OAuth2CallbackComponent } from './oauth2-callback/oauth2-callback.compo
     NbAuthModule.forRoot({
       strategies: [
         NbOAuth2AuthStrategy.setup({
-          clientId: 'Add_Client_ID_HERE',
+          clientId: '222308801855-00ija7jbfffolbrsuo54qoake8uld3um.apps.googleusercontent.com',
           name: 'google',
           authorize: {
             endpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
             responseType: NbOAuth2ResponseType.TOKEN,
             scope: 'https://www.googleapis.com/auth/userinfo.profile',
-            redirectUri: 'http://localhost:4200/auth/callback',
+            redirectUri: 'http://d5bnzen7zsmwo.cloudfront.net/auth/callback'
+            // redirectUri: 'http://localhost:4200/auth/callback',
           },
         }),
       ],

@@ -124,14 +124,14 @@ export class DataAccessService {
   }
 
   public addMetaTags(metaDataId, metaTags): Observable<InsertionResponse> {
-    const metaTagsURL = this.webServerURL + 'dataAccess/createMetaTags.py';
+    const metaTagsURL = this.awsApiDomainName + 'metatags';
     metaTags['metaDataId'] = metaDataId;
     const postBody = metaTags;
     const headers = new HttpHeaders({
       'Content-Type': 'text/plain',
       'Access-Control-Allow-Origin': '*',
     });
-    return this.http.post<InsertionResponse>(metaTagsURL, postBody);
+    return this.http.put<InsertionResponse>(metaTagsURL, postBody);
   }
 
   public addAssetToCollection(assetId, collection, searchTerm): Observable<InsertionResponse> {
@@ -366,6 +366,36 @@ export class DataAccessService {
   public saveAssetChanges(mid, data) {
     const URL = this.awsApiDomainName + 'metatags';
     const postBody = {'metaDataId': mid, 'data': data};
+    const headers = new HttpHeaders({
+      'Content-Type': 'text/json',
+      'Access-Control-Allow-Origin': '*',
+    });
+    return this.http.post<InsertionResponse>(URL, postBody);
+  }
+
+
+  public saveMetaTagChanges(mid, data) {
+    const URL = this.awsApiDomainName + 'multitag';
+    let d={"metaDataId":mid,"insert":{},"update":{}}
+    console.log(data)
+    for (const [key, value] of Object.entries(data)) {
+      console.log(key)
+      if (key.includes("New_tag")) {
+        let tagName = key.split(':')[1];
+        if (tagName in d.insert){
+          d.insert[tagName].push(value);
+        }
+        else{
+          d.insert[tagName]=[value];
+        }
+      }
+      else {
+        d.update[key]=value;
+      }
+      console.log(d)
+    }
+
+    const postBody = d;
     const headers = new HttpHeaders({
       'Content-Type': 'text/json',
       'Access-Control-Allow-Origin': '*',

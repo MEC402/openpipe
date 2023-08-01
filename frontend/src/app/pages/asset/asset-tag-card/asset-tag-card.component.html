@@ -5,11 +5,11 @@
         <span class="delta" [class.up]="currentAssetVerified" [class.down]="!currentAssetVerified">
           <nb-icon  [icon]="currentAssetVerified ? 'checkmark-circle-2' : 'minus-circle' " pack="eva"></nb-icon>
         </span>
-        {{asset.openpipe_canonical_title[0]}} Meta-Tags | guid: 100/{{asset.assetId}}<br>
+        {{getFirstValue(asset.openpipe_canonical_title)}} Meta-Tags | guid: 100/{{asset.assetId}}<br>
         <a [href]="currentAssetLink"  target="_blank" rel="noopener noreferrer">{{this.currentAssetLink}}</a>
       </div>
       <div class="col-1">
-        <button nbButton size="tiny" nbButton status="primary" (click)="saveAssetChanges()">Save changes</button>
+        <button nbButton size="tiny" nbButton status="primary" (click)="saveMetaTagChanges()">Save changes</button>
       </div>
     </div>
   </nb-card-header>
@@ -17,19 +17,64 @@
   <nb-card-body>
     <nb-tabset (changeTab)="onTabChange()">
       <nb-tab tabTitle="Tombstone">
-        <ngx-tag-viewer [tags]="tombstoneTags" (onTagChange)="sendTheNewValue($event)"></ngx-tag-viewer>
+<!--        <ngx-tag-viewer [tags]="tombstoneTags" (onTagChange)="sendTheNewValue($event)"></ngx-tag-viewer>-->
+        <div class="row">
+          <div class="col-4" *ngFor="let tag of tombstoneTags;" >
+            <div class="row">
+              <div class="col-4">
+                <label [for]="tag.tagName" class="label">{{tag.tagName}}</label><br>
+              </div>
+              <button nbButton size="tiny" status="success" shape="round" (click)="addNewElement(container,tag.originalTagName)">+</button>
+            </div>
+            <div #container>
+              <div  *ngFor="let element of tag.value;" >
+                <textarea nbInput [ngModel]="getDictValue(element)" (ngModelChange)="sendTheNewValue($event,getDictKey(element),tag.tagName)" fullWidth></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
       </nb-tab>
       <nb-tab tabTitle="Canonical Tags">
-        <ngx-tag-viewer [tags]="canonicalTags" (onTagChange)="sendTheNewValue($event)"></ngx-tag-viewer>
+<!--        <ngx-tag-viewer [tags]="canonicalTags" (onTagChange)="sendTheNewValue($event)"></ngx-tag-viewer>-->
+        <div class="row">
+          <div class="col-4" *ngFor="let tag of canonicalTags;" >
+            <div class="row">
+              <div class="col-4">
+                <label [for]="tag.tagName" class="label">{{tag.tagName}}</label><br>
+              </div>
+              <button nbButton size="tiny" status="success" shape="round" (click)="addNewElement(container,tag.originalTagName)">+</button>
+            </div>
+            <div #container>
+              <div  *ngFor="let element of tag.value;" >
+                <textarea nbInput [ngModel]="getDictValue(element)" (ngModelChange)="sendTheNewValue($event,getDictKey(element),tag.tagName)" fullWidth></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
       </nb-tab>
       <nb-tab tabTitle="Museum">
-        <ngx-tag-viewer [tags]="museumTags" (onTagChange)="sendTheNewValue($event)"></ngx-tag-viewer>
+<!--        <ngx-tag-viewer [tags]="museumTags" (onTagChange)="sendTheNewValue($event)"></ngx-tag-viewer>-->
+        <div class="row">
+          <div class="col-4" *ngFor="let tag of museumTags;" >
+            <div class="row">
+              <div class="col-4">
+                <label [for]="tag.tagName" class="label">{{tag.tagName}}</label><br>
+              </div>
+              <button nbButton size="tiny" status="success" shape="round" (click)="addNewElement(container,tag.originalTagName)">+</button>
+            </div>
+            <div #container>
+              <div  *ngFor="let element of tag.value;" >
+                <textarea nbInput [ngModel]="getDictValue(element)" (ngModelChange)="sendTheNewValue($event,getDictKey(element),tag.tagName)" fullWidth></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
       </nb-tab>
       <nb-tab tabTitle="Settings">
         <div class="or">
           <button nbButton size="tiny" status="success" *ngIf="!currentAssetVerified">Mark as Verified</button>
           <label for="score" class="label">score</label>
-          <input type="text" nbInput id="score" [value]="currentAssetScore" (input)="sendTheNewValue($event)">
+<!--          <input type="text" nbInput id="score" [value]="currentAssetScore" (input)="sendTheNewValue($event,tag.tagName)">-->
           <nb-toggle [(ngModel)]="currentAssetAccessStatus">{{currentAssetAccessStatus ? 'public' : 'private' }}</nb-toggle>
         </div>
       </nb-tab>

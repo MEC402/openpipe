@@ -1,10 +1,18 @@
 
   <div class="row">
-    <div class="col-4" *ngFor="let i of tags">
-        <label [for]="i.tagName" class="label">{{i.tagName}}</label><br>
+    <div class="col-4" *ngFor="let tag of tags;">
+        <label [for]="tag.tagName" class="label">{{tag.tagName}}</label><br>
 <!--        <input type="text" nbInput fullWidth [id]="i.originalTagName" [value]="i.value" (input)="sendTheNewValue($event)">-->
-        <textarea nbInput [id]="i.originalTagName" [value]="i.value" (input)="sendTheNewValue($event)" fullWidth></textarea>
+<!--        <textarea nbInput [id]="tag.originalTagName" [value]="tag.value" (input)="sendTheNewValue($event)" fullWidth></textarea>-->
+
+      <div *ngIf="isArray(tag.value)">
+        <div *ngFor="let element of tag.value; let i = index">
+          <textarea nbInput [(ngModel)]="tag.value[i]" (ngModelChange)="sendTheNewValue($event)" fullWidth></textarea>
+        </div>
       </div>
+
+      <button (click)="addNewElement('')">Add new textarea</button>
+    </div>
     </div>
 
 

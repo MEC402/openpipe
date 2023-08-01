@@ -18,6 +18,18 @@ export class TagViewerComponent implements OnInit {
   }
 
   sendTheNewValue(e) {
-    this.onTagChange.emit({'tag': e.target.id, 'value': e.target.value});
+    // this.onTagChange.emit({'tag': e.target.id, 'value': e.target.value});
+    console.log(this.tags)
   }
+
+  addNewElement(newElement: string) {
+    // if (newElement.trim() !== '') {
+      this.tags.push(newElement);
+    // }
+  }
+
+  isArray(obj : any ) {
+    return Array.isArray(obj)
+  }
+
 }

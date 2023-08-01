@@ -22,10 +22,8 @@ export class AssetTagCardComponent implements OnInit {
   museumTags = [];
   selectedAssetChanges = {};
   currentAssetImage: any;
-  assetLink: any;
   currentAssetAccessStatus = true;
-  allTagsView = false;
-
+  newTagCounter = 0;
 
   selectTagNames = ['openpipe_canonical_artist', 'openpipe_canonical_title',  'openpipe_canonical_displayDate' ,
     'openpipe_canonical_Moment', 'openpipe_canonical_medium', 'openpipe_canonical_Technique', 'openpipe_canonical_country'
@@ -36,6 +34,7 @@ export class AssetTagCardComponent implements OnInit {
   constructor(private dataAccess: DataAccessService) { }
 
   ngOnInit() {
+    this.newTagCounter=0;
   }
 
   updateUI(a) {
@@ -50,22 +49,24 @@ export class AssetTagCardComponent implements OnInit {
     this.selectedAssetChanges = {};
     let s = 'Local';
     if ('openpipe_canonical_source' in this.asset) {
-      s = this.asset.openpipe_canonical_source[0];
+      s = this.asset.openpipe_canonical_source[0][Object.keys(this.asset.openpipe_canonical_source[0])[0]];
     }
 
     if (s.includes('Metropolitan')) {
-      this.currentAssetLink = 'https://www.metmuseum.org/art/collection/search/' + this.asset.objectID;
+      this.currentAssetLink = 'https://www.metmuseum.org/art/collection/search/' +this.asset.objectID[0][Object.keys(this.asset.objectID[0])[0]];
     } else if (s.includes('Cleveland')) {
-      this.currentAssetLink = 'https://www.clevelandart.org/art/' + this.asset.accession_number;
+      this.currentAssetLink = 'https://www.clevelandart.org/art/' + this.asset.accession_number[0][Object.keys(this.asset.accession_number[0])[0]]
+      ;
     } else if (s.includes('Rijks')) {
-      this.currentAssetLink = 'https://www.rijksmuseum.nl/en/collection/' + this.asset.objectNumber;
+      this.currentAssetLink = 'https://www.rijksmuseum.nl/en/collection/' + this.asset.objectNumber[0][Object.keys(this.asset.objectNumber[0])[0]]
+      ;
     } else {
       this.currentAssetLink = 'Link not available';
     }
 
     this.separateTagsInGroups();
-
     console.log(this.tombstoneTags);
+    console.log(this.canonicalTags)
   }
 
   saveAssetChanges() {
@@ -74,19 +75,31 @@ export class AssetTagCardComponent implements OnInit {
     });
   }
 
-  sendTheNewValue(e) {
-    this.selectedAssetChanges[e.tag] = e.value;
-    this.asset[e.tag] = e.value;
+  saveMetaTagChanges() {
+    this.dataAccess.saveMetaTagChanges(this.asset.metaDataId, this.selectedAssetChanges).subscribe(res => {
+      console.log(res);
+    });
+  }
+
+  sendTheNewValue(e, metaTagId,tagName) {
+    const value = e;
+    console.log(value)
+    console.log(metaTagId)
+    this.selectedAssetChanges[metaTagId] = value;
+    console.log(this.selectedAssetChanges)
   }
 
   onTabChange() {
     this.separateTagsInGroups();
+    this.selectedAssetChanges={};
   }
 
   separateTagsInGroups() {
     const ts = [];
     const ct = [];
     const mt = [];
+
+    console.log(this.asset)
 
     for (const [key, value] of Object.entries(this.asset)) {
       if (this.selectTagNames.includes(key)) {
@@ -103,5 +116,29 @@ export class AssetTagCardComponent implements OnInit {
     this.tombstoneTags = ts;
     this.canonicalTags = ct;
     this.museumTags = mt;
+  }
+
+  addNewElement(container: HTMLElement, originalTagName) {
+    const textBox = document.createElement('textarea');
+    textBox.classList.add('form-control');
+    textBox.id = "New_tag:"+ originalTagName + ":" + this.newTagCounter;
+    this.newTagCounter++;
+    textBox.addEventListener('input', (e) => this.sendTheNewValue((e.target as HTMLButtonElement).value,textBox.id,originalTagName ));
+    container.appendChild(textBox);
+  }
+
+  isArray(obj : any ) {
+    return Array.isArray(obj)
+  }
+
+  getFirstValue(tag: any) {
+    return tag[0][Object.keys(tag[0])[0]]
+  }
+  getDictValue(v: any) {
+    return v[Object.keys(v)[0]]
+  }
+
+  getDictKey(k: any) {
+    return Object.keys(k)[0];
   }
 }

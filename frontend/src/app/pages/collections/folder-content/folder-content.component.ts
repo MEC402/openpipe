@@ -48,12 +48,16 @@ export class FolderContentComponent implements OnInit, OnDestroy {
         title: 'Picture',
         type: 'html',
         valuePrepareFunction: (openpipe_canonical_smallImage) => {
-          return '<img width="50px" src="' + openpipe_canonical_smallImage[0] + '" />';
+          return '<img width="50px" src="' + openpipe_canonical_smallImage[0][Object.keys(openpipe_canonical_smallImage[0])[0]] + '" />';
         },
       },
       openpipe_canonical_title: {
-        title: 'Title',
-        type: 'string',
+        filter: true,
+        title: 'Picture',
+        type: 'html',
+        valuePrepareFunction: (openpipe_canonical_title) => {
+          return '<p>'+ openpipe_canonical_title[0][Object.keys(openpipe_canonical_title[0])[0]] + '</p>';
+        },
       },
     },
   };
@@ -84,6 +88,7 @@ export class FolderContentComponent implements OnInit, OnDestroy {
         pages.push(i);
       }
       this.currentFolderAssets.load(res.data);
+
       Observable.merge(pages.map( g => this.dataAccess.getFolderAssets(this.folderId, g, pageSize)))
         .subscribe(ob => {
           ob.pipe(takeUntil(this._destroyed$)).subscribe(resp => {
@@ -110,12 +115,12 @@ export class FolderContentComponent implements OnInit, OnDestroy {
 
 
   onClick(event) {
+    console.log(this.currentFolderAssets)
     this.currentAsset = event.data;
     this.assetTagInfo.updateUI(this.currentAsset);
     this.currentAssetType = this.currentAsset.assetType;
-    this.currentAssetImage = this.currentAsset.openpipe_canonical_smallImage[0];
-    this.currentAssetFullImage = this.currentAsset.openpipe_canonical_fullImage[0];
-    console.log(this.currentAsset);
+    this.currentAssetImage = this.currentAsset.openpipe_canonical_smallImage[0][Object.keys(this.currentAsset.openpipe_canonical_smallImage[0])[0]]
+    this.currentAssetFullImage = this.currentAsset.openpipe_canonical_fullImage[0][Object.keys(this.currentAsset.openpipe_canonical_fullImage[0])[0]]
     this.onFlipCard();
   }
 
