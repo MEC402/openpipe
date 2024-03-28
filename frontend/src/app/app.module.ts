@@ -53,8 +53,8 @@ import { OAuth2CallbackComponent } from './oauth2-callback/oauth2-callback.compo
             endpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
             responseType: NbOAuth2ResponseType.TOKEN,
             scope: 'https://www.googleapis.com/auth/userinfo.profile',
-            redirectUri: 'http://d5bnzen7zsmwo.cloudfront.net/auth/callback'
-            // redirectUri: 'http://localhost:4200/auth/callback',
+            redirectUri: 'http://d5bnzen7zsmwo.cloudfront.net/auth/callback',
+            //redirectUri: 'http://localhost:4200/auth/callback',
           },
         }),
       ],

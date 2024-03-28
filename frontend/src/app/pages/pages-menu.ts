@@ -44,6 +44,11 @@ export const MENU_ITEMS: NbMenuItem[] = [
     link: '/pages/settings',
   },
   {
+    title: 'Sync',
+    icon: 'sync-outline',
+    link: '/pages/sync',
+  },
+  {
     title: 'ChatBot',
     icon: 'message-circle-outline',
     link: '/pages/chatbot',

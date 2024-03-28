@@ -51,7 +51,8 @@ export class UploaderComponent  {
       this.uploadAll();
     }
 
-    this.dataAccess.getCollections().subscribe(res => {
+    this.dataAccess.getFolders(1, 500).subscribe(res => {
+      console.log(res.data);
       this.collections = res.data;
     });
   }

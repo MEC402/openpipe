@@ -1,0 +1,45 @@
+<p> <span class="emoji">🚨</span> The Sync can break the Luminary and change it content. <span class="emoji">🚨</span></p>
+
+
+<div *ngIf="currentSyncStatus==='ready'">
+  <p>  Sync is ready to run. </p>
+  <button nbButton status="danger" (click)="runSync(dialog)"> Run Sync </button>
+</div>
+
+<div *ngIf="currentSyncStatus==='running'">
+  <p>  Sync is running. Please wait. To see the progress you need to refresh the page. </p> <br>
+  <p> Last Run : {{lastRun}} </p> <br>
+  <p> Start Time: {{startTime}} </p> <br>
+  <p> Run Time: {{runTime}} </p> <br>
+  <nb-progress-bar [value]="progressPercentage" status="primary"> {{countActionsComplete}} of {{countActionsTotal}} </nb-progress-bar>
+</div>
+
+
+
+
+
+<ng-template #dialog let-data let-ref="dialogRef">
+  <nb-card>
+    <nb-card-body>
+      <div class="warning-container">
+        <div class="warning-header">WARNING: Sync Operation Initiated</div>
+        <div class="warning-text">You are about to run a synchronization operation.<br>
+          Please be aware that syncing changes the content of Luminary Museum App.<br>
+          This process updates or modifies the database and the app settings based on the openpipe content.</div>
+        <div class="warning-text">Proceed with Caution:
+          <ul>
+            <li><strong>Data Changes:</strong> Syncing can lead to significant changes in your content. Ensure you have reviewed what will be synced and are comfortable with these changes.</li>
+            <li><strong>Risk of Disruption:</strong> If the sync operation runs unsuccessfully, it can cause disruptions or even break certain functionalities. It's crucial to have backups or a recovery plan in place.</li>
+          </ul>
+        </div>
+        <div class="warning-text"><strong>Are you sure you want to proceed with the sync operation?</strong></div>
+        <div class="button-container">
+          <button class="button" (click)="confirmRun()">Yes</button>
+          <button class="button button-no" (click)="ref.close()" >No</button>
+        </div>
+      </div>
+    </nb-card-body>
+
+  </nb-card>
+</ng-template>
+

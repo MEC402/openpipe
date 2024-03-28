@@ -21,7 +21,7 @@ export class CollectionsComponent implements OnInit, OnDestroy {
   @ViewChild(NbPopoverDirective, { static: false }) popover: NbPopoverDirective;
 
   constructor(private dataAccess: DataAccessService, private router: Router) {
-    dataAccess.getFolders(1, 200).subscribe(res => {
+    dataAccess.getFolders(1, 500).subscribe(res => {
       console.log(res.data);
       this.collections = res.data;
     });

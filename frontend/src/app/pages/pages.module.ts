@@ -9,7 +9,7 @@ import {
     NbInputModule, NbLayoutModule,
     NbListModule,
     NbMenuModule,
-    NbPopoverModule,
+    NbPopoverModule, NbProgressBarModule,
     NbRadioModule,
     NbSelectModule, NbSidebarModule, NbSpinnerModule,
     NbStepperModule,
@@ -68,6 +68,7 @@ import { AssetTagCardComponent } from './asset/asset-tag-card/asset-tag-card.com
 import { TagViewerComponent } from './asset/asset-tag-card/tag-viewer/tag-viewer.component';
 import {MatTableModule} from "@angular/material/table";
 import {TextFieldModule} from "@angular/cdk/text-field";
+import { SyncComponent } from './sync/sync.component';
 
 
 @NgModule({
@@ -115,6 +116,7 @@ import {TextFieldModule} from "@angular/cdk/text-field";
         NbBadgeModule,
         MatTableModule,
         TextFieldModule,
+        NbProgressBarModule,
     ],
   entryComponents: [ButtonViewComponent, TopicDropDownComponent, CellDropDownComponent],
   declarations: [
@@ -152,6 +154,7 @@ import {TextFieldModule} from "@angular/cdk/text-field";
     FolderContentComponent,
     AssetTagCardComponent,
     TagViewerComponent,
+    SyncComponent,
   ],
 })
 export class PagesModule {

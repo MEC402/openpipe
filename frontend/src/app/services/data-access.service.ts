@@ -13,8 +13,8 @@ export class DataAccessService {
   domainURL;
   awsApiDomainName;
   constructor(private http: HttpClient) {
-    this.webServerURL = 'http://mec402.boisestate.edu/cgi-bin/';
-    this.domainURL = 'http://mec402.boisestate.edu/';
+    this.webServerURL = 'https://mec402.boisestate.edu/cgi-bin/';
+    this.domainURL = 'https://mec402.boisestate.edu/';
    // this.webServerURL = 'http://localhost/cgi-bin/';
     this.awsApiDomainName = 'https://lmod9t47la.execute-api.us-west-2.amazonaws.com/v1/';
   }
@@ -480,8 +480,21 @@ export class DataAccessService {
     });
     return this.http.post(URL, postBody);
   }
+
+  runSync() {
+    const url = this.webServerURL + 'sync/runsync.py';
+    return this.http.get(url);
+  }
+
+  getSyncStatus(): Observable<syncStat> {
+    const url = this.webServerURL + 'sync/syncstat.py';
+    return this.http.get<syncStat>(url);
+  }
 }
 
+class syncStat {
+  status;
+}
 
 class UserInfo {
   sub;

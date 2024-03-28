@@ -7,7 +7,7 @@
 </style>
 
 <nb-select placeholder="Select Folder" [(selected)]="chosenCollection">
-  <nb-option *ngFor="let c of collections" [value]="c">{{c.name[0]}}</nb-option>
+  <nb-option *ngFor="let c of collections" [value]="c">{{c.name}}</nb-option>
 </nb-select>
 
 <div class="container">

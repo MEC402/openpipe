@@ -16,6 +16,7 @@ import {AssetComponent} from './asset/asset.component';
 import {TopicsComponent} from './topics/topics.component';
 import {MoveAssetsComponent} from "./collections/move-assets/move-assets.component";
 import {FolderContentComponent} from "./collections/folder-content/folder-content.component";
+import {SyncComponent} from "./sync/sync.component";
 
 const routes: Routes = [{
   path: '',
@@ -48,6 +49,10 @@ const routes: Routes = [{
     {
       path: 'settings',
       component: SettingsComponent,
+    },
+    {
+      path: 'sync',
+      component: SyncComponent,
     },
     {
       path: 'layoutEditor',

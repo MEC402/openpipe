@@ -8,59 +8,108 @@ orm = ORM()
 tables = TO().getClasses()
 MetaTags = tables["metaTag"]
 
+def fixMissingDisplayDate():
+    stm = """select * from metaTag where metaDataId in ( select metaDataId from metaTag where tagname='openpipe_canonical_displaydate' and value='') order by metaDataId"""
 
-# stm = """select * from metaTag where metaDataId in(
-# select asset.metaDataId from asset) order by metaDataId;"""
-#
-# # join collectionMember on asset.id=assetId where collectionId=222
-#
-# tagResultSet = orm.executeSelect(stm)
-# tags = {}
-#
-# for t in tagResultSet["data"]:
-#     mid = t["metaDataId"][0]
-#     tagName = t["tagName"][0]
-#     value = t["value"][0] 
-#     tagId = t['id'][0]
-#     if mid not in tags:
-#         tags[mid] = {tagName: {"value": value, "id": tagId}}
-#     else:
-#         tags[mid][tagName] = {"value": value, "id": tagId}
-#
-# print("fetched data")
-# count = 0
-# updates = []
-# for tm in tags:
-#     t = tags[tm]
-#     if 'openpipe_canonical_source' in t and "openpipe_canonical_displayDate" in t:
-#         if t['openpipe_canonical_source']["value"] == "The Metropolitan Museum of Art":
-#             if str(t['openpipe_canonical_displayDate']["value"]).strip() == '':
-#                 updates.append({'id': t["openpipe_canonical_displayDate"]["id"],
-#                                 "value": t['objectDate']["value"]})
-#
-#         elif t['openpipe_canonical_source']["value"] == "Cleveland Museum of Art":
-#             if str(t['openpipe_canonical_displayDate']["value"]).strip() == '':
-#                 updates.append({'id': t["openpipe_canonical_displayDate"]["id"],
-#                                 "value": t["creation_date"]["value"]})
+    # join collectionMember on asset.id=assetId where collectionId=222
 
-#     if t["wall_description"]["value"] != "null":
-#         updates.append({'id': t["openpipe_canonical_biography"]["id"],
-#                         "value": t["wall_description"]["value"]})
-#     else:
-#         updates.append({'id': t["openpipe_canonical_biography"]["id"],
-#                         "value": ""})
-#
-# elif t['openpipe_canonical_source']["value"] == "Rijksmuseum Amsterdam":
-#     if t["plaqueDescriptionEnglish"]["value"] != "null":
-#         updates.append({'id': t["openpipe_canonical_biography"]["id"],
-#                         "value": t["plaqueDescriptionEnglish"]["value"]})
-#     else:
-#         updates.append({'id': t["openpipe_canonical_biography"]["id"], "value": ""})
+    tagResultSet = orm.executeSelect(stm)
+    tags = {}
 
-# print(len(tags))
-# print(len(updates))
-#
-# orm.bulkUpdate(updates, MetaTags, 1000)
+    for t in tagResultSet["data"]:
+        mid = t["metaDataId"][0]
+        tagName = t["tagName"][0]
+        value = t["value"][0]
+        tagId = t['id'][0]
+        if mid not in tags:
+            tags[mid] = {tagName: {"value": value, "id": tagId}}
+        else:
+            tags[mid][tagName] = {"value": value, "id": tagId}
+
+    print("fetched data")
+    count = 0
+    updates = []
+    for tm in tags:
+        t = tags[tm]
+        if 'openpipe_canonical_source' in t and "openpipe_canonical_displayDate" in t:
+            if t['openpipe_canonical_source']["value"] == "The Metropolitan Museum of Art":
+                if str(t['openpipe_canonical_displayDate']["value"]).strip() == '':
+                    if t['objectDate']["value"].strip() != "":
+                        updates.append({'id': t["openpipe_canonical_displayDate"]["id"],
+                                        "value": t['objectDate']["value"]})
+                    else:
+                        updates.append({'id': t["openpipe_canonical_displayDate"]["id"],
+                                        "value": t['objectBeginDate']["value"]})
+
+            elif t['openpipe_canonical_source']["value"] == "Cleveland Museum of Art":
+                if str(t['openpipe_canonical_displayDate']["value"]).strip() == '':
+                    updates.append({'id': t["openpipe_canonical_displayDate"]["id"],
+                                    "value": t["creation_date"]["value"]})
+
+            elif t['openpipe_canonical_source']["value"] == "Rijksmuseum Amsterdam":
+                if str(t['openpipe_canonical_displayDate']["value"]).strip() == '':
+                    updates.append({'id': t["openpipe_canonical_displayDate"]["id"],
+                                    "value": t["dating"]["value"].split(",")[0].split(":")[1]})
+
+            # elif t['openpipe_canonical_source']["value"] == "Rijksmuseum Amsterdam":
+            #     if t["plaqueDescriptionEnglish"]["value"] != "null":
+            #         updates.append({'id': t["openpipe_canonical_biography"]["id"],
+            #                     "value": t["plaqueDescriptionEnglish"]["value"]})
+            #     else:
+            #         updates.append({'id': t["openpipe_canonical_biography"]["id"], "value": ""})
+
+    print(len(tags))
+    print(len(updates))
+
+    orm.bulkUpdate(updates, MetaTags, 1000)
+
+
+def fixMissingClevelandWallDescriptions():
+    stm = """select * from metaTag where metaDataId in ( select metaDataId from metaTag where tagname='openpipe_canonical_source' and value='Cleveland Museum of Art') order by metaDataId;"""
+
+    # join collectionMember on asset.id=assetId where collectionId=222
+
+    tagResultSet = orm.executeSelect(stm)
+    tags = {}
+
+    for t in tagResultSet["data"]:
+        mid = t["metaDataId"][0]
+        tagName = t["tagName"][0]
+        value = t["value"][0]
+        tagId = t['id'][0]
+        if mid not in tags:
+            tags[mid] = {tagName: {"value": value, "id": tagId}}
+        else:
+            tags[mid][tagName] = {"value": value, "id": tagId}
+
+    print("fetched data")
+    count = 0
+    updates = []
+    count=0
+    for tm in tags:
+        t = tags[tm]
+        if "openpipe_canonical_biography" in t:
+            if str(t['wall_description']["value"]).strip() == "None" or str(t['wall_description']["value"]).strip() == "null":
+                updates.append({'id': t["openpipe_canonical_biography"]["id"], "value": ""})
+                count+=1
+            else:
+                updates.append({'id': t["openpipe_canonical_biography"]["id"],
+                                "value": t["wall_description"]["value"]})
+        else:
+            print(t)
+
+            # elif t['openpipe_canonical_source']["value"] == "Rijksmuseum Amsterdam":
+            #     if t["plaqueDescriptionEnglish"]["value"] != "null":
+            #         updates.append({'id': t["openpipe_canonical_biography"]["id"],
+            #                     "value": t["plaqueDescriptionEnglish"]["value"]})
+            #     else:
+            #         updates.append({'id': t["openpipe_canonical_biography"]["id"], "value": ""})
+
+    print(len(tags))
+    print(len(updates))
+    print(count)
+
+    orm.bulkUpdate(updates, MetaTags, 1000)
 
 def copyMetMediumFromSource():
     stm = """select q.id as sId,p.id as dId,q.metaDataId as sMid, p.metaDataId as dMid, q.tagName as sTagName,q.value as sValue , p.tagName as dTagName,p.value as dValue from (select * from metaTag where tagName="openpipe_canonical_medium" and value="medium" and  metaDataId in
@@ -210,9 +259,11 @@ FROM
     orm.session.commit()
     orm.session.close()
 
-copyMetMediumFromSource()
+# copyMetMediumFromSource()
 # copyClevelandArtistFromSource()
 # copyFullFromLarge()
 # findDimension()
+fixMissingDisplayDate()
+# fixMissingClevelandWallDescriptions()
 
 
