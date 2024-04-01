@@ -18,13 +18,14 @@
     <nb-tabset (changeTab)="onTabChange()">
       <nb-tab tabTitle="Tombstone">
 <!--        <ngx-tag-viewer [tags]="tombstoneTags" (onTagChange)="sendTheNewValue($event)"></ngx-tag-viewer>-->
-        <div class="row">
-          <div class="col-4" *ngFor="let tag of tombstoneTags;" >
+        <div  style="height: 480px; overflow-y: auto;">
+          <div class="col-8" *ngFor="let tag of tombstoneTags;" >
             <div class="row">
-              <div class="col-4">
-                <label [for]="tag.tagName" class="label">{{tag.tagName}}</label><br>
+              <div >
+                <label style="display: inline-block;" [for]="tag.tagName" class="label">{{tag.tagName}}
+              <button style="display: inline-block; margin: 0 0 0 0; padding: 3px;" nbButton size="tiny" status="success" shape="round" (click)="addNewElement(container,tag.originalTagName)">+</button>
+              </label>
               </div>
-              <button nbButton size="tiny" status="success" shape="round" (click)="addNewElement(container,tag.originalTagName)">+</button>
             </div>
             <div #container>
               <div  *ngFor="let element of tag.value;" >
@@ -36,13 +37,14 @@
       </nb-tab>
       <nb-tab tabTitle="Canonical Tags">
 <!--        <ngx-tag-viewer [tags]="canonicalTags" (onTagChange)="sendTheNewValue($event)"></ngx-tag-viewer>-->
-        <div class="row">
-          <div class="col-4" *ngFor="let tag of canonicalTags;" >
+        <!--div class="row"-->
+        <div  style="height: 480px; overflow-y: auto;">
+          <div class="col-8" *ngFor="let tag of canonicalTags;" >
             <div class="row">
-              <div class="col-4">
-                <label [for]="tag.tagName" class="label">{{tag.tagName}}</label><br>
+              <div >
+                <label [for]="tag.tagName" class="label">{{tag.tagName}}</label>
+              <button style="display: inline-block; padding: 2px;" nbButton size="tiny" status="success" shape="round" (click)="addNewElement(container,tag.originalTagName)">+</button>
               </div>
-              <button nbButton size="tiny" status="success" shape="round" (click)="addNewElement(container,tag.originalTagName)">+</button>
             </div>
             <div #container>
               <div  *ngFor="let element of tag.value;" >
@@ -54,13 +56,13 @@
       </nb-tab>
       <nb-tab tabTitle="Museum">
 <!--        <ngx-tag-viewer [tags]="museumTags" (onTagChange)="sendTheNewValue($event)"></ngx-tag-viewer>-->
-        <div class="row">
-          <div class="col-4" *ngFor="let tag of museumTags;" >
+        <div  style="height: 480px; overflow-y: auto;">
+          <div class="col-8" *ngFor="let tag of museumTags;" >
             <div class="row">
-              <div class="col-4">
-                <label [for]="tag.tagName" class="label">{{tag.tagName}}</label><br>
+              <div >
+                <label [for]="tag.tagName" class="label">{{tag.tagName}}</label>
               </div>
-              <button nbButton size="tiny" status="success" shape="round" (click)="addNewElement(container,tag.originalTagName)">+</button>
+              <button style="padding: 2px;" nbButton size="tiny" status="success" shape="round" (click)="addNewElement(container,tag.originalTagName)">+</button>
             </div>
             <div #container>
               <div  *ngFor="let element of tag.value;" >
